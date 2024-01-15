@@ -1,3 +1,3 @@
 export enum PotionType {
-    Luck = 'Luck'
+    LuckPotion = 'LuckPotion'
 }

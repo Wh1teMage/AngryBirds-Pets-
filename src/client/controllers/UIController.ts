@@ -19,15 +19,18 @@ import { RequestOperationStatus, TradeOperationStatus, TradeUpdateStatus } from 
 import { DynamicText, StrokeInfo } from "client/classes/DynamicText";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
-const mainGUI   = playerGui.WaitForChild('MainGui') as ScreenGui
+const mainGUI   = playerGui.WaitForChild('TestingStuff') as ScreenGui
 
+const test = mainGUI.WaitForChild('TextLabel') as TextLabel
 
-const menu = mainGUI.WaitForChild('Menu') as IMenu
+//const menu = mainGUI.WaitForChild('Menu') as IMenu
 /*
 const menuBtn   = mainGUI.WaitForChild('MenuBtn')   as IButton
 const shop      = mainGUI.WaitForChild('Shop')      as IShop
 const shopBtn   = mainGUI.WaitForChild('ShopBtn')   as IButton
 */
+
+/*
 const menuGuitest = 
     [
         {name: 'Menu', objComponent: 'Frame', children: [
@@ -45,6 +48,8 @@ const test =
     {name: 'SurfaceGui', objComponent: 'Surface'},
     {name: 'BillboardGui', objComponent: 'Billboard'},
 ]
+
+*/
 
 let ClearChildrenIgnoreFilter = (parent: Instance, filter: string[]) => {
     for (let v of parent.GetChildren()) {
@@ -71,6 +76,12 @@ export class UIController implements OnStart, OnInit {
         print('Waiting')
         if (!this._playerController.fullyLoaded) { this._playerController.loadSignal.Wait() }
         print('Loading GUI')
+
+
+        
+
+
+        /*
 
         let replicaData = this._playerController.replica.Data
         let menuPath = ComponentsInitializer.InitializeObject(menuGuitest, mainGUI);
