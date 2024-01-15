@@ -29,7 +29,7 @@ EggsData.set('Default', {
         { chance: 30, name: 'Cat'},
         { chance: 15, name: 'Cat'},
     ]),
-    model: Workspace.WaitForChild('TestEgg') as IEggModel
+    //model: Workspace.WaitForChild('TestEgg') as IEggModel
 })
 
 /*
