@@ -17,6 +17,7 @@ import { PetsData } from "shared/info/PetInfo";
 import { Events } from "client/network";
 import { RequestOperationStatus, TradeOperationStatus, TradeUpdateStatus } from "shared/interfaces/TradeData";
 import { DynamicText, StrokeInfo } from "client/classes/DynamicText";
+import { GUIUtilities } from "client/classes/GUIUtilities";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const mainGUI   = playerGui.WaitForChild('TestingStuff') as ScreenGui
@@ -78,7 +79,7 @@ export class UIController implements OnStart, OnInit {
         print('Loading GUI')
 
 
-        
+        //GUIUtilities.test(test, 1000)
 
 
         /*
