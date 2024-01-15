@@ -18,6 +18,7 @@ export interface ISessionData {
         wins: number
         stars: number
         rebirths: number
+        luck: number
     }
 
 }
@@ -33,5 +34,6 @@ export const SessionData: ISessionData = {
         wins: 1,
         stars: 1,
         rebirths: 1,
+        luck: 1,
     }
 }

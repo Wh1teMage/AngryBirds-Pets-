@@ -24,6 +24,8 @@ import { Trade } from "server/classes/TradeClass";
 import { Players } from "@rbxts/services";
 import { PetModelManager } from "server/classes/PetModelClass";
 import { PotionType } from "shared/enums/PotionEnum";
+import { PotionsData } from "shared/info/PotionInfo";
+import { PetsData } from "shared/info/PetInfo";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -39,6 +41,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     private _playerEggController = new PlayerEggController(this)
     private _playerValueController = new PlayerValueController(this)
     private _playerTradeController = new PlayerTradeController(this)
+    private _playerPotionController = new PlayerPotionController(this)
 
     public FindPet = (pet: IDBPetData) => this._playerPetController.FindPet(pet)
     public AppendPet = (pet: IDBPetData | undefined) => this._playerPetController.AppendPet(pet)
@@ -58,6 +61,11 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
     public SetupTrade = (trade: Trade) => this._playerTradeController.SetupTrade(trade)
     public UpdateTrade = (pet: IDBPetData, status: TradeUpdateStatus) => this._playerTradeController.UpdateTrade(pet, status)
+
+    public AppendPotion = (potion: PotionType) => this._playerPotionController.AppendPotion(potion)
+    public PopPotion = (potion: PotionType) => this._playerPotionController.PopPotion(potion)
+    public UsePotion = (potion: PotionType) => this._playerPotionController.UsePotion(potion)
+    public ApplyPotionEffect = (potion: PotionType, hasbuff: boolean, endtime: number) => this._playerPotionController.ApplyPotionEffect(potion, hasbuff, endtime)
 
     onStart() {
         this.initProfile()
@@ -81,6 +89,11 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
         }
 
         task.spawn(() => {
+            this.AppendPotion(PotionType.LuckPotion)
+            this.UsePotion(PotionType.LuckPotion)
+
+            print(this.profile)
+
             /*
             for (let i = 0; i<100; i++) {
                 
@@ -202,6 +215,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             task.spawn(() => {
                 while (task.wait(1)) {
 
+                    this.profile.Data.StatValues.IngameTime += 1
+                    
                     this.session.character!.Humanoid.WalkSpeed = 120
                     //this.replica.SetValue('Session.testvalue', math.random(0, 100))
                     //Events.ReplicateEffect.fire(this.instance, EffectName.ClickSound)
@@ -281,20 +296,80 @@ class PlayerPotionController {
     }
 
     public AppendPotion(potion: PotionType) {
+        let profileData = this.player.profile.Data
+        let potionIndex = -1
+        profileData.Potions.forEach((val, index) => { if (val.potion === potion) { potionIndex = index } })
 
+        if (potionIndex < 0) { 
+            profileData.Potions.push({potion: potion, amount: 1})
+            this.player.replica.SetValue('Profile.Potions', profileData.Potions)
+            return 
+        }
+
+        profileData.Potions[potionIndex] = { potion: potion, amount: profileData.Potions[potionIndex].amount+1 }
+        this.player.replica.SetValue('Profile.Potions', profileData.Potions)
     }
 
-    public RemovePotion(potion: PotionType) {
+    public PopPotion(potion: PotionType) {
+        let profileData = this.player.profile.Data
 
+        let potionIndex = -1
+        profileData.Potions.forEach((val, index) => { if (val.potion === potion) { potionIndex = index } })
+        if (potionIndex < 0) { return }
+        if (profileData.Potions[potionIndex].amount <= 0) { return }
+
+        let removedPotion = profileData.Potions[potionIndex]
+        profileData.Potions[potionIndex] = { potion: potion, amount: profileData.Potions[potionIndex].amount-1 }
+
+        this.player.replica.SetValue('Profile.Potions', profileData.Potions)
+        return removedPotion
     }
 
     public UsePotion(potion: PotionType) {
+        let profileData = this.player.profile.Data
+        let removedPotion = this.PopPotion(potion)
+        if (!removedPotion) { return }
 
-        this.ApplyPotionEffect(potion)
+        let potionInfo = PotionsData.get(removedPotion.potion)
+        if (!potionInfo) { return }
+
+        let buffIndex = -1
+        let hasBuff = false
+        let endTime = 0
+
+        profileData.ActiveBuffs.forEach((val, index) => { if (val.name === potionInfo!.buffname) { buffIndex = index } })
+        if (buffIndex >= 0) { 
+            profileData.ActiveBuffs[buffIndex].endTime += potionInfo!.duration; 
+            hasBuff = true; 
+            endTime = profileData.ActiveBuffs[buffIndex].endTime + potionInfo!.duration 
+        }
+        else { 
+            profileData.ActiveBuffs.push({ name: potionInfo!.buffname, endTime: profileData.StatValues.IngameTime + potionInfo!.duration, source: potion }); 
+            endTime = profileData.StatValues.IngameTime + potionInfo!.duration 
+        }
+        
+        this.player.replica.SetValue('Profile.ActiveBuffs', profileData.ActiveBuffs)
+
+        this.ApplyPotionEffect(potion, hasBuff, endTime)
     }
 
-    public ApplyPotionEffect(potion: PotionType) {
+    public ApplyPotionEffect(potion: PotionType, hasbuff: boolean, endtime: number) {
+        let profileData = this.player.profile.Data
 
+        let potionInfo = PotionsData.get(potion)
+        if (!potionInfo) { return }
+
+        task.delay(endtime - profileData.StatValues.IngameTime, () => {
+            let buffIndex = -1
+            profileData.ActiveBuffs.forEach((val, index) => { if (val.name === potionInfo!.buffname) { buffIndex = index } })
+            if (buffIndex >= 0) { return }
+
+            potionInfo!.disableEffect(this.player)
+        })
+
+        if (!hasbuff) { potionInfo!.enableEffect(this.player) }
+
+        this.player.replica.SetValues('Session.multipliers', this.player.session.multipliers)
     }
 
 }
@@ -504,6 +579,12 @@ class PlayerPetController {
         profileData.Pets.remove(petIndex)
         profileData.EquippedPets.push(pet)
 
+        let petData = PetsData.get(pet.name)
+
+        for (let multi of petData!.multipliers) {
+            profileData.Multipliers[multi[0] as keyof typeof profileData.Multipliers] += multi[1]
+        }
+
         PetModelManager.AddPet(this.player.instance, pet)
 
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
@@ -520,6 +601,12 @@ class PlayerPetController {
 
         profileData.EquippedPets.remove(equippedPetIndex)
         profileData.Pets.push(pet)
+
+        let petData = PetsData.get(pet.name)
+
+        for (let multi of petData!.multipliers) {
+            profileData.Multipliers[multi[0] as keyof typeof profileData.Multipliers] -= multi[1]
+        }
 
         PetModelManager.RemovePet(this.player.instance, pet)
 
