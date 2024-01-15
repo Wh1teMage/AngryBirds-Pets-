@@ -79,7 +79,8 @@ export class UIController implements OnStart, OnInit {
         print('Loading GUI')
 
 
-        GUIUtilities.InitializeGuiTimer(test, 1000)
+        GUIUtilities.InitializeGuiTimer(test, 10)
+        GUIUtilities.InitializeGuiWheel(test, 10, 5)
 
 
         /*
