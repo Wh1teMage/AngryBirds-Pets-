@@ -1,11 +1,10 @@
 export class GUIUtilities {
 
-    static test(inst: Instance, params: number) {
-
-    }
-
     static InitializeGuiWheel(obj: Frame, speed: number) {
-
+        while (true) {
+            obj.Rotation += speed
+            task.wait(1)
+        }
     }
 
     static InitializeGuiTimer(TimerObj: TextLabel, time: number) {
