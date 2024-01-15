@@ -5,10 +5,10 @@ export const PotionsData = new Map<PotionType, IPotionData>()
 
 PotionsData.set(PotionType.LuckPotion, {
     duration: 10,
-    enableEffect(player) {
+    enableEffect: (player) => {
 
     },
-    disableEffect(player) {
-        
+    disableEffect: (player) => {
+
     }
 })
