@@ -69,7 +69,7 @@ export abstract class AbilityClass {
 export const Abilities = new Map<string, (player?: Player) => AbilityClass>()
 
 export const AbilityDecorator = Modding.createDecorator<[string]>('Class', (descriptor, [name]) => {
-    Abilities.set(name, (player?: Player) => {return new (descriptor.constructor as Constructor)(player as never) as AbilityClass})
+    Abilities.set(name, (player?: Player) => {return new (descriptor.object as Constructor)(player as never) as AbilityClass})
 }) 
 
 export class AbilityFabric {

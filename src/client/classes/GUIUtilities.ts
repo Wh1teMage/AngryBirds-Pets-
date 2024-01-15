@@ -9,7 +9,7 @@ export class GUIUtilities {
     }
 
     static InitializeGuiTimer(TimerObj: TextLabel, time: number) {
-
+        print(time)
         let EndTime = os.time() + time
 
         function getTimeRemaining(){

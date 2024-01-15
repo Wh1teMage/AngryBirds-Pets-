@@ -79,7 +79,7 @@ export class UIController implements OnStart, OnInit {
         print('Loading GUI')
 
 
-        //GUIUtilities.test(test, 1000)
+        GUIUtilities.InitializeGuiTimer(test, 1000)
 
 
         /*
