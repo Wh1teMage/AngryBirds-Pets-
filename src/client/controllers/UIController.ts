@@ -54,6 +54,7 @@ let ClearChildrenIgnoreFilter = (parent: Instance, filter: string[]) => {
     }
 }
 
+
 //const testFrame = playerGui.WaitForChild('ScreenGui').WaitForChild('Frame') as Frame
 //const testBtn   = playerGui.WaitForChild('ScreenGui').WaitForChild('TextButton') as TextButton
 
@@ -176,7 +177,6 @@ export class UIController implements OnStart, OnInit {
 
                 port.Parent = textButton.instance
                 textButton.instance.Parent = scrollingFrame
-                
             }
 
             for (let v of val.Pets) {
