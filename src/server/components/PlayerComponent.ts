@@ -23,6 +23,7 @@ import { ITradingPlayer, TradeUpdateStatus } from "shared/interfaces/TradeData";
 import { Trade } from "server/classes/TradeClass";
 import { Players } from "@rbxts/services";
 import { PetModelManager } from "server/classes/PetModelClass";
+import { PotionType } from "shared/enums/PotionEnum";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -271,6 +272,33 @@ class PlayerValueController {
 
 }
 
+class PlayerPotionController {
+
+    private player: ServerPlayerComponent
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+
+    public AppendPotion(potion: PotionType) {
+
+    }
+
+    public RemovePotion(potion: PotionType) {
+
+    }
+
+    public UsePotion(potion: PotionType) {
+
+        this.ApplyPotionEffect(potion)
+    }
+
+    public ApplyPotionEffect(potion: PotionType) {
+
+    }
+
+}
+
 class PlayerTradeController {
     private player: ServerPlayerComponent
     private _operationsCallbacks = {
@@ -315,30 +343,7 @@ class PlayerTradeController {
 
         print(selectedTradeData)
     }
-    /*
-    public RecieveTrade(startedPlayer: Player) {
-        if (!ServerPlayerFabric.GetPlayer(startedPlayer)) { return }
 
-        let sessionData = this.player.session
-        let otherSessionData = ServerPlayerFabric.GetPlayer(startedPlayer)!.session
-        let trade = new TradeClass(startedPlayer, this.player.instance)
-
-        sessionData.tradeRequests = []
-        otherSessionData.tradeRequests = []
-        
-        sessionData.activeTrade = trade
-        otherSessionData.activeTrade = trade
-    }
-
-    public RequestTrade(requestedPlayer: Player) {
-        let sessionData = this.player.session
-        if (sessionData.activeTrade) { return }
-
-        sessionData.tradeRequests.push(requestedPlayer)
-
-        // trade event
-    }
-    */
     public UpdateTrade(pet: IDBPetData, status: TradeUpdateStatus) {
         print(pet, 'pet', this.player.session.activeTrade)
         let sessionData = this.player.session
@@ -375,20 +380,6 @@ class PlayerTradeController {
         data.tradePets.remove(petIndex)
     }
 
-    /*
-    public GetPlayersTrade(player: Player) {
-        for (let trade of ActiveTrades) {
-            if (trade.requiredPlayer.player === player || trade.requiredPlayer.player === player) { return trade }
-        }
-        return false
-    }
-
-    public UpdateTrade(player: Player, pet: IDBPetData, status: TradeOperationStatus) {
-        if (!TradeManager.GetPlayersTrade(player)) { return }
-
-
-    }
-    */
 }
 
 class PlayerEggController {
