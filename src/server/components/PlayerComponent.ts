@@ -27,6 +27,9 @@ import { PotionType } from "shared/enums/PotionEnum";
 import { PotionsData } from "shared/info/PotionInfo";
 import { PetsData } from "shared/info/PetInfo";
 import { WorldsData } from "shared/info/WorldInfo";
+import { ToolsData } from "shared/info/ToolInfo";
+import { ToolValueType } from "shared/interfaces/ToolData";
+import { WorldType } from "shared/enums/WorldEnums";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -56,6 +59,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public CheckSpaceForPets = (value: number) => this._playerPetController.CheckSpaceForPets(value)
 
     public SetWins = (value: number) => this._playerValueController.SetWins(value)
+    public SetStars = (value: number) => this._playerValueController.SetStars(value)
     public SetStrength = (value: number) => this._playerValueController.SetStrength(value)
 
     public BuyEgg = (name: string, buytype: BuyType) => this._playerEggController.BuyEgg(name, buytype)
@@ -70,6 +74,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public ApplyPotionEffect = (potion: PotionType) => this._playerPotionController.ApplyPotionEffect(potion)
 
     public SetPetMultipliers = () => this._playerMultiplersController.SetPetMultipliers()
+    public SetWorldMultipliers = () => this._playerMultiplersController.SetWorldMultipliers()
 
     onStart() {
         this.initProfile()
@@ -290,6 +295,11 @@ class PlayerValueController {
         this.player.replica.SetValue('Profile.Values.Wins', value)
     }
 
+    public SetStars(value: number) {
+        this.player.profile.Data.Values.Stars = value
+        this.player.replica.SetValue('Profile.Values.Stars', value)
+    }
+
 }
 
 class PlayerMultiplersController {
@@ -308,11 +318,24 @@ class PlayerMultiplersController {
             let petData = PetUtilities.DBToPetTransfer(value)
 
             for (let multi of petData!.multipliers) {
-                this.player.session.petmultipliers[multi[0] as keyof typeof this.player.session.petmultipliers] += multi[1]
+                this.player.session.petmultipliers[multi[0] as keyof typeof DefaultMultipliers] += multi[1]
             }
         })
 
         this.player.replica.SetValues('Session.petmultipliers', this.player.session.petmultipliers)
+
+    }
+
+    public SetWorldMultipliers() {
+
+        let sessionData = this.player.session
+        let selectedWorld = table.clone( WorldsData.get(sessionData.currentWorld)! ) 
+
+        for (let multi of selectedWorld!.multipliers) {
+            this.player.session.worldmultipliers[multi[0] as keyof typeof DefaultMultipliers] = multi[1]
+        }
+
+        this.player.replica.SetValues('Session.worldmultipliers', this.player.session.worldmultipliers)
 
     }
 
@@ -711,18 +734,78 @@ class PlayerWorldController {
         let sessionData = this.player.session
         let maxWorld = table.clone( WorldsData.get(profileData.Config.MaxWorld)! )  
 
-        let selectedWorld = sessionData.currentWorld
+        WorldsData.forEach((world, worldtype) => {
+            let parts = game.Workspace.GetPartBoundsInBox(world.hitbox.CFrame, world.hitbox.Size)
+            let foundRootPart = parts.find((value) => value === this.player.session.character!.PrimaryPart)
 
-        WorldsData.forEach((value) => {
-            //value.hitbox.
-            this.player.session.character!.PrimaryPart
+            if ( !foundRootPart ) { return }
+            if ( maxWorld.weight < world.weight ) { return }
+
+            sessionData.currentWorld = worldtype
         })
 
-        // check weights with maxworld and current world
+        this.player.SetWorldMultipliers()
     }
 
-    public UpdateMaxWorld() {
-        
+    public BuyMaxWorld(world: WorldType) {
+        let profileData = this.player.profile.Data
+        let worldInfo = table.clone( WorldsData.get(world)! )  
+
+        if (profileData.Values.Stars < worldInfo.price) {return}
+
+        this.player.SetStars(profileData.Values.Stars - worldInfo.price)
+        profileData.Config.MaxWorld = world
+        this.ChangeWorld()
+    }
+
+}
+
+class PlayerToolController {
+
+    private player: ServerPlayerComponent
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+
+    public AppendTool(toolname: string) {
+        if (!ToolsData.get(toolname)) { return }
+        if (this.player.profile.Data.OwnedTools.find((val) => val === toolname)) { return }
+        this.player.profile.Data.OwnedTools.push(toolname)
+    }
+
+    public EquipTool(toolname: string) {
+        if (!ToolsData.get(toolname)) { return }
+        if (!this.player.profile.Data.OwnedTools.find((val) => val === toolname)) { return }
+        this.player.profile.Data.EquippedTool = toolname
+    }
+
+    public BuyTool(toolname: string) {
+        if (!ToolsData.get(toolname)) { return }
+        if (this.player.profile.Data.OwnedTools.find((val) => val === toolname)) { return }
+
+        let profileData = this.player.profile.Data
+        let toolInfo = ToolsData.get(toolname)!
+
+        switch (toolInfo.valuetype) {
+            case ToolValueType.Strength:
+
+                if (profileData.Values.Strength < toolInfo.price) {return}
+
+                this.player.SetWins(profileData.Values.Strength - toolInfo.price)
+                this.AppendTool(toolname)
+
+                break
+            case ToolValueType.VBugs:
+
+                Events.ReplicateEffect.fire(this.player.instance, EffectName.ReplicatePurchase, new Map<string, number>([['productId', toolInfo.productid!]]))
+
+                // should rebuilt this egg system btw (esp with paid once)
+                break
+            default:
+            
+        }
+
     }
 
 }

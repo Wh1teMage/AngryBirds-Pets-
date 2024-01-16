@@ -40,6 +40,9 @@ export interface IProfileData {
 
     PetIndex: Array<string>
     
+    OwnedTools: Array<string>
+    EquippedTool: string
+
     CONSTANTS: {
         VERSION: number
         name: string,
