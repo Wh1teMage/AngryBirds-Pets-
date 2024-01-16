@@ -1,9 +1,11 @@
+import { IMultipliers } from "./SessionData"
+
 export interface IPetData {
 
     name: string
     model: Model
 
-    multipliers: Map<string, number>
+    multipliers: Map<keyof IMultipliers, number>
 
     stats: {
         rarity: Rarities

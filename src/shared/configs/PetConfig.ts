@@ -23,11 +23,11 @@ export const petUpgradeConfig = {
 export const petCallbacks = new Map<string, (info: IPetData) => void>()
 
 petCallbacks.set('void', (info: IPetData) => {
-    info.multipliers.set('coins', info.multipliers.get('coins')!*multipliersConfig.void)
+    info.multipliers.set('strength', info.multipliers.get('strength')!*multipliersConfig.void)
 })
 
 petCallbacks.set('size', (info: IPetData) => {
-    info.multipliers.set('coins', info.multipliers.get('coins')!*multipliersConfig.size[info.additional.size])
+    info.multipliers.set('strength', info.multipliers.get('strength')!*multipliersConfig.size[info.additional.size])
 })
 
 //try to make shared petservice ig ( i have no idea how to make it better and readable )

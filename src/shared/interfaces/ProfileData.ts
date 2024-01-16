@@ -30,13 +30,15 @@ export interface IProfileData {
         MaxWorld: WorldType
     }
 
-    ActiveBuffs: Array<{name: string, endTime: number, source: string}>
+    ActiveBuffs: Array<{name: string, endTime: number, startTime: number, source: string}>
     Potions: Array<{potion: PotionType, amount: number}>
 
     Abilities: Array<string>
     Pets: Array<IDBPetData>
     EquippedPets: Array<IDBPetData>
     Products: Array<string>
+
+    PetIndex: Array<string>
     
     CONSTANTS: {
         VERSION: number

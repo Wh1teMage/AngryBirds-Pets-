@@ -28,8 +28,8 @@ export const defaultValue: IProfileData = {
 
     Config: {
         Luck: 1,
-        MaxPets: 1000,
-        MaxEquippedPets: 500,
+        MaxPets: 100,
+        MaxEquippedPets: 3,
         MaxWorld: WorldType.Default
     },
 
@@ -40,6 +40,8 @@ export const defaultValue: IProfileData = {
     Abilities: [],
     Products: [],
     Pets: [],
+
+    PetIndex: [],
 
     CONSTANTS: {
         VERSION: VERSION,

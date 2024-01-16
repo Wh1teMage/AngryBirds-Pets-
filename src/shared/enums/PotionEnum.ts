@@ -1,3 +1,4 @@
 export enum PotionType {
-    LuckPotion = 'LuckPotion'
+    LuckPotion = 'LuckPotion',
+    StrengthPotion = 'StrengthPotion',
 }

@@ -7,9 +7,20 @@ PotionsData.set(PotionType.LuckPotion, {
     duration: 10,
     buffname: 'LuckPotionBuff',
     enableEffect: (player) => {
-        player.session.multipliers.luck += .1
+        player.session.potionmultipliers.luck += .1
     },
     disableEffect: (player) => {
-        player.session.multipliers.luck -= .1
+        player.session.potionmultipliers.luck -= .1
+    }
+})
+
+PotionsData.set(PotionType.StrengthPotion, {
+    duration: 10,
+    buffname: 'StrengthPotionBuff',
+    enableEffect: (player) => {
+        player.session.potionmultipliers.strength += 1.1
+    },
+    disableEffect: (player) => {
+        player.session.potionmultipliers.strength -= 1.1
     }
 })

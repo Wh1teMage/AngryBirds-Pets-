@@ -20,15 +20,15 @@ export class PetUtilities {
         let originalPet = PetsData.get(info.name)!
         let pet: IPetData = {
             name: originalPet.name,
-            stats: originalPet.stats,
-            additional: info.additional,
-            multipliers: originalPet.multipliers,
+            stats: table.clone( originalPet.stats ),
+            additional: table.clone( info.additional ),
+            multipliers: table.clone( originalPet.multipliers ),
             model: originalPet.model.Clone()
         }
 
         PetUtilities.modifyPetMultipliers(pet)
 
-        return pet
+        return table.clone(pet)
     }
 
     static PetToDBTransfer(info: IPetData) {

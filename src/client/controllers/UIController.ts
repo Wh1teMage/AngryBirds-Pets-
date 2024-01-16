@@ -20,18 +20,18 @@ import { DynamicText, StrokeInfo } from "client/classes/DynamicText";
 import { GUIUtilities } from "client/classes/GUIUtilities";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
-const mainGUI   = playerGui.WaitForChild('TestingStuff') as ScreenGui
+const mainGUI   = playerGui.WaitForChild('MainGui') as ScreenGui
 
-const test = mainGUI.WaitForChild('TextLabel') as TextLabel
-
-//const menu = mainGUI.WaitForChild('Menu') as IMenu
+//const testing = mainGUI.WaitForChild('TextLabel') as TextLabel
 /*
+const menu = mainGUI.WaitForChild('Menu') as IMenu
+
 const menuBtn   = mainGUI.WaitForChild('MenuBtn')   as IButton
 const shop      = mainGUI.WaitForChild('Shop')      as IShop
 const shopBtn   = mainGUI.WaitForChild('ShopBtn')   as IButton
 */
 
-/*
+
 const menuGuitest = 
     [
         {name: 'Menu', objComponent: 'Frame', children: [
@@ -50,7 +50,7 @@ const test =
     {name: 'BillboardGui', objComponent: 'Billboard'},
 ]
 
-*/
+
 
 let ClearChildrenIgnoreFilter = (parent: Instance, filter: string[]) => {
     for (let v of parent.GetChildren()) {
@@ -78,12 +78,8 @@ export class UIController implements OnStart, OnInit {
         if (!this._playerController.fullyLoaded) { this._playerController.loadSignal.Wait() }
         print('Loading GUI')
 
-
-        GUIUtilities.InitializeGuiTimer(test, 10)
-        GUIUtilities.InitializeGuiWheel(test, 10, 5)
-
-
-        /*
+        //GUIUtilities.InitializeGuiTimer(testing, 10)
+        //GUIUtilities.InitializeGuiWheel(testing, 10, 5)
 
         let replicaData = this._playerController.replica.Data
         let menuPath = ComponentsInitializer.InitializeObject(menuGuitest, mainGUI);
@@ -113,15 +109,17 @@ export class UIController implements OnStart, OnInit {
         menuPath.Menu.Funny.get<ButtonComponent>().BindToClick((arg) => {
             dynamicText.Start()
         })
-
+        
+        /*
         let testcomps = ComponentsInitializer.InitializeObject(test, Workspace.WaitForChild('testpart') as Part)
 
         let bind = new Binding<number>(0);
         let label = (testcomps.SurfaceGui.get<SurfaceComponent>().instance.WaitForChild('TextLabel')! as TextLabel)
-
+        
         bind.AddCallback((val) => {
             label.Text = tostring(val)
         })
+        */
 
         print(menuPath.Menu.SubMenu.get<FrameComponent>())
         //print(menuPath.Menu.SubMenu.get<FrameComponent>())

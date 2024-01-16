@@ -6,7 +6,7 @@ export const PetsData = new Map<string, IPetData>()
 PetsData.set('Cat', 
 {
     name: 'Cat',
-    multipliers: new Map([['coins', 1]]),
+    multipliers: new Map([['strength', 1]]),
     stats: {
         rarity: Rarities.Common,
         sizeOffset: new Vector3(0,0,0),
