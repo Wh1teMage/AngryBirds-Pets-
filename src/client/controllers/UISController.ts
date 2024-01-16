@@ -28,6 +28,7 @@ export class UISController implements OnStart, OnInit {
 
         ContextActionService.BindAction('Controls', (actionname: string, state: Enum.UserInputState, inputobj: InputObject) => {
             let formattedInput = tostring(inputobj.KeyCode)+tostring(state)
+            if (inputobj.UserInputType) { formattedInput = tostring(inputobj.UserInputType)+tostring(state) }
             
             if (!formattedControls.get(formattedInput)) { warn('Client Context Doesnt Exist!'); return }
             Contexts.get(formattedControls.get(formattedInput)!)!.callback()
