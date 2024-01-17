@@ -7,3 +7,7 @@ export interface IWorldData {
     weight: number // to detect max world
     price: number
 }
+
+export enum WorldOperationStatus {
+    Buy   = 'Buy'
+}

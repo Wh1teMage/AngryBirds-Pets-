@@ -3,20 +3,25 @@ import { EffectName } from "./enums/EffectEnums";
 import { BuyType } from "./interfaces/EggData";
 import { RequestOperationStatus, TradeOperationStatus, TradeUpdateStatus } from "./interfaces/TradeData";
 import { IDBPetData, PetOperationStatus } from "./interfaces/PetData";
+import { ToolOperationStatus } from "./interfaces/ToolData";
+import { WorldOperationStatus } from "./interfaces/WorldData";
+import { WorldType } from "./enums/WorldEnums";
 
 interface ClientToServerEvents {
     PurchasePrompt: (productid: number, giftid?: number) => void
     RegisterInput: (name: string, state: Enum.UserInputState) => void
     BuyEgg: (name: string, buytype: BuyType) => void
 
-    RequestTrade: (operation: RequestOperationStatus, otherPlayer: Player) => void
+    RequestTrade: (operation: RequestOperationStatus, otherplayer: Player) => void
     ManageTrade: (operation: TradeOperationStatus, status?: TradeUpdateStatus, pet?: IDBPetData) => void
     ManagePet: (operation: PetOperationStatus, pet: IDBPetData) => void
+    ManageTool: (operation: ToolOperationStatus, toolname: string) => void
+    ManageWorld: (operation: WorldOperationStatus, world: WorldType) => void
 }
 
 interface ServerToClientEvents {
     ReplicateEffect: (name: string, additional?: Map<string, any>) => void
-    SendTradeRequest: (requestingPlayer: Player) => void
+    SendTradeRequest: (requestingplayer: Player) => void
 }
 
 interface ClientToServerFunctions {}
