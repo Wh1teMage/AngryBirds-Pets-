@@ -8,6 +8,9 @@ import { RequestOperationStatus, TradeOperationStatus, TradeUpdateStatus } from 
 import { TradeRequest, TradeRequestManager } from "server/classes/TradeRequestClass";
 import { IDBPetData, PetOperationStatus } from "shared/interfaces/PetData";
 import { TradeManager } from "server/classes/TradeClass";
+import { ToolOperationStatus } from "shared/interfaces/ToolData";
+import { WorldOperationStatus } from "shared/interfaces/WorldData";
+import { WorldType } from "shared/enums/WorldEnums";
 
 @Service({})
 export class SignalService implements OnStart, OnInit {
@@ -71,6 +74,22 @@ export class SignalService implements OnStart, OnInit {
             if (operation === PetOperationStatus.Equip) { playerComp.EquipPet(pet) }
             if (operation === PetOperationStatus.Unequip) { playerComp.UnequipPet(pet) }
 
+        })
+
+        Events.ManageTool.connect((player: Player, operation: ToolOperationStatus, toolname: string) => {
+            let playerComp = ServerPlayerFabric.GetPlayer(player)
+            if (!playerComp) { return }
+
+            if (operation === ToolOperationStatus.Equip) { playerComp.EquipTool(toolname) }
+            if (operation === ToolOperationStatus.Buy) { playerComp.BuyTool(toolname) }
+
+        })
+
+        Events.ManageWorld.connect((player: Player, operation: WorldOperationStatus, world: WorldType) => {
+            let playerComp = ServerPlayerFabric.GetPlayer(player)
+            if (!playerComp) { return }
+
+            if (operation === WorldOperationStatus.Buy) { playerComp.EquipWorld(world) }
         })
 
     }
