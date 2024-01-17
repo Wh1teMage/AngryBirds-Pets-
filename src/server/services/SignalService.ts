@@ -89,7 +89,7 @@ export class SignalService implements OnStart, OnInit {
             let playerComp = ServerPlayerFabric.GetPlayer(player)
             if (!playerComp) { return }
 
-            if (operation === WorldOperationStatus.Buy) { playerComp.EquipWorld(world) }
+            if (operation === WorldOperationStatus.Buy) { playerComp.BuyMaxWorld(world) }
         })
 
     }
