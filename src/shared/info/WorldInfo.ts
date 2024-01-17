@@ -16,5 +16,5 @@ WorldsData.set(WorldType.Desert, {
     shop: [],
     multipliers: new Map([['strength', 1.5]]),
     weight: 2,
-    price: 1,
+    price: -1,
 })
