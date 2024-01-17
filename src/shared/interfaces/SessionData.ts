@@ -30,6 +30,7 @@ export interface IMultipliers {
     rebirths: number
     luck: number
     product: number
+    attackspeed: number
 }
 
 export const DefaultMultipliers: IMultipliers = {
@@ -38,7 +39,8 @@ export const DefaultMultipliers: IMultipliers = {
     stars: 1,
     rebirths: 1,
     luck: 1,
-    product: 1
+    product: 1,
+    attackspeed: 1,
 }
 
 export const SessionData: ISessionData = {

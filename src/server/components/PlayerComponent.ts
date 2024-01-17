@@ -47,6 +47,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     private _playerToolController = new PlayerToolController(this)
     private _playerValueController = new PlayerValueController(this)
     private _playerTradeController = new PlayerTradeController(this)
+    private _playerWorldController = new PlayerWorldController(this)
     private _playerPotionController = new PlayerPotionController(this)
     private _playerMultiplersController = new PlayerMultiplersController(this)
 
@@ -79,7 +80,11 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public SetWorldMultipliers = () => this._playerMultiplersController.SetWorldMultipliers()
     public CalculateMultiplier = (multiname: keyof IMultipliers) => this._playerMultiplersController.CalculateMultiplier(multiname)
 
+    public BuyTool = (toolname: string) => this._playerToolController.BuyTool(toolname)
+    public EquipTool = (toolname: string) => this._playerToolController.EquipTool(toolname)
     public ReplicateModel = () => this._playerToolController.ReplicateModel()
+
+    public BuyMaxWorld = (world: WorldType) => this._playerWorldController.BuyMaxWorld(world)
 
     onStart() {
         this.initProfile()
@@ -768,8 +773,9 @@ class PlayerWorldController {
     public BuyMaxWorld(world: WorldType) {
         let profileData = this.player.profile.Data
         let worldInfo = table.clone( WorldsData.get(world)! )  
-
-        if (profileData.Values.Stars < worldInfo.price) {return}
+        
+        if (worldInfo.weight < WorldsData.get(profileData.Config.MaxWorld)!.weight) { return }
+        if (profileData.Values.Stars < worldInfo.price) { return }
 
         this.player.SetStars(profileData.Values.Stars - worldInfo.price)
         profileData.Config.MaxWorld = world
