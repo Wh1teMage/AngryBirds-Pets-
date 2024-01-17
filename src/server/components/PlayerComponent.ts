@@ -7,7 +7,7 @@ import { LoadProfile } from "server/services/DataStoreService";
 import { IProfileData } from "shared/interfaces/ProfileData";
 import { Replica, ReplicaService } from "@rbxts/replicaservice";
 import { PlayerDataReplica } from "shared/interfaces/PlayerData";
-import { DefaultMultipliers, ICharacter, ISessionData, SessionData } from "shared/interfaces/SessionData";
+import { DefaultMultipliers, ICharacter, IMultipliers, ISessionData, SessionData } from "shared/interfaces/SessionData";
 import { Events } from "server/network";
 import { EffectName } from "shared/enums/EffectEnums";
 import { CharacterFabric } from "./CharacterComponent";
@@ -27,6 +27,10 @@ import { PotionType } from "shared/enums/PotionEnum";
 import { PotionsData } from "shared/info/PotionInfo";
 import { PetsData } from "shared/info/PetInfo";
 import { WorldsData } from "shared/info/WorldInfo";
+import { ToolsData } from "shared/info/ToolInfo";
+import { IToolData, ToolValueType } from "shared/interfaces/ToolData";
+import { WorldType } from "shared/enums/WorldEnums";
+import { CreationUtilities } from "shared/utility/CreationUtilities";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -40,6 +44,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     //private _character!: ICharacter
     private _playerPetController = new PlayerPetController(this)
     private _playerEggController = new PlayerEggController(this)
+    private _playerToolController = new PlayerToolController(this)
     private _playerValueController = new PlayerValueController(this)
     private _playerTradeController = new PlayerTradeController(this)
     private _playerPotionController = new PlayerPotionController(this)
@@ -56,6 +61,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public CheckSpaceForPets = (value: number) => this._playerPetController.CheckSpaceForPets(value)
 
     public SetWins = (value: number) => this._playerValueController.SetWins(value)
+    public SetStars = (value: number) => this._playerValueController.SetStars(value)
     public SetStrength = (value: number) => this._playerValueController.SetStrength(value)
 
     public BuyEgg = (name: string, buytype: BuyType) => this._playerEggController.BuyEgg(name, buytype)
@@ -70,6 +76,10 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public ApplyPotionEffect = (potion: PotionType) => this._playerPotionController.ApplyPotionEffect(potion)
 
     public SetPetMultipliers = () => this._playerMultiplersController.SetPetMultipliers()
+    public SetWorldMultipliers = () => this._playerMultiplersController.SetWorldMultipliers()
+    public CalculateMultiplier = (multiname: keyof IMultipliers) => this._playerMultiplersController.CalculateMultiplier(multiname)
+
+    public ReplicateModel = () => this._playerToolController.ReplicateModel()
 
     onStart() {
         this.initProfile()
@@ -77,12 +87,14 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
         
         this.instance.CharacterAppearanceLoaded.Connect((character) => {
             CharacterFabric.CreateCharacter(character, this) 
+            this.ReplicateModel()
             //this._character = character as ICharacter
             //this.session.character = character as ICharacter
         })
 
         if (this.instance.Character) { 
             CharacterFabric.CreateCharacter(this.instance.Character, this); 
+            this.ReplicateModel()
             //this._character = this.instance.Character as ICharacter 
             //this.session.character = this.instance.Character as ICharacter
         }
@@ -221,7 +233,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                 while (task.wait(1)) {
 
                     this.profile.Data.StatValues.IngameTime += 1
-                    print(this.session.petmultipliers.strength)
+                    print(this.session.multipliers.pet.strength)
                     this.session.character!.Humanoid.WalkSpeed = 120
                     //this.replica.SetValue('Session.testvalue', math.random(0, 100))
                     //Events.ReplicateEffect.fire(this.instance, EffectName.ClickSound)
@@ -290,6 +302,11 @@ class PlayerValueController {
         this.player.replica.SetValue('Profile.Values.Wins', value)
     }
 
+    public SetStars(value: number) {
+        this.player.profile.Data.Values.Stars = value
+        this.player.replica.SetValue('Profile.Values.Stars', value)
+    }
+
 }
 
 class PlayerMultiplersController {
@@ -300,19 +317,43 @@ class PlayerMultiplersController {
         this.player = player
     }
 
+    public CalculateMultiplier(multiname: string) {
+        let sessionData = this.player.session
+        let overallMultiplier = 1
+
+        Functions.iterateObject(sessionData.multipliers, (index, value: IMultipliers) => {
+            overallMultiplier *= value[multiname as keyof IMultipliers] || 1
+        })
+
+        return overallMultiplier
+    }
+
     public SetPetMultipliers() {
 
-        this.player.session.petmultipliers = table.clone( DefaultMultipliers ) 
+        this.player.session.multipliers.pet = table.clone( DefaultMultipliers ) 
 
         this.player.profile.Data.EquippedPets.forEach((value) => {
             let petData = PetUtilities.DBToPetTransfer(value)
 
             for (let multi of petData!.multipliers) {
-                this.player.session.petmultipliers[multi[0] as keyof typeof this.player.session.petmultipliers] += multi[1]
+                this.player.session.multipliers.pet[multi[0] as keyof typeof DefaultMultipliers] += multi[1]
             }
         })
 
-        this.player.replica.SetValues('Session.petmultipliers', this.player.session.petmultipliers)
+        this.player.replica.SetValues('Session.multipliers.pet', this.player.session.multipliers.pet)
+
+    }
+
+    public SetWorldMultipliers() {
+
+        let sessionData = this.player.session
+        let selectedWorld = table.clone( WorldsData.get(sessionData.currentWorld)! ) 
+
+        for (let multi of selectedWorld!.multipliers) {
+            this.player.session.multipliers.world[multi[0] as keyof typeof DefaultMultipliers] = multi[1]
+        }
+
+        this.player.replica.SetValues('Session.multipliers.world', this.player.session.multipliers.world)
 
     }
 
@@ -412,7 +453,7 @@ class PlayerPotionController {
 
         if ((activeBuff.endTime - activeBuff.startTime) <= potionInfo.duration-2) { potionInfo!.enableEffect(this.player) }
 
-        this.player.replica.SetValues('Session.potionmultipliers', this.player.session.potionmultipliers)
+        this.player.replica.SetValues('Session.multipliers.potion', this.player.session.multipliers.potion)
     }
 
 }
@@ -711,18 +752,120 @@ class PlayerWorldController {
         let sessionData = this.player.session
         let maxWorld = table.clone( WorldsData.get(profileData.Config.MaxWorld)! )  
 
-        let selectedWorld = sessionData.currentWorld
+        WorldsData.forEach((world, worldtype) => {
+            let parts = game.Workspace.GetPartBoundsInBox(world.hitbox.CFrame, world.hitbox.Size)
+            let foundRootPart = parts.find((value) => value === this.player.session.character!.PrimaryPart)
 
-        WorldsData.forEach((value) => {
-            //value.hitbox.
-            this.player.session.character!.PrimaryPart
+            if ( !foundRootPart ) { return }
+            if ( maxWorld.weight < world.weight ) { return }
+
+            sessionData.currentWorld = worldtype
         })
 
-        // check weights with maxworld and current world
+        this.player.SetWorldMultipliers()
     }
 
-    public UpdateMaxWorld() {
+    public BuyMaxWorld(world: WorldType) {
+        let profileData = this.player.profile.Data
+        let worldInfo = table.clone( WorldsData.get(world)! )  
+
+        if (profileData.Values.Stars < worldInfo.price) {return}
+
+        this.player.SetStars(profileData.Values.Stars - worldInfo.price)
+        profileData.Config.MaxWorld = world
+        this.ChangeWorld()
+    }
+
+}
+
+class PlayerToolController {
+
+    private player: ServerPlayerComponent
+    private lastUsed: number = tick()
+    private using: boolean = false
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+
+    private canUse(toolinfo: IToolData) {
+        if ((this.lastUsed + toolinfo.firerate*(1/1)) > tick()) { return }
+        if (this.using) { return }
+        return true
+    }
+
+    public AppendTool(toolname: string) {
+        if (!ToolsData.get(toolname)) { return }
+        if (this.player.profile.Data.OwnedTools.find((val) => val === toolname)) { return }
+        this.player.profile.Data.OwnedTools.push(toolname)
+    }
+
+    public EquipTool(toolname: string) {
+        if (!ToolsData.get(toolname)) { return }
+        if (!this.player.profile.Data.OwnedTools.find((val) => val === toolname)) { return }
+        this.player.profile.Data.EquippedTool = toolname
+    }
+
+    public BuyTool(toolname: string) {
+        if (!ToolsData.get(toolname)) { return }
+        if (this.player.profile.Data.OwnedTools.find((val) => val === toolname)) { return }
+
+        let profileData = this.player.profile.Data
+        let toolInfo = ToolsData.get(toolname)!
+
+        switch (toolInfo.valuetype) {
+            case ToolValueType.Strength:
+
+                if (profileData.Values.Strength < toolInfo.price) {return}
+
+                this.player.SetWins(profileData.Values.Strength - toolInfo.price)
+                this.AppendTool(toolname)
+
+                break
+            case ToolValueType.VBugs:
+
+                Events.ReplicateEffect.fire(this.player.instance, EffectName.ReplicatePurchase, new Map<string, number>([['productId', toolInfo.productid!]]))
+
+                break
+            default:
+            
+        }
+
+    }
+
+    public UseTool() {
+        let profileData = this.player.profile.Data
+        let toolInfo = ToolsData.get(profileData.EquippedTool)!
+
+        if (!this.canUse(toolInfo)) { return }
+
+        this.using = true
+
+        this.player.SetStrength(profileData.Values.Strength + toolInfo.addition * this.player.CalculateMultiplier('strength'))
+
+        this.lastUsed = tick()
+        this.using = false
+
+        Events.ReplicateEffect.fire(this.player.instance, toolInfo.effectname)
+    }
+
+    public ReplicateModel() {
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+        let toolInfo = ToolsData.get(profileData.EquippedTool)!
+
+        if (sessionData.character?.FindFirstChild('ToolModel')) {
+            sessionData.character?.FindFirstChild('ToolModel')?.Destroy()
+        }
         
+        let clonnedModel = toolInfo.model.Clone()
+        clonnedModel.Name = 'ToolModel'
+        clonnedModel.PrimaryPart!.Anchored = false
+
+        clonnedModel.Parent = sessionData.character!
+        clonnedModel.PivotTo((sessionData.character!.FindFirstChild('RightHand') as Part).CFrame.mul(toolInfo.rotationOffset))
+
+        CreationUtilities.Weld(clonnedModel.PrimaryPart!, sessionData.character!.FindFirstChild('RightHand') as Part)
     }
 
 }

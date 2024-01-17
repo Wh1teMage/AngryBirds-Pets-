@@ -5,4 +5,5 @@ export interface IWorldData {
     shop: Array<string>
     multipliers: Map<keyof IMultipliers, number>
     weight: number // to detect max world
+    price: number
 }

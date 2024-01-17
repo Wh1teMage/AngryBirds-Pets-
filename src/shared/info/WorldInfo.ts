@@ -8,4 +8,5 @@ WorldsData.set(WorldType.Default, {
     shop: [],
     multipliers: new Map([['strength', 1]]),
     weight: 1,
+    price: 1,
 })

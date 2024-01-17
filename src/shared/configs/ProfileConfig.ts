@@ -43,6 +43,9 @@ export const defaultValue: IProfileData = {
 
     PetIndex: [],
 
+    OwnedTools: ['Default'],
+    EquippedTool: 'Default',
+
     CONSTANTS: {
         VERSION: VERSION,
         name: 'Default',
