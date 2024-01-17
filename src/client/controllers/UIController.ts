@@ -19,6 +19,8 @@ import { RequestOperationStatus, TradeOperationStatus, TradeUpdateStatus } from 
 import { DynamicText, StrokeInfo } from "client/classes/DynamicText";
 import { GUIUtilities } from "client/classes/GUIUtilities";
 import { ToolOperationStatus } from "shared/interfaces/ToolData";
+import { WorldOperationStatus } from "shared/interfaces/WorldData";
+import { WorldType } from "shared/enums/WorldEnums";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const mainGUI   = playerGui.WaitForChild('MainGui') as ScreenGui
@@ -111,10 +113,14 @@ export class UIController implements OnStart, OnInit {
             dynamicText.Start()
         })
         
+        // menuPath.ShopBtn.get<ButtonComponent>().BindToClick((arg) => {
+        //     Events.ManageTool(ToolOperationStatus.Buy, 'Default3')
+        //     task.wait(2)
+        //     Events.ManageTool(ToolOperationStatus.Equip, 'Default3')
+        // })
+
         menuPath.ShopBtn.get<ButtonComponent>().BindToClick((arg) => {
-            Events.ManageTool(ToolOperationStatus.Buy, 'Default3')
-            task.wait(2)
-            Events.ManageTool(ToolOperationStatus.Equip, 'Default3')
+            Events.ManageWorld(WorldOperationStatus.Buy, WorldType.Desert)
         })
 
         /*
