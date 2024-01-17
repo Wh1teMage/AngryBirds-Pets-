@@ -26,9 +26,12 @@ export const LoadProfile = (player: Player) => {
         player.Kick("Profile wasnt found! Please rejoin");
         return
     }
-    
+    print('Loaded', profile.Data)
     profile.Data = Functions.constuctData(profile.Data, defaultValue) as IProfileData
     profile.Data.CONSTANTS = defaultValue.CONSTANTS
+
+    print('Formatted', profile.Data)
+    print('Current Tool', profile.Data.EquippedTool)
 
     profile.AddUserId(player.UserId);
     profile.ListenToRelease(()=>{
