@@ -804,12 +804,18 @@ class PlayerToolController {
         if (!ToolsData.get(toolname)) { return }
         if (this.player.profile.Data.OwnedTools.find((val) => val === toolname)) { return }
         this.player.profile.Data.OwnedTools.push(toolname)
+
+        this.player.replica.SetValue('Profile.OwnedTools', this.player.profile.Data.OwnedTools)
     }
 
     public EquipTool(toolname: string) {
         if (!ToolsData.get(toolname)) { return }
         if (!this.player.profile.Data.OwnedTools.find((val) => val === toolname)) { return }
         this.player.profile.Data.EquippedTool = toolname
+
+        this.player.replica.SetValue('Profile.EquippedTool', this.player.profile.Data.EquippedTool)
+
+        this.ReplicateModel()
     }
 
     public BuyTool(toolname: string) {
