@@ -12,9 +12,15 @@ export interface ISessionData {
     currentWorld: WorldType
     sessionTime: number
 
-    potionmultipliers: IMultipliers
-    petmultipliers: IMultipliers
-    worldmultipliers: IMultipliers
+    multipliers: {
+        pet: IMultipliers
+        world: IMultipliers
+        potion: IMultipliers
+    }
+
+    //potionmultipliers: IMultipliers
+    //petmultipliers: IMultipliers
+    //worldmultipliers: IMultipliers
 }
 
 export interface IMultipliers {
@@ -41,7 +47,13 @@ export const SessionData: ISessionData = {
     currentWorld: WorldType.Default,
     sessionTime: 0,
 
-    potionmultipliers: table.clone(DefaultMultipliers),
-    petmultipliers: table.clone(DefaultMultipliers),
-    worldmultipliers: table.clone(DefaultMultipliers),
+    multipliers: {
+        pet: table.clone(DefaultMultipliers),
+        world: table.clone(DefaultMultipliers),
+        potion: table.clone(DefaultMultipliers),
+    }
+
+    //potionmultipliers: table.clone(DefaultMultipliers),
+    //petmultipliers: table.clone(DefaultMultipliers),
+    //worldmultipliers: table.clone(DefaultMultipliers),
 }

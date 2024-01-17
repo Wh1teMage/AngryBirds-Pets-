@@ -4,6 +4,8 @@ export const ToolsData = new Map<string, IToolData>()
 
 ToolsData.set('Default', {
     model: game.Workspace.WaitForChild('Enot') as Model,
+    sizeOffset: new Vector3(0,0,0),
+    rotationOffset: new CFrame(0,0,0),
 
     name: 'Default',
     addition: 1,
@@ -16,6 +18,8 @@ ToolsData.set('Default', {
 
 ToolsData.set('Default2', {
     model: game.Workspace.WaitForChild('Enot') as Model,
+    sizeOffset: new Vector3(0,0,0),
+    rotationOffset: new CFrame(0,0,0),
 
     name: 'Default2',
     addition: 1,

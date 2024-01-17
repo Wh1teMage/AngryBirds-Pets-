@@ -6,6 +6,8 @@ export enum ToolValueType {
 
 export interface IToolData {
     model: Model
+    sizeOffset: Vector3
+    rotationOffset: CFrame
 
     name: string
     addition: number

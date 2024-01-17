@@ -15,7 +15,7 @@ interface ClientToServerEvents {
 }
 
 interface ServerToClientEvents {
-    ReplicateEffect: (name: EffectName, additional?: Map<string, any>) => void
+    ReplicateEffect: (name: string, additional?: Map<string, any>) => void
     SendTradeRequest: (requestingPlayer: Player) => void
 }
 
