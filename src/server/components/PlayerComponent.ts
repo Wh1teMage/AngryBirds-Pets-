@@ -1,4 +1,3 @@
-
 import { Dependency, OnStart } from "@flamework/core";
 import { Component, BaseComponent, Components } from "@flamework/components";
 import { Profile, ProfileMetaData } from "@rbxts/profileservice/globals";
@@ -85,6 +84,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public ReplicateModel = () => this._playerToolController.ReplicateModel()
 
     public BuyMaxWorld = (world: WorldType) => this._playerWorldController.BuyMaxWorld(world)
+    public ChangeWorld = () => this._playerWorldController.ChangeWorld()
 
     onStart() {
         this.initProfile()
@@ -239,7 +239,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
                     this.profile.Data.StatValues.IngameTime += 1
                     print(this.session.multipliers.pet.strength)
-                    this.session.character!.Humanoid.WalkSpeed = 120
+                    this.session.character!.Humanoid.WalkSpeed += 120
+                    this.ChangeWorld()
                     //this.replica.SetValue('Session.testvalue', math.random(0, 100))
                     //Events.ReplicateEffect.fire(this.instance, EffectName.ClickSound)
                 }

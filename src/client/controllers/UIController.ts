@@ -21,6 +21,7 @@ import { GUIUtilities } from "client/classes/GUIUtilities";
 import { ToolOperationStatus } from "shared/interfaces/ToolData";
 import { WorldOperationStatus } from "shared/interfaces/WorldData";
 import { WorldType } from "shared/enums/WorldEnums";
+import { WorldsData } from "shared/info/WorldInfo";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const mainGUI   = playerGui.WaitForChild('MainGui') as ScreenGui
@@ -250,6 +251,10 @@ export class UIController implements OnStart, OnInit {
             replicaData.Profile.Pets.forEach((value, key) => format.Pets.push(value))
             print(format)
             petDisplayBind.set(format)
+        })
+
+        this._playerController.replica.ListenToChange('Session.currentWorld', (newValue) => {
+            print(WorldsData.get(newValue)!.shop)
         })
 
         petDisplayBind.set({Pets: replicaData.Profile.Pets, EquippedPets: replicaData.Profile.EquippedPets})
