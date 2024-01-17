@@ -10,3 +10,11 @@ WorldsData.set(WorldType.Default, {
     weight: 1,
     price: 1,
 })
+
+WorldsData.set(WorldType.Desert, {
+    hitbox: game.Workspace.WaitForChild('TestPart') as Part,
+    shop: [],
+    multipliers: new Map([['strength', 1.5]]),
+    weight: 2,
+    price: 1,
+})
