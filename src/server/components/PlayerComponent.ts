@@ -20,7 +20,7 @@ import { BuyTypeConfig } from "shared/configs/EggConfig";
 import { EggsData } from "shared/info/EggInfo";
 import { ITradingPlayer, TradeUpdateStatus } from "shared/interfaces/TradeData";
 import { Trade } from "server/classes/TradeClass";
-import { Players } from "@rbxts/services";
+import { Players, HttpService } from "@rbxts/services";
 import { PetModelManager } from "server/classes/PetModelClass";
 import { PotionType } from "shared/enums/PotionEnum";
 import { PotionsData } from "shared/info/PotionInfo";
@@ -1038,4 +1038,41 @@ class PlayerRewardController {
 
     }
 
+}
+
+interface FollowResponse{
+    isFollowing: boolean,
+    isFollowed: boolean,
+    userId: number
+}
+
+class PlayerHttpsController{
+    private player: ServerPlayerComponent
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+
+    public CheckIsFriend(id: number){
+        return this.player.instance.IsFriendsWith(id)
+    }
+
+    public CheckFolowingPlayers(ids:number[]){
+        let res = HttpService.RequestAsync(
+            {
+                Url: `https://friends.roproxy.com/v1/user/following-exists`,
+                Method: "POST",
+                Body: tostring({
+                    "targetUserIds": [
+                      1080987986, 295934777
+                    ]
+                })
+        })
+        let decoded = HttpService.JSONDecode(res.Body) as FollowResponse[]
+        let result = true
+        decoded.forEach(element => {
+            result = result && element.isFollowing
+        });
+        return result
+    }
 }
