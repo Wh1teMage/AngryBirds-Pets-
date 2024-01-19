@@ -14,7 +14,11 @@ export const defaultValue: IProfileData = {
     },
 
     StatValues: {
-        DayAmount: 1,
+        FirstJoin: os.time(),
+        LastJoined: os.time(),
+        LastDayTime: 0, // os.time()
+
+        DayAmount: 0,
         IngameTime: 0,
         RobuxSpent: 0,
     },
@@ -24,12 +28,14 @@ export const defaultValue: IProfileData = {
         Wins: 1,
         Stars: 1,
         Rebirths: 1,
+        VoidMachine: 1,
     },
 
     Config: {
         Luck: 1,
         MaxPets: 100,
         MaxEquippedPets: 3,
+        MaxPetsInVoidMachine: 5,
         MaxWorld: WorldType.Default
     },
 
@@ -45,6 +51,9 @@ export const defaultValue: IProfileData = {
 
     OwnedTools: ['Default'],
     EquippedTool: 'Default',
+
+    VoidMachine: [],
+    RedeemedCodes: [],
 
     CONSTANTS: {
         VERSION: VERSION,

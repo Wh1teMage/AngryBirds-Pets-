@@ -1,4 +1,4 @@
-import { IDBPetData, IPetData, Sizes } from "shared/interfaces/PetData"
+import { Evolutions, IDBPetData, IPetData, Sizes } from "shared/interfaces/PetData"
 import Functions from "./LuaUtilFunctions"
 import { petCallbacks } from "shared/configs/PetConfig"
 import { PetsData } from "shared/info/PetInfo"
@@ -44,7 +44,8 @@ export class PetUtilities {
         let pet: IDBPetData = {
             name: name,
             additional: {
-                size: Sizes.Normal
+                size: Sizes.Normal,
+                evolution: Evolutions.Normal
             }
         }
 

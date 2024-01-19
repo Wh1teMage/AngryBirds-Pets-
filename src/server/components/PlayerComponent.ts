@@ -10,7 +10,7 @@ import { DefaultMultipliers, ICharacter, IMultipliers, ISessionData, SessionData
 import { Events } from "server/network";
 import { EffectName } from "shared/enums/EffectEnums";
 import { CharacterFabric } from "./CharacterComponent";
-import { IDBPetData, Sizes } from "shared/interfaces/PetData";
+import { Evolutions, IDBPetData, Sizes } from "shared/interfaces/PetData";
 import { PetUtilities } from "shared/utility/PetUtilities";
 import { petUpgradeConfig } from "shared/configs/PetConfig";
 import Functions from "shared/utility/LuaUtilFunctions";
@@ -30,6 +30,8 @@ import { ToolsData } from "shared/info/ToolInfo";
 import { IToolData, ToolValueType } from "shared/interfaces/ToolData";
 import { WorldType } from "shared/enums/WorldEnums";
 import { CreationUtilities } from "shared/utility/CreationUtilities";
+import { CodesRewardsData, DailyRewardsData, SelectDailyReward, SelectSessionReward } from "shared/info/RewardInfo";
+import { IRewardData } from "shared/interfaces/RewardData";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -57,7 +59,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public EquipPet = (pet: IDBPetData) => this._playerPetController.EquipPet(pet)
     public UnequipPet = (pet: IDBPetData) => this._playerPetController.UnequipPet(pet)
 
-    public EvolvePetSize = (pet: IDBPetData) => this._playerPetController.EvolvePetSize(pet)
+    public UpgradePetSize = (pet: IDBPetData) => this._playerPetController.UpgradePetSize(pet)
     public CheckSpaceForPets = (value: number) => this._playerPetController.CheckSpaceForPets(value)
 
     public SetWins = (value: number) => this._playerValueController.SetWins(value)
@@ -70,7 +72,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public SetupTrade = (trade: Trade) => this._playerTradeController.SetupTrade(trade)
     public UpdateTrade = (pet: IDBPetData, status: TradeUpdateStatus) => this._playerTradeController.UpdateTrade(pet, status)
 
-    public AppendPotion = (potion: PotionType) => this._playerPotionController.AppendPotion(potion)
+    public AppendPotion = (potion: PotionType, amout?: number) => this._playerPotionController.AppendPotion(potion, amout)
     public PopPotion = (potion: PotionType) => this._playerPotionController.PopPotion(potion)
     public UsePotion = (potion: PotionType) => this._playerPotionController.UsePotion(potion)
     public ApplyPotionEffect = (potion: PotionType) => this._playerPotionController.ApplyPotionEffect(potion)
@@ -123,7 +125,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                         name: 'Cat',
                         additional: {
                             size: Sizes.Normal,
-                            void: true,
+                            evolution: Evolutions.Void
                         }
                     }
                 )
@@ -133,7 +135,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                         name: 'Cat',
                         additional: {
                             size: Sizes.Normal,
-                            void: true,
+                            evolution: Evolutions.Void
                         }
                     }
                 )
@@ -238,6 +240,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                 while (task.wait(1)) {
 
                     this.profile.Data.StatValues.IngameTime += 1
+                    this.session.sessionTime += 1
                     print(this.session.multipliers.pet.strength)
                     this.session.character!.Humanoid.WalkSpeed += 120
                     this.ChangeWorld()
@@ -381,18 +384,18 @@ class PlayerPotionController {
         return buffIndex
     }
 
-    public AppendPotion(potion: PotionType) {
+    public AppendPotion(potion: PotionType, amout?: number) {
         let profileData = this.player.profile.Data
         let potionIndex = -1
         profileData.Potions.forEach((val, index) => { if (val.potion === potion) { potionIndex = index } })
 
         if (potionIndex < 0) { 
-            profileData.Potions.push({potion: potion, amount: 1})
+            profileData.Potions.push({potion: potion, amount: amout || 1})
             this.player.replica.SetValue('Profile.Potions', profileData.Potions)
             return 
         }
 
-        profileData.Potions[potionIndex] = { potion: potion, amount: profileData.Potions[potionIndex].amount+1 }
+        profileData.Potions[potionIndex] = { potion: potion, amount: profileData.Potions[potionIndex].amount+(amout || 1) }
         this.player.replica.SetValue('Profile.Potions', profileData.Potions)
     }
 
@@ -702,7 +705,7 @@ class PlayerPetController {
     }
 
     public FindPet(pet: IDBPetData) {
-        let foundPet;
+        let foundPet: IDBPetData | undefined;
         let profileData = this.player.profile.Data
 
         profileData.Pets.forEach((value, index) => { if (Functions.compareObjects(pet, value)) { foundPet = value } })
@@ -713,8 +716,11 @@ class PlayerPetController {
         if (!pet) { return }
         if (!this.CheckSpaceForPets(1)) {return}
 
+        if (this.player.profile.Data.PetIndex.indexOf(pet.name) < 0) { this.player.profile.Data.PetIndex.push(pet.name) }
+
         this.player.profile.Data.Pets.push(pet)
         this.player.replica.SetValue('Profile.Pets', this.player.profile.Data.Pets)
+        this.player.replica.SetValue('Profile.PetIndex', this.player.profile.Data.PetIndex)
     }
 
     public RemovePet(pet: IDBPetData) {
@@ -728,7 +734,7 @@ class PlayerPetController {
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
 
-    public EvolvePetSize(pet: IDBPetData) {
+    public UpgradePetSize(pet: IDBPetData) {
         let globalPass = 0
         this.player.profile.Data.Pets.forEach((value) => { if (PetUtilities.ComparePets(pet, value)) { globalPass = 1 } })
         if (globalPass === 0) { return }
@@ -741,6 +747,70 @@ class PlayerPetController {
         formatted.additional.size = petUpgradeConfig.SizeUpgrades[pet.additional.size].nextSize as Sizes
 
         this.AppendPet(formatted)
+    }
+
+    public UpgradePetEvolution(pet: IDBPetData, count?: number) {
+        let profileData = this.player.profile.Data
+        let formatted = pet
+
+        let selectedPet = this.FindPet(pet)
+        let nextEvolution = petUpgradeConfig.EvolutionUpgrades[pet.additional.evolution].nextEvolution
+
+        if (!selectedPet) { return }
+        if (!nextEvolution) { return }
+
+        switch (selectedPet.additional.evolution) {
+            case Evolutions.Normal:
+                if (!count) { return }
+
+                let realCount = 0
+                this.player.profile.Data.Pets.forEach((value) => { if (PetUtilities.ComparePets(pet, value)) { realCount += 1 } })
+
+                if (realCount < count) { return }
+
+                this.player.profile.Data.Pets.forEach((value) => { if (PetUtilities.ComparePets(pet, value)) { 
+                    this.RemovePet(value)
+                 } })
+
+                let chance = math.random(1,5)
+                if (count < chance) { return }
+
+                formatted.additional.evolution = petUpgradeConfig.EvolutionUpgrades[pet.additional.evolution].nextEvolution as Evolutions
+                this.AppendPet(formatted)
+
+                return
+
+            case Evolutions.Gold:
+
+                 if (profileData.VoidMachine.size() >= profileData.Config.MaxPetsInVoidMachine) { return }
+                 this.RemovePet(pet)
+
+                 formatted.additional.evolution = petUpgradeConfig.EvolutionUpgrades[pet.additional.evolution].nextEvolution as Evolutions
+                 profileData.VoidMachine.push({pet: formatted, endTime: os.time()+petUpgradeConfig.EvolutionUpgrades.Gold.requirements.time, startTime: os.time()})
+
+                 this.player.replica.SetValue('Profile.VoidMachine', profileData.VoidMachine)
+
+                return
+
+        }
+    }
+
+    public ClaimVoidPet(pet: IDBPetData, skip?: boolean) {
+        let profileData = this.player.profile.Data
+
+        let petIndex = -1
+        profileData.VoidMachine.forEach((value, index) => { if (Functions.compareObjects(value.pet, pet)) { petIndex = index } })
+
+        if (petIndex < 0) { return }
+        if (!this.CheckSpaceForPets(1)) {return}
+
+        let selecteVoidPet = profileData.VoidMachine[petIndex]
+
+        if (!skip && ((os.time() - selecteVoidPet.startTime) < (selecteVoidPet.endTime - selecteVoidPet.startTime)*profileData.Multipliers.VoidMachine)) { return }
+
+        profileData.VoidMachine.remove(petIndex)
+        this.AppendPet(pet)
+        this.player.replica.SetValue('Profile.VoidMachine', profileData.VoidMachine)
     }
 
 }
@@ -769,11 +839,12 @@ class PlayerWorldController {
         })
 
         this.player.SetWorldMultipliers()
+        this.player.replica.SetValue('Session.currentWorld', sessionData.currentWorld)
     }
 
     public BuyMaxWorld(world: WorldType) {
         let profileData = this.player.profile.Data
-        let worldInfo = table.clone( WorldsData.get(world)! )  
+        let worldInfo = WorldsData.get(world)!
         
         if (worldInfo.weight < WorldsData.get(profileData.Config.MaxWorld)!.weight) { return }
         if (profileData.Values.Stars < worldInfo.price) { return }
@@ -781,6 +852,16 @@ class PlayerWorldController {
         this.player.SetStars(profileData.Values.Stars - worldInfo.price)
         profileData.Config.MaxWorld = world
         this.ChangeWorld()
+    }
+
+    public UseWorldTeleport(world: WorldType) {
+        let profileData = this.player.profile.Data
+        let worldInfo = WorldsData.get(world)!
+
+        if (worldInfo.weight < WorldsData.get(profileData.Config.MaxWorld)!.weight) { return }
+        if (profileData.Products.indexOf('SomeWorldTpgamepass') < 0) { return } //TODO
+
+        this.player.session.character!.PrimaryPart!.CFrame = worldInfo.teleportPart.CFrame
     }
 
 }
@@ -879,6 +960,82 @@ class PlayerToolController {
         clonnedModel.PivotTo((sessionData.character!.FindFirstChild('RightHand') as Part).CFrame.mul(toolInfo.rotationOffset))
 
         CreationUtilities.Weld(clonnedModel.PrimaryPart!, sessionData.character!.FindFirstChild('RightHand') as Part)
+    }
+
+}
+
+class PlayerRewardController {
+
+    private player: ServerPlayerComponent
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+
+    private _applyReward(reward: IRewardData) {
+        let profile = this.player.profile.Data
+        
+        reward.Potions?.forEach((value) => {
+            this.player.AppendPotion(value.potion, value.amount)
+        })
+
+        reward.Pets?.forEach((value) => {
+            for (let i = 0; i < value.amount; i++) {
+                this.player.AppendPet(value.pet)
+            }
+        })
+
+        this.player.SetStrength(profile.Values.Strength + (reward.Values?.Strength || 0))
+        this.player.SetStars(profile.Values.Stars + (reward.Values?.Stars || 0))
+        this.player.SetWins(profile.Values.Wins + (reward.Values?.Wins || 0))
+        
+    }
+
+    public ClaimDailyReward() {
+
+        let profileData = this.player.profile.Data
+
+        if ((os.time() - profileData.StatValues.LastDayTime) < 24*60*60) { return }
+
+        profileData.StatValues.LastDayTime = os.time()
+        profileData.StatValues.DayAmount += 1
+
+        let currentDay = profileData.StatValues.DayAmount%DailyRewardsData.size()
+        let selectedReward = SelectDailyReward(currentDay)
+
+        if (!selectedReward) { return }
+        
+        this._applyReward(selectedReward)
+
+    }
+
+    public ClaimSessionReward(rewardindex: number) {
+
+        let sessionData = this.player.session
+        let selectedReward = SelectSessionReward(rewardindex)
+
+        if (!selectedReward) { return }
+        if (sessionData.claimedRewards.includes(rewardindex)) { return }
+        if (selectedReward.Time > sessionData.sessionTime) { return }
+
+        sessionData.claimedRewards.push(rewardindex)
+
+        this._applyReward(selectedReward)
+
+    }
+
+    public RedeemCode(code: string) {
+
+        let profileData = this.player.profile.Data
+        let selectedReward = CodesRewardsData.get(code)
+
+        if (!selectedReward) { return }
+        if (profileData.RedeemedCodes.includes(code)) { return }
+
+        profileData.RedeemedCodes.push(code)
+
+        this._applyReward(selectedReward)
+
     }
 
 }

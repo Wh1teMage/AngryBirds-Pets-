@@ -21,8 +21,9 @@ export interface IDBPetData {
     name: string,
     additional: {
         size: Sizes
-        void?: boolean
+        evolution: Evolutions
         limit?: number
+        perks?: Array<string>
     }
 }
 
@@ -33,6 +34,12 @@ export enum Rarities {
 export enum Sizes {
     Normal = 'Normal',
     Huge = 'Huge',
+}
+
+export enum Evolutions {
+    Normal = 'Normal',
+    Gold = 'Gold',
+    Void = 'Void',
 }
 
 export enum PetOperationStatus {

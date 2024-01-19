@@ -11,6 +11,10 @@ export interface IProfileData {
     }
 
     StatValues: {
+        FirstJoin: number
+        LastJoined: number
+        LastDayTime: number
+
         DayAmount: number
         IngameTime: number
         RobuxSpent: number
@@ -21,12 +25,14 @@ export interface IProfileData {
         Wins: number
         Stars: number
         Rebirths: number
+        VoidMachine: number
     }
 
     Config: {
         Luck: number
         MaxPets: number
         MaxEquippedPets: number
+        MaxPetsInVoidMachine: number
         MaxWorld: WorldType
     }
 
@@ -42,6 +48,9 @@ export interface IProfileData {
     
     OwnedTools: Array<string>
     EquippedTool: string
+
+    VoidMachine: Array<{pet: IDBPetData, endTime: number, startTime: number}>
+    RedeemedCodes: Array<string>
 
     CONSTANTS: {
         VERSION: number

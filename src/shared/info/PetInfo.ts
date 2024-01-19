@@ -1,5 +1,5 @@
 import { Workspace } from "@rbxts/services"
-import { IPetData, Rarities, Sizes } from "shared/interfaces/PetData"
+import { Evolutions, IPetData, Rarities, Sizes } from "shared/interfaces/PetData"
 
 export const PetsData = new Map<string, IPetData>()
 
@@ -13,7 +13,8 @@ PetsData.set('Cat',
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal
+        size: Sizes.Normal,
+        evolution: Evolutions.Normal
     },
     model: Workspace.WaitForChild('Enot') as Model
 })
