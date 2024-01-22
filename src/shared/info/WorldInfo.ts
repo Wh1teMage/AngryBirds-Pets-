@@ -10,6 +10,13 @@ WorldsData.set(WorldType.Default, {
     multipliers: new Map([['strength', 1]]),
     weight: 1,
     price: 1,
+
+    reward: 100,
+    length: 100,
+
+    gravity: 500,
+    density: 500,
+    shootPosition: new Vector3(0,0,0)
 })
 
 WorldsData.set(WorldType.Desert, {
@@ -19,4 +26,11 @@ WorldsData.set(WorldType.Desert, {
     multipliers: new Map([['strength', 1.5]]),
     weight: 2,
     price: -1,
+
+    reward: 1000,
+    length: 100,
+
+    gravity: 500,
+    density: 500,
+    shootPosition: new Vector3(0,0,0)
 })

@@ -92,6 +92,13 @@ export class SignalService implements OnStart, OnInit {
             if (operation === WorldOperationStatus.Buy) { playerComp.BuyMaxWorld(world) }
         })
 
+        Events.ShootObject.connect((player: Player) => {
+            let playerComp = ServerPlayerFabric.GetPlayer(player)
+            if (!playerComp) { return }
+
+            playerComp.ShootObject()
+        })
+
     }
 
     onStart() {

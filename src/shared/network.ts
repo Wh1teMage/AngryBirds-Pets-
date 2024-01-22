@@ -15,8 +15,11 @@ interface ClientToServerEvents {
     RequestTrade: (operation: RequestOperationStatus, otherplayer: Player) => void
     ManageTrade: (operation: TradeOperationStatus, status?: TradeUpdateStatus, pet?: IDBPetData) => void
     ManagePet: (operation: PetOperationStatus, pet: IDBPetData) => void
+
     ManageTool: (operation: ToolOperationStatus, toolname: string) => void
     ManageWorld: (operation: WorldOperationStatus, world: WorldType) => void
+
+    ShootObject: () => void
 }
 
 interface ServerToClientEvents {

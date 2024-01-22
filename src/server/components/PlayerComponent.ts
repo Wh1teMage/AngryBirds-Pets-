@@ -32,6 +32,8 @@ import { WorldType } from "shared/enums/WorldEnums";
 import { CreationUtilities } from "shared/utility/CreationUtilities";
 import { CodesRewardsData, DailyRewardsData, SelectDailyReward, SelectSessionReward } from "shared/info/RewardInfo";
 import { IRewardData } from "shared/interfaces/RewardData";
+import { PassiveValues } from "shared/interfaces/PassiveData";
+import { FlyingObjectClass } from "server/classes/FlyingObjectClass";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -50,6 +52,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     private _playerTradeController = new PlayerTradeController(this)
     private _playerWorldController = new PlayerWorldController(this)
     private _playerPotionController = new PlayerPotionController(this)
+    private _playerFlyingController = new PlayerFlyingController(this)
     private _playerMultiplersController = new PlayerMultiplersController(this)
 
     public FindPet = (pet: IDBPetData) => this._playerPetController.FindPet(pet)
@@ -88,6 +91,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public BuyMaxWorld = (world: WorldType) => this._playerWorldController.BuyMaxWorld(world)
     public ChangeWorld = () => this._playerWorldController.ChangeWorld()
 
+    public ShootObject = () => this._playerFlyingController.ShootObject()
+
     onStart() {
         this.initProfile()
         this.initReplica()
@@ -113,11 +118,13 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
         this.SetPetMultipliers()
 
+        this.session.activePassives.forEach((value) => { value.onStart() })
+
         task.spawn(() => {
             this.AppendPotion(PotionType.LuckPotion)
             this.UsePotion(PotionType.LuckPotion)
 
-            
+            /*
             for (let i = 0; i<3; i++) {
                 
                 this.AppendPet(
@@ -141,7 +148,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                 )
                 task.wait()
             }
-            
+            */
             /*
             
             for (let i = 0; i<1; i++) {
@@ -302,18 +309,21 @@ class PlayerValueController {
     }
 
     public SetStrength(value: number) {
-        this.player.profile.Data.Values.Strength = value
-        this.player.replica.SetValue('Profile.Values.Strength', value)
+        this.player.profile.Data.Values.StrengthVal = value
+        this.player.session.activePassives.forEach((value) => { value.onValueAdded(PassiveValues.Strength) })
+        this.player.replica.SetValue('Profile.Values.StrengthVal', value)
     }
 
     public SetWins(value: number) {
-        this.player.profile.Data.Values.Wins = value
-        this.player.replica.SetValue('Profile.Values.Wins', value)
+        this.player.profile.Data.Values.WinsVal = value
+        this.player.session.activePassives.forEach((value) => { value.onValueAdded(PassiveValues.Wins) })
+        this.player.replica.SetValue('Profile.Values.WinsVal', value)
     }
 
     public SetStars(value: number) {
-        this.player.profile.Data.Values.Stars = value
-        this.player.replica.SetValue('Profile.Values.Stars', value)
+        this.player.profile.Data.Values.StarsVal = value
+        this.player.session.activePassives.forEach((value) => { value.onValueAdded(PassiveValues.Stars) })
+        this.player.replica.SetValue('Profile.Values.StarsVal', value)
     }
 
 }
@@ -326,7 +336,7 @@ class PlayerMultiplersController {
         this.player = player
     }
 
-    public CalculateMultiplier(multiname: string) {
+    public CalculateMultiplier(multiname: string) { // add profile multipliers
         let sessionData = this.player.session
         let overallMultiplier = 1
 
@@ -587,14 +597,14 @@ class PlayerEggController {
         switch (eggInfo.valuetype) {
             case EggValueType.Wins:
 
-                if (profileData.Values.Wins < eggInfo.price) {return}
+                if (profileData.Values.WinsVal < eggInfo.price) {return}
 
                 for (let i = 0; i < amount; i++) {
                     let petName = PetUtilities.RandomWeight(eggInfo.petchances, profileData.Config.Luck)
                     this.player.AppendPet(PetUtilities.NameToDBPetWithEgg(petName, eggInfo.name)!)
                 }
 
-                this.player.SetWins(profileData.Values.Wins - eggInfo.price)
+                this.player.SetWins(profileData.Values.WinsVal - eggInfo.price)
 
                 break
             case EggValueType.VBugs:
@@ -806,7 +816,7 @@ class PlayerPetController {
 
         let selecteVoidPet = profileData.VoidMachine[petIndex]
 
-        if (!skip && ((os.time() - selecteVoidPet.startTime) < (selecteVoidPet.endTime - selecteVoidPet.startTime)*profileData.Multipliers.VoidMachine)) { return }
+        if (!skip && ((os.time() - selecteVoidPet.startTime) < (selecteVoidPet.endTime - selecteVoidPet.startTime)*profileData.Multipliers.VoidMachineMul)) { return }
 
         profileData.VoidMachine.remove(petIndex)
         this.AppendPet(pet)
@@ -847,9 +857,9 @@ class PlayerWorldController {
         let worldInfo = WorldsData.get(world)!
         
         if (worldInfo.weight < WorldsData.get(profileData.Config.MaxWorld)!.weight) { return }
-        if (profileData.Values.Stars < worldInfo.price) { return }
+        if (profileData.Values.StarsVal < worldInfo.price) { return }
 
-        this.player.SetStars(profileData.Values.Stars - worldInfo.price)
+        this.player.SetStars(profileData.Values.StarsVal - worldInfo.price)
         profileData.Config.MaxWorld = world
         this.ChangeWorld()
     }
@@ -910,9 +920,9 @@ class PlayerToolController {
         switch (toolInfo.valuetype) {
             case ToolValueType.Strength:
 
-                if (profileData.Values.Strength < toolInfo.price) {return}
+                if (profileData.Values.StrengthVal < toolInfo.price) {return}
 
-                this.player.SetWins(profileData.Values.Strength - toolInfo.price)
+                this.player.SetWins(profileData.Values.StrengthVal - toolInfo.price)
                 this.AppendTool(toolname)
 
                 break
@@ -935,10 +945,12 @@ class PlayerToolController {
 
         this.using = true
 
-        this.player.SetStrength(profileData.Values.Strength + toolInfo.addition * this.player.CalculateMultiplier('strength'))
+        this.player.SetStrength(profileData.Values.StrengthVal + toolInfo.addition * this.player.CalculateMultiplier('strength'))
 
         this.lastUsed = tick()
         this.using = false
+
+        this.player.session.activePassives.forEach((value) => { value.onShoot() })
 
         Events.ReplicateEffect.fire(this.player.instance, toolInfo.effectname)
     }
@@ -985,9 +997,9 @@ class PlayerRewardController {
             }
         })
 
-        this.player.SetStrength(profile.Values.Strength + (reward.Values?.Strength || 0))
-        this.player.SetStars(profile.Values.Stars + (reward.Values?.Stars || 0))
-        this.player.SetWins(profile.Values.Wins + (reward.Values?.Wins || 0))
+        this.player.SetStrength(profile.Values.StrengthVal + (reward.Values?.Strength || 0))
+        this.player.SetStars(profile.Values.StarsVal + (reward.Values?.Stars || 0))
+        this.player.SetWins(profile.Values.WinsVal + (reward.Values?.Wins || 0))
         
     }
 
@@ -1040,13 +1052,7 @@ class PlayerRewardController {
 
 }
 
-interface FollowResponse{
-    isFollowing: boolean,
-    isFollowed: boolean,
-    userId: number
-}
-
-class PlayerHttpsController{
+class PlayerHttpsController {
     private player: ServerPlayerComponent
 
     constructor(player: ServerPlayerComponent) {
@@ -1057,22 +1063,86 @@ class PlayerHttpsController{
         return this.player.instance.IsFriendsWith(id)
     }
 
-    public CheckFolowingPlayers(ids:number[]){
+    public CheckFolowingPlayers(ids: number[]){
         let res = HttpService.RequestAsync(
             {
                 Url: `https://friends.roproxy.com/v1/user/following-exists`,
                 Method: "POST",
                 Body: tostring({
-                    "targetUserIds": [
-                      1080987986, 295934777
-                    ]
+                    "targetUserIds": ids
                 })
         })
-        let decoded = HttpService.JSONDecode(res.Body) as FollowResponse[]
+
+        if (!res.Success) { return }
+
+        let decoded = HttpService.JSONDecode(res.Body) as { followings: {    
+            isFollowing: boolean,
+            isFollowed: boolean,
+            userId: number
+        }[] }
+
         let result = true
-        decoded.forEach(element => {
-            result = result && element.isFollowing
+        decoded.followings.forEach(value => {
+            result = result && value.isFollowing
         });
+
         return result
     }
+}
+
+class PlayerFlyingController {
+
+    private player: ServerPlayerComponent
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+
+    public ShootObject() {
+        let sessionData = this.player.session
+        let profileData = this.player.profile.Data
+        if (sessionData.currentFlyingObject) { return }
+
+        let currentWorld = WorldsData.get(sessionData.currentWorld)
+        if (!currentWorld) { return }
+
+        let flyingPart = new Instance('Part')
+        flyingPart.CanCollide = false
+        flyingPart.Position = new Vector3(1,1,1)
+        flyingPart.Transparency = 0
+        flyingPart.Name = this.player.instance.Name+tostring(math.random(10e9, 10e8))
+
+        let object = new FlyingObjectClass(
+            flyingPart, 
+            currentWorld.gravity, 
+            currentWorld.density, 
+            new Vector3(profileData.Values.StrengthVal/currentWorld.density, profileData.Values.StrengthVal/currentWorld.gravity/3, 0), 
+            currentWorld.shootPosition
+        )
+
+        object.BindToStop((obj) => {
+            print('ended')
+            print(currentWorld!.reward * math.max((obj.TravelledDistance / currentWorld!.length), .01) * this.player.CalculateMultiplier('wins'))
+            this.player.SetWins( profileData.Values.WinsVal + currentWorld!.reward * math.max((obj.TravelledDistance / currentWorld!.length), .01) * this.player.CalculateMultiplier('wins') )
+            sessionData.currentFlyingObject = undefined
+            this.player.replica.SetValue('Session.currentFlyingObject', undefined)
+        })
+
+        sessionData.currentFlyingObject = { partName: flyingPart.Name }
+        this.player.replica.SetValue('Session.currentFlyingObject', sessionData.currentFlyingObject)
+
+        let ignoreFolder = game.Workspace.FindFirstChild('_ignoreObjects')
+
+        if (!ignoreFolder) { 
+            ignoreFolder = new Instance('Folder', game.Workspace)
+            ignoreFolder.Name = '_ignoreObjects'
+            ignoreFolder.Parent = game.Workspace
+        }
+
+        flyingPart.Parent = ignoreFolder
+
+        print('started')
+        object.Activate()
+    }
+
 }

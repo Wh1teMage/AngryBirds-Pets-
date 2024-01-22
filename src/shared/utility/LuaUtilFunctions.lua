@@ -10,7 +10,7 @@ local function TableClone(transfer, template)
     for index, value in template do
         if typeof(value) == 'table' then
 
-            if transfer[index] and transfer[index][1] then -- used to check arrays (maybe rewrite later)
+            if typeof(transfer[index]) == 'table' and transfer[index][1] then -- used to check arrays (maybe rewrite later)
                 proxy[index] = transfer[index]
                 continue
             end

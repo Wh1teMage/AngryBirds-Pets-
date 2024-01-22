@@ -7,10 +7,10 @@ export const VERSION = 1.3
 
 export const defaultValue: IProfileData = {
     Values: {
-        Strength: 0,
-        Wins: 0,
-        Stars: 0,
-        Rebirths: 0,
+        StrengthVal: 0,
+        WinsVal: 0,
+        StarsVal: 0,
+        RebirthsVal: 0,
     },
 
     StatValues: {
@@ -24,11 +24,11 @@ export const defaultValue: IProfileData = {
     },
 
     Multipliers: {
-        Strength: 1,
-        Wins: 1,
-        Stars: 1,
-        Rebirths: 1,
-        VoidMachine: 1,
+        StrengthMul: 1,
+        WinsMul: 1,
+        StarsMul: 1,
+        RebirthsMul: 1,
+        VoidMachineMul: 1,
     },
 
     Config: {

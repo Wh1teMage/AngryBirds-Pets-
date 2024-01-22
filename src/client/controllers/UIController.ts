@@ -122,6 +122,7 @@ export class UIController implements OnStart, OnInit {
 
         menuPath.ShopBtn.get<ButtonComponent>().BindToClick((arg) => {
             Events.ManageWorld(WorldOperationStatus.Buy, WorldType.Desert)
+            Events.ShootObject()
         })
 
         /*

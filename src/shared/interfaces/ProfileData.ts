@@ -4,10 +4,10 @@ import { PotionType } from "shared/enums/PotionEnum"
 
 export interface IProfileData {
     Values: {
-        Strength: number
-        Wins: number
-        Stars: number
-        Rebirths: number
+        StrengthVal: number
+        WinsVal: number
+        StarsVal: number
+        RebirthsVal: number
     }
 
     StatValues: {
@@ -21,11 +21,11 @@ export interface IProfileData {
     }
 
     Multipliers: {
-        Strength: number
-        Wins: number
-        Stars: number
-        Rebirths: number
-        VoidMachine: number
+        StrengthMul: number
+        WinsMul: number
+        StarsMul: number
+        RebirthsMul: number
+        VoidMachineMul: number
     }
 
     Config: {

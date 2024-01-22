@@ -1,6 +1,7 @@
 import { WorldType } from "shared/enums/WorldEnums"
 import { ITradeObj } from "./TradeData"
 import { IPassiveData } from "./PassiveData"
+import { IDBPetData } from "./PetData"
 
 export interface ICharacter extends Model {
     PrimaryPart: Part,
@@ -15,6 +16,7 @@ export interface ISessionData {
 
     claimedRewards: Array<number>
     activePassives: Array<IPassiveData>
+    currentFlyingObject?: { partName: string }
 
     multipliers: {
         other: IMultipliers
@@ -56,6 +58,7 @@ export const SessionData: ISessionData = {
 
     claimedRewards: [],
     activePassives: [],
+    currentFlyingObject: undefined,
 
     multipliers: {
         other: table.clone(DefaultMultipliers),
