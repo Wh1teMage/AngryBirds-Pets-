@@ -94,6 +94,9 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public ShootObject = () => this._playerFlyingController.ShootObject()
 
     onStart() {
+
+        this.instance
+        
         this.initProfile()
         this.initReplica()
         
@@ -1107,17 +1110,16 @@ class PlayerFlyingController {
         if (!currentWorld) { return }
 
         let flyingPart = new Instance('Part')
-        flyingPart.CanCollide = false
-        flyingPart.Position = new Vector3(1,1,1)
+        flyingPart.CanCollide = true
+        flyingPart.Size = new Vector3(5,5,5)
         flyingPart.Transparency = 0
         flyingPart.Name = this.player.instance.Name+tostring(math.random(10e9, 10e8))
 
         let object = new FlyingObjectClass(
             flyingPart, 
-            currentWorld.gravity, 
-            currentWorld.density, 
             new Vector3(profileData.Values.StrengthVal/currentWorld.density, profileData.Values.StrengthVal/currentWorld.gravity/3, 0), 
-            currentWorld.shootPosition
+            currentWorld.shootPosition,
+            { gravity: currentWorld.gravity, density: currentWorld.density, length: currentWorld.length },
         )
 
         object.BindToStop((obj) => {
@@ -1128,9 +1130,6 @@ class PlayerFlyingController {
             this.player.replica.SetValue('Session.currentFlyingObject', undefined)
         })
 
-        sessionData.currentFlyingObject = { partName: flyingPart.Name }
-        this.player.replica.SetValue('Session.currentFlyingObject', sessionData.currentFlyingObject)
-
         let ignoreFolder = game.Workspace.FindFirstChild('_ignoreObjects')
 
         if (!ignoreFolder) { 
@@ -1139,8 +1138,15 @@ class PlayerFlyingController {
             ignoreFolder.Parent = game.Workspace
         }
 
+        flyingPart.Anchored = true
         flyingPart.Parent = ignoreFolder
 
+        sessionData.currentFlyingObject = { partName: flyingPart.Name }
+        this.player.replica.SetValue('Session.currentFlyingObject', sessionData.currentFlyingObject)
+
+        task.wait(.2) // wait for client to replicate
+        flyingPart.Anchored = false
+        flyingPart.SetNetworkOwner(undefined)
         print('started')
         object.Activate()
     }

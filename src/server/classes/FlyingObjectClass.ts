@@ -9,6 +9,7 @@ export class FlyingObjectClass {
     private part: BasePart
     private gravity: number
     private density: number
+    private length: number
 
     private koef: number
     private startingVelocity: Vector3
@@ -23,15 +24,16 @@ export class FlyingObjectClass {
     private _onStop: Array<(obj: FlyingObjectClass) => void> = []
     private _onStart: Array<(obj: FlyingObjectClass) => void> = []
 
-    constructor(part: BasePart, gravity: number, density: number, velocity: Vector3, position: Vector3) { // x axes only
+    constructor(part: BasePart, velocity: Vector3, position: Vector3, info: { gravity: number, density: number, length: number }) { // x axes only
 
         this.part = part
-        this.gravity = gravity
-        this.density = density
+        this.gravity = info.gravity
+        this.density = info.density
+        this.length = info.length
 
         this.startingVelocity = velocity
         this.position = position
-        this.koef = (velocity.X*gravity)/(velocity.Y*density)
+        this.koef = (velocity.X*info.gravity)/(velocity.Y*info.density)
 
         this.bounces = math.ceil( this.koef )
         this.overallSum = (1+this.bounces)*this.bounces/2
@@ -97,6 +99,10 @@ export class FlyingObjectClass {
 
             this.TravelledDistance += this.BodyVelocity.Velocity.X*this.step-(this.density*this.step**2)/2
             this.BodyVelocity.Velocity = this.BodyVelocity.Velocity.add(new Vector3(-this.density*this.step, -this.gravity*this.step, 0))
+
+            if (this.part.Position.X - this.position.X >= this.length) {
+                this.part.Position = new Vector3(this.position.X, this.part.Position.Y, this.position.Z)
+            }
 
             if (this.BodyVelocity.Velocity.X <= 0) break
             if (this.part.Position.Y < this.position.Y) {

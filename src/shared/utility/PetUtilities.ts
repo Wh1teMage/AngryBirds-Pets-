@@ -3,6 +3,7 @@ import Functions from "./LuaUtilFunctions"
 import { petCallbacks } from "shared/configs/PetConfig"
 import { PetsData } from "shared/info/PetInfo"
 import { EggsData } from "shared/info/EggInfo"
+import { CreationUtilities } from "./CreationUtilities"
 
 export class PetUtilities {
 
@@ -86,6 +87,21 @@ export class PetUtilities {
 
     static ComparePets(pet1: IDBPetData, pet2: IDBPetData) {
         return Functions.compareObjects(pet1, pet2, true)
+    }
+
+    static GetWeldedPetModel(model: Model) {
+        let primary = model.PrimaryPart!
+        primary.Anchored = true
+        primary.CanCollide = false
+
+        for (let obj of model.GetDescendants()) {
+            if (!obj.IsA('BasePart')) { continue }
+            obj.Anchored = false
+            obj.CanCollide = false
+            CreationUtilities.Weld(primary, obj)
+        }
+
+        return model
     }
 
 }

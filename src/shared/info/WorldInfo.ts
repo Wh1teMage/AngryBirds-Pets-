@@ -12,11 +12,11 @@ WorldsData.set(WorldType.Default, {
     price: 1,
 
     reward: 100,
-    length: 100,
+    length: 1000,
 
-    gravity: 500,
-    density: 500,
-    shootPosition: new Vector3(0,0,0)
+    gravity: 200,
+    density: 100,
+    shootPosition: new Vector3(0,7,0)
 })
 
 WorldsData.set(WorldType.Desert, {
@@ -32,5 +32,5 @@ WorldsData.set(WorldType.Desert, {
 
     gravity: 500,
     density: 500,
-    shootPosition: new Vector3(0,0,0)
+    shootPosition: new Vector3(0,7,0)
 })
