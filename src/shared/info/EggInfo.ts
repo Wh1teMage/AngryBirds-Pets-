@@ -18,7 +18,7 @@ let transferPercantages = (chances: Chances) => {
     print(form)
     return form
 }
-
+/*
 EggsData.set('Default', {
     name: 'Default',
     price: 100,
@@ -31,6 +31,18 @@ EggsData.set('Default', {
     ]),
     //model: Workspace.WaitForChild('TestEgg') as IEggModel
 })
+*/
+EggsData.set('Default', {
+    name: 'Default',
+    price: 100,
+    valuetype: EggValueType.Wins,
+    petchances: [
+        { weight: 1, name: 'Cat' },
+        { weight: 10, name: 'Cat' },
+    ],
+    //model: Workspace.WaitForChild('TestEgg') as IEggModel
+})
+
 
 /*
 [

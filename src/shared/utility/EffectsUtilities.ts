@@ -4,6 +4,8 @@ export class EffectsUtilities {
 
     public static PlaySound(soundobj: string | Sound) {
 
+        if (!Players.LocalPlayer.Character?.FindFirstChild('Head')) { return }
+
         if (typeOf(soundobj) === 'string') {
             let sound = new Instance('Sound')
             sound.SoundId = soundobj as string
@@ -13,7 +15,7 @@ export class EffectsUtilities {
 
             return
         }
-
+        
         let sound = (soundobj as Sound).Clone()
 
         sound.PlayOnRemove = true

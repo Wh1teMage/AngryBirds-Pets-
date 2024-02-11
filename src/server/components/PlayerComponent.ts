@@ -593,7 +593,7 @@ class PlayerEggController {
         let eggInfo = EggsData.get(name)
 
         // additional buytype check later on (check gamepass)
-
+        print(eggInfo)
         if (!this.player.CheckSpaceForPets(amount)) {return}
         if (!eggInfo) {return}
 
@@ -601,7 +601,7 @@ class PlayerEggController {
             case EggValueType.Wins:
 
                 if (profileData.Values.WinsVal < eggInfo.price) {return}
-
+                print(eggInfo, 1)
                 for (let i = 0; i < amount; i++) {
                     let petName = PetUtilities.RandomWeight(eggInfo.petchances, profileData.Config.Luck)
                     this.player.AppendPet(PetUtilities.NameToDBPetWithEgg(petName, eggInfo.name)!)

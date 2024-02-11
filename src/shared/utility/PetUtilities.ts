@@ -21,6 +21,7 @@ export class PetUtilities {
         let originalPet = PetsData.get(info.name)!
         let pet: IPetData = {
             name: originalPet.name,
+            locked: originalPet.locked,
             stats: table.clone( originalPet.stats ),
             additional: table.clone( info.additional ),
             multipliers: table.clone( originalPet.multipliers ),
@@ -44,6 +45,7 @@ export class PetUtilities {
 
         let pet: IDBPetData = {
             name: name,
+            locked: false,
             additional: {
                 size: Sizes.Normal,
                 evolution: Evolutions.Normal

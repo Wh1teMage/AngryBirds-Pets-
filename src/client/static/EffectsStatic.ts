@@ -6,7 +6,7 @@ import { TweenService } from "@rbxts/services";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const player = Players.LocalPlayer
-const circle = playerGui.WaitForChild('TestingStuff').WaitForChild('Frame') as Frame
+//const circle = playerGui.WaitForChild('TestingStuff').WaitForChild('Frame') as Frame
 
 export const PlayEffect = (name: string, additional?: Map<string, any>) => {
     if (!Effects.get(name)) { warn('Effects Doesnt Exist!'); return }

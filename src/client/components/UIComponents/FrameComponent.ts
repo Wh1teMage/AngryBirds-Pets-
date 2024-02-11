@@ -9,12 +9,13 @@ export class FrameComponent extends BaseComponent<Attributes, Frame> implements 
 
     onStart() {
         
-        this.BindToOpen(() => { UIAnimations.Blur() })
-        this.BindToClose(() => { UIAnimations.Blur() })
+        this.BindToOpen(() => { })
+        this.BindToClose(() => {  })
 
     }
 
     public IsOpened = false
+    public CanBeClosedByOthers = true
 
     private _locked = false
 

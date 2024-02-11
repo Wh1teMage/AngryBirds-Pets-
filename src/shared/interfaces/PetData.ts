@@ -5,6 +5,7 @@ export interface IPetData {
     name: string
     model: Model
 
+    locked: boolean,
     multipliers: Map<keyof IMultipliers, number>
 
     stats: {
@@ -19,6 +20,7 @@ export interface IPetData {
 
 export interface IDBPetData {
     name: string,
+    locked: boolean,
     additional: {
         size: Sizes
         evolution: Evolutions

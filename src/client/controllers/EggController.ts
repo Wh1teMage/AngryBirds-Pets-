@@ -20,6 +20,7 @@ export class EggController implements OnStart, OnInit {
             let name = egg[0]
             let data = egg[1]
             
+            /*
             if (!data.model) { continue }
 
             data.model.Platform.BillboardGui.Main.Price.Text = tostring(data.price)
@@ -61,9 +62,10 @@ export class EggController implements OnStart, OnInit {
 
                 // buyButton.BindToClick(() => { Events.BuyEgg(name, BuyType.Single) })
             }
+            */
             
-            //task.wait(2)
-            
+            task.wait(4)
+            print('Bought')
             for (let i = 0; i < 3; i++) {
                 Events.BuyEgg(name, BuyType.Single)
             }

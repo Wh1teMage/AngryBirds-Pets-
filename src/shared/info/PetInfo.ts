@@ -6,6 +6,7 @@ export const PetsData = new Map<string, IPetData>()
 PetsData.set('Cat', 
 {
     name: 'Cat',
+    locked: false,
     multipliers: new Map([['strength', 1]]),
     stats: {
         rarity: Rarities.Common,

@@ -2,6 +2,7 @@ import { Dependency, OnStart } from "@flamework/core";
 import { Component, BaseComponent, Components } from "@flamework/components";
 import { PlayEffect } from "client/static/EffectsStatic";
 import { EffectName } from "shared/enums/EffectEnums";
+import { TweenService } from "@rbxts/services";
 
 interface Attributes {}
 
@@ -13,13 +14,22 @@ export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implem
     private _onEnter?: Array<(arg: GuiButton) => void> = []
     private _onLeave?: Array<(arg: GuiButton) => void> = []
 
+    private _defaultScaleValue = 1
+    private _scale?: UIScale
+
     private _defaultClick(arg: GuiButton) {
         PlayEffect('ClickSound' as EffectName)
     }
 
-    private _defaultEnter(arg: GuiButton) {}
+    private _defaultEnter(arg: GuiButton) {
+        if (!this._scale) { return }
+        TweenService.Create(this._scale, new TweenInfo(.1), { 'Scale': this._defaultScaleValue * 1.1 }).Play()
+    }
 
-    private _defaultLeave(arg: GuiButton) {}
+    private _defaultLeave(arg: GuiButton) {
+        if (!this._scale) { return }
+        TweenService.Create(this._scale, new TweenInfo(.1), { 'Scale': this._defaultScaleValue }).Play()
+    }
 
     constructor() {
         super()
@@ -27,6 +37,12 @@ export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implem
         this.BindToClick((arg: GuiButton) => this._defaultClick(arg))
         this.BindToEnter((arg: GuiButton) => this._defaultEnter(arg))
         this.BindToLeave((arg: GuiButton) => this._defaultLeave(arg))
+
+        if (!this.instance.FindFirstChild('UIScale')) { return }
+        let scale = this.instance.WaitForChild('UIScale') as UIScale
+
+        this._scale = scale
+        this._defaultScaleValue = scale.Scale
     }
 
     onStart() {
