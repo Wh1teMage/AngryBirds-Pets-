@@ -47,7 +47,11 @@ const mainUIInterface =
         {name: 'Store', objComponent: 'Image'},
         {name: 'Rebirth', objComponent: 'Image'},
         {name: 'Trade', objComponent: 'Image'},
-        {name: 'PetInventory', objComponent: 'Image'},
+        {name: 'PetInventory', objComponent: 'Image', children: [
+            {name: 'PetInfo', objComponent: 'Frame', children: [
+                {name: 'Equip', objComponent: 'Button'},
+            ]}
+        ]},
     ]
 
 
@@ -59,6 +63,9 @@ export class UIController implements OnStart, OnInit {
 
     private Pets: IDBPetData[] = []
     private EquippedPets: IDBPetData[] = []
+
+    private selectedPet?: IDBPetData
+    private selectedPetStatus: PetOperationStatus = PetOperationStatus.Equip
 
     constructor(playerController: PlayerController) {
         this._playerController = playerController
@@ -78,16 +85,25 @@ export class UIController implements OnStart, OnInit {
 
         let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
         
+        let equipAmount = petInventory.WaitForChild('Backpack').WaitForChild('AmountInfo').WaitForChild('Equip').WaitForChild('Amount')! as TextLabel
+        let backpackAmount = equipAmount.Parent!.Parent!.WaitForChild('Backpack').WaitForChild('Amount')! as TextLabel
+
+        equipAmount.Text = tostring(this.EquippedPets.size())+'/'+tostring(this._playerController.replica.Data.Profile.Config.MaxEquippedPets)
+        backpackAmount.Text = tostring(this.Pets.size())+'/'+tostring(this._playerController.replica.Data.Profile.Config.MaxPets)
+
         for (let pet of this.Pets) {
             let obj = petInventory.WaitForChild('Template')!.WaitForChild('PetExample')!.Clone() as GuiButton;
             obj.Parent = petInventory.WaitForChild('PetsFrame').WaitForChild('ScrollingFrame')!;
             obj.Visible = true;
 
             (obj.WaitForChild('PetName') as TextLabel).Text = pet.name;
-            (obj.WaitForChild('Equip') as TextLabel).Visible = false;
+            (obj.WaitForChild('Equip') as ImageLabel).Visible = false;
+            (obj.WaitForChild('Lock') as ImageLabel).Visible = false;
+
+            if (pet.locked) { (obj.WaitForChild('Lock') as ImageLabel).Visible = true; }
 
             let button = ButtonFabric.CreateButton(obj)
-            button.BindToClick(() => { this.displayPet(pet) })
+            button.BindToClick(() => { this.displayPet(pet, false) })
         }
 
         for (let pet of this.EquippedPets) {
@@ -97,22 +113,46 @@ export class UIController implements OnStart, OnInit {
 
             (obj.WaitForChild('PetName') as TextLabel).Text = pet.name;
             (obj.WaitForChild('Equip') as TextLabel).Visible = true;
+            (obj.WaitForChild('Lock') as ImageLabel).Visible = false;
+
+            if (pet.locked) { (obj.WaitForChild('Lock') as ImageLabel).Visible = true; }
 
             let button = ButtonFabric.CreateButton(obj)
-            button.BindToClick(() => { this.displayPet(pet) })
+            button.BindToClick(() => { this.displayPet(pet, true) })
         }
 
     }
 
-    private displayPet(pet: IDBPetData) {
+    private displayPet(pet: IDBPetData, equipped: boolean) {
+        this.selectedPet = pet
+
         let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
         let petInfo = petInventory.WaitForChild('PetInfo')! as Frame
 
         let formattedPet = PetUtilities.DBToPetTransfer(pet);
         if (!formattedPet) { return }
 
-        (petInfo.WaitForChild('Stats').WaitForChild('Boost') as TextLabel).Text = tostring(formattedPet.multipliers.get('strength'));
+        let mainStats = petInfo.WaitForChild('Stats').WaitForChild('Main') as Frame;
+
+        (petInfo.WaitForChild('Stats').WaitForChild('Number') as Frame).Visible = false;
+        (petInfo.WaitForChild('Stats').WaitForChild('Boost') as TextLabel).Text = tostring(formattedPet.multipliers.get('strength'))+'x Boost';
         (petInfo.WaitForChild('PetName') as TextLabel).Text = formattedPet.name;
+        (petInfo.WaitForChild('Equip').WaitForChild('TextLabel') as TextLabel).Text = 'Equip';
+        //mainStats.Mutation // TO DO
+        (mainStats.WaitForChild('PetCraft').WaitForChild('Text') as TextLabel).Text = formattedPet.additional.evolution;
+        (mainStats.WaitForChild('PetSize').WaitForChild('Text') as TextLabel).Text = formattedPet.additional.size;
+
+        this.selectedPetStatus = PetOperationStatus.Equip
+
+        if (equipped) {
+            (petInfo.WaitForChild('Equip').WaitForChild('TextLabel') as TextLabel).Text = 'Unequip'
+            this.selectedPetStatus = PetOperationStatus.Unequip
+        }
+
+        if (pet.additional.limit) {
+            (petInfo.WaitForChild('Stats').WaitForChild('Number').WaitForChild('Text') as TextLabel).Text = tostring(pet.additional.limit);
+            (petInfo.WaitForChild('Stats').WaitForChild('Number') as Frame).Visible = true;
+        }
     }
 
     onInit() {
@@ -173,9 +213,27 @@ export class UIController implements OnStart, OnInit {
             this.UIPath.PetInventory.get<ImageComponent>().Change()
         })
 
+        this.UIPath.PetInventory.PetInfo.Equip.get<ButtonComponent>().BindToClick(() => {
+            if (!this.selectedPet) { return }
+            Events.ManagePet(this.selectedPetStatus, this.selectedPet)
+        })
+
+        let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
+        let petInfo = petInventory.WaitForChild('PetInfo')! as Frame
+
         this._playerController.replica.ListenToChange('Profile.EquippedPets', (newValue, oldValue) => {
             this.EquippedPets = newValue
             this.updatePets()
+
+            if (newValue.size() > oldValue.size()) {
+                if (newValue[newValue.size()-1].name !== this.selectedPet!.name) { return }
+                (petInfo.WaitForChild('Equip').WaitForChild('TextLabel') as TextLabel).Text = 'Unequip'
+            }
+
+            if (oldValue.size() > newValue.size()) {
+                if (oldValue[oldValue.size()-1].name !== this.selectedPet!.name) { return }
+                (petInfo.WaitForChild('Equip').WaitForChild('TextLabel') as TextLabel).Text = 'Equip'
+            }
         })
 
         this._playerController.replica.ListenToChange('Profile.Pets', (newValue, oldValue) => {

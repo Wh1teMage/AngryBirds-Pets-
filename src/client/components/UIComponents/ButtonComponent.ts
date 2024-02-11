@@ -18,12 +18,13 @@ export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implem
     private _scale?: UIScale
 
     private _defaultClick(arg: GuiButton) {
-        PlayEffect('ClickSound' as EffectName)
+        PlayEffect('ClickSound')
     }
 
     private _defaultEnter(arg: GuiButton) {
         if (!this._scale) { return }
         TweenService.Create(this._scale, new TweenInfo(.1), { 'Scale': this._defaultScaleValue * 1.1 }).Play()
+        PlayEffect('HoverSound')
     }
 
     private _defaultLeave(arg: GuiButton) {
