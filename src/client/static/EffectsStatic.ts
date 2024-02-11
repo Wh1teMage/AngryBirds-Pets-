@@ -26,6 +26,7 @@ Effects.set('ClickSound', () => {
 })
 
 Effects.set('ClickEffect', (additional) => {
+    /*
     let clonedCircle = circle.Clone()
     let position = additional!.get('position') as Vector2
     clonedCircle.Parent = playerGui.WaitForChild('TestingStuff')
@@ -33,4 +34,5 @@ Effects.set('ClickEffect', (additional) => {
     TweenService.Create(clonedCircle, new TweenInfo(0.25), {'Size': UDim2.fromScale(0.5, 0.5)}).Play()
     task.wait(0.25)
     clonedCircle.Destroy()
+    */
 })

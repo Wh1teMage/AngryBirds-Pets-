@@ -24,7 +24,19 @@ import { WorldsData } from "shared/info/WorldInfo";
 import { PetUtilities } from "shared/utility/PetUtilities";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
-const mainGUI   = playerGui.WaitForChild('MainGui') as ScreenGui
+const mainUI   = playerGui.WaitForChild('MainUI') as ScreenGui
+
+const mainUIInterface = 
+    [
+        {name: 'RightList', objComponent: 'Frame', children: [
+            {name: 'Buttons', objComponent: 'Button', children: [
+                {name: 'Codes', objComponent: 'Button'},
+                {name: 'Daily', objComponent: 'Button'},
+                {name: 'Settings', objComponent: 'Button'},
+            ]},
+        ]}
+
+    ]
 
 
 @Controller({})
@@ -47,6 +59,9 @@ export class UIController implements OnStart, OnInit {
         //let currentlyShooting: Part | undefined = undefined
 
         let replicaData = this._playerController.replica.Data
+        let UISetup = ComponentsInitializer.InitializeObject(mainUIInterface, mainUI);
+
+        
         
     }
 
