@@ -28,14 +28,26 @@ const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const mainUI   = playerGui.WaitForChild('MainUI') as ScreenGui
 
 const mainUIInterface = 
-    [
+    [   {name: 'UpperList', objComponent: 'Frame', children: [
+            {name: 'Accuracy', objComponent: 'Image'},
+            {name: 'Gems', objComponent: 'Image'},
+            {name: 'Stars', objComponent: 'Image'},
+            {name: 'Wins', objComponent: 'Image'},
+        ]},
+
         {name: 'RightList', objComponent: 'Frame', children: [
             {name: 'Buttons', objComponent: 'Frame', children: [
                 {name: 'Codes', objComponent: 'Button'},
                 {name: 'Daily', objComponent: 'Button'},
                 {name: 'Settings', objComponent: 'Button'},
             ]},
+            {name: 'Gifts', objComponent: 'Button'},
+            {name: 'Limited', objComponent: 'Button'},
+            {name: 'Wheel', objComponent: 'Image', children:[
+                {name: 'Image', objComponent: 'Button'},
+            ]},
         ]},
+
         {name: 'LeftList', objComponent: 'Frame', children: [
             {name: 'Invite', objComponent: 'Button'},
             {name: 'Pets', objComponent: 'Button'},
@@ -90,7 +102,8 @@ const mainUIInterface =
             {name: 'Close', objComponent: 'Button'}
         ]},
         {name: 'PetInventory', objComponent: 'Image', children:[
-            {name: 'Close', objComponent: 'Button'}
+            {name: 'Close', objComponent: 'Button'},
+            {name: 'Info', objComponent: 'Button'}
         ]},
         {name: 'Quest', objComponent: 'Image', children:[
             {name: 'Close', objComponent: 'Button'}
@@ -128,9 +141,7 @@ const mainUIInterface =
         {name: 'VoidMachine', objComponent: 'Image', children:[
             {name: 'Close', objComponent: 'Button'}
         ]},
-        {name: 'WheelSpin', objComponent: 'Image', children:[
-            {name: 'Close', objComponent: 'Button'}
-        ]},
+        {name: 'WheelSpin', objComponent: 'Image'},
     ]
 
 
@@ -209,7 +220,7 @@ export class UIController implements OnStart, OnInit {
         //let currentlyShooting: Part | undefined = undefined
         this.UIPath = ComponentsInitializer.InitializeObject(mainUIInterface, mainUI)
         let replicaData = this._playerController.replica.Data
-        
+        print(this.UIPath)
         let dynamicCodesText = new DynamicText(
             this.UIPath.Codes.get<ImageComponent>().instance.WaitForChild('Info') as TextLabel, 
             '<stroke color="#163542" joins="miter" thickness="2.5" transparency="0">Follow <font color="rgb(255, 0, 0)">@StudioBosses</font>, <font color="rgb(237,0,203)">@4upahero</font> and <font color="rgb(89, 255, 29)">@KetwilDev</font> for powerful codes!</stroke>',
@@ -282,6 +293,14 @@ export class UIController implements OnStart, OnInit {
             UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         })
 
+        this.UIPath.DailyRewards.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.DailyRewards.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
         // this.UIPath.VIP.get<ImageComponent>().BindToClose((obj) => {
         //     UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
         // })
@@ -290,14 +309,51 @@ export class UIController implements OnStart, OnInit {
         //     UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         // })
 
+        this.UIPath.Limited.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.Limited.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
+        this.UIPath.Guide.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.Guide.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
+        this.UIPath.Guide.get<ImageComponent>().CanBeClosedByOthers = false
+
+        this.UIPath.WheelSpin.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.WheelSpin.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
+
+
+
 
 
         this.UIPath.RightList.Buttons.Codes.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.Codes.get<ImageComponent>().Change()
         })
 
+        this.UIPath.Codes.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Codes.get<ImageComponent>().Close()
+        })
+
         this.UIPath.RightList.Buttons.Settings.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.Settings.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.Settings.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Settings.get<ImageComponent>().Close()
         })
 
         this.UIPath.LeftList.Store.get<ButtonComponent>().BindToClick(() => {
@@ -328,9 +384,13 @@ export class UIController implements OnStart, OnInit {
             this.UIPath.Rebirth.get<ImageComponent>().Change()
         })
 
-        this.UIPath.Rebirth.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Rebirth.get<ImageComponent>().Close()
-        })
+        // ! НИЖЕ БОГА НЕТ
+        // !! ДО РЕЛИЗА НЕ ТРОГАТЬ !!
+        // this.UIPath.Rebirth.Close.get<ButtonComponent>().BindToClick(() => {
+        //     this.UIPath.Rebirth.get<ImageComponent>().Close()
+        // })
+        // !! ДО РЕЛИЗА НЕ ТРОГАТЬ !!
+        // ! ВЫШЕ БОГА НЕТ
 
         this.UIPath.LeftList.Trade.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.TradePlayerList.get<ImageComponent>().Change()
@@ -348,7 +408,41 @@ export class UIController implements OnStart, OnInit {
             this.UIPath.Teleport.get<ImageComponent>().Close()
         })
 
+        this.UIPath.RightList.Buttons.Daily.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.DailyRewards.get<ImageComponent>().Change()
+        })
 
+        this.UIPath.DailyRewards.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.DailyRewards.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.RightList.Gifts.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Gifts.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.Gifts.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Gifts.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.RightList.Limited.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Limited.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.Limited.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Limited.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.PetInventory.Info.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Guide.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.Guide.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Guide.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.RightList.Wheel.Image.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.WheelSpin.get<ImageComponent>().Change()
+        })
 
 
 
