@@ -444,8 +444,8 @@ export class UIController implements OnStart, OnInit {
             this.UIPath.WheelSpin.get<ImageComponent>().Change()
         })
 
-
-
+        let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
+        let petInfo = petInventory.WaitForChild('PetInfo')! as Frame
 
         this._playerController.replica.ListenToChange('Profile.EquippedPets', (newValue, oldValue) => {
             this.EquippedPets = newValue

@@ -22,7 +22,11 @@ Effects.set('ReplicatePurchase', (additional) => {
 })
 
 Effects.set('ClickSound', () => {
-    EffectsUtilities.PlaySound('rbxassetid://7741939171')
+    EffectsUtilities.PlaySound('rbxassetid://6052548458')
+})
+
+Effects.set('HoverSound', () => {
+    EffectsUtilities.PlaySound('rbxassetid://10066936758')
 })
 
 Effects.set('ClickEffect', (additional) => {

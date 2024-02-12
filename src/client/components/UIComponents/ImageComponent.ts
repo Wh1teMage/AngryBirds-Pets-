@@ -11,13 +11,14 @@ export class ImageComponent extends BaseComponent<Attributes, ImageLabel> implem
 
     onStart() {
         
-        this.BindToOpen(() => { print(this.instance.Name, 'Open'); UIAnimations.BlurSwitch(16); UIAnimations.Zoom(75); this.instance.Visible = true; this.CloseOthers() })
-        this.BindToClose(() => { print(this.instance.Name, 'Close'); UIAnimations.BlurSwitch(0); UIAnimations.Zoom(0); task.delay(.3, () =>  this.instance.Visible = false) })
+        this.BindToOpen(() => { UIAnimations.BlurSwitch(16); UIAnimations.Zoom(80); this.instance.Visible = true; if (this.CanCloseOthers) { this.CloseOthers() } })
+        this.BindToClose(() => { UIAnimations.BlurSwitch(0); UIAnimations.Zoom(0); task.delay(.3, () =>  this.instance.Visible = false) })
 
     }
 
     public IsOpened = false
     public CanBeClosedByOthers = true
+    public CanCloseOthers = true
 
     private _locked = false
 
