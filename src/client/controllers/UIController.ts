@@ -41,8 +41,14 @@ const mainUIInterface =
                 {name: 'Daily', objComponent: 'Button'},
                 {name: 'Settings', objComponent: 'Button'},
             ]},
+            {name: 'AutoShoot', objComponent: 'Button'},
+            {name: 'AutoTrain', objComponent: 'Button'},
+            {name: 'Event', objComponent: 'Button'},
             {name: 'Gifts', objComponent: 'Button'},
             {name: 'Limited', objComponent: 'Button'},
+            {name: 'Premium', objComponent: 'Button'},
+            {name: 'Quest', objComponent: 'Button'},
+            {name: 'UpdateLog', objComponent: 'Button'},
             {name: 'Wheel', objComponent: 'Image', children:[
                 {name: 'Image', objComponent: 'Button'},
             ]},
@@ -335,6 +341,30 @@ export class UIController implements OnStart, OnInit {
             UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         })
 
+        this.UIPath.Event.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.Event.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
+        this.UIPath.Quest.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.Quest.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
+        this.UIPath.UpdateLog.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.UpdateLog.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
 
 
 
@@ -443,6 +473,34 @@ export class UIController implements OnStart, OnInit {
         this.UIPath.RightList.Wheel.Image.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.WheelSpin.get<ImageComponent>().Change()
         })
+
+        this.UIPath.RightList.Event.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Event.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.Event.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Event.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.RightList.Quest.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Quest.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.Quest.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Quest.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.RightList.UpdateLog.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.UpdateLog.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.UpdateLog.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.UpdateLog.get<ImageComponent>().Close()
+        })
+
+
+
+
 
         let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
         let petInfo = petInventory.WaitForChild('PetInfo')! as Frame
