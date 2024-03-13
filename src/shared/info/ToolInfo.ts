@@ -10,11 +10,11 @@ ToolsData.set('Slingshot1W1', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default1',
-    addition: 1,
+    addition: 2,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: 100,
+    price: 0,
     valuetype: ToolValueType.Strength
 })
 
@@ -24,11 +24,11 @@ ToolsData.set('Slingshot2W1', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default2',
-    addition: 1,
+    addition: 3,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 600,
     valuetype: ToolValueType.Strength
 })
 
@@ -38,11 +38,11 @@ ToolsData.set('Slingshot3W1', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default3',
-    addition: 1,
+    addition: 5,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 3000,
     valuetype: ToolValueType.Strength
 })
 
@@ -53,11 +53,11 @@ ToolsData.set('Slingshot4W1', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default4',
-    addition: 1,
+    addition: 8,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 10000,
     valuetype: ToolValueType.Strength
 })
 
@@ -68,11 +68,11 @@ ToolsData.set('Slingshot5W1', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default5',
-    addition: 1,
+    addition: 12,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 20000,
     valuetype: ToolValueType.Strength
 })
 
@@ -82,7 +82,7 @@ ToolsData.set('SlingshotD1W1', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default6',
-    addition: 1,
+    addition: 50,
     firerate: 1/1,
     effectname: 'Shoot',
 
@@ -98,7 +98,7 @@ ToolsData.set('Slingshot1W2', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default1',
-    addition: 1,
+    addition: 18,
     firerate: 1/1,
     effectname: 'Shoot',
 
@@ -112,7 +112,7 @@ ToolsData.set('Slingshot2W2', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default2',
-    addition: 1,
+    addition: 27,
     firerate: 1/1,
     effectname: 'Shoot',
 
@@ -126,7 +126,7 @@ ToolsData.set('Slingshot3W2', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default3',
-    addition: 1,
+    addition: 40,
     firerate: 1/1,
     effectname: 'Shoot',
 
@@ -141,7 +141,7 @@ ToolsData.set('Slingshot4W2', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default4',
-    addition: 1,
+    addition: 60,
     firerate: 1/1,
     effectname: 'Shoot',
 
@@ -156,7 +156,7 @@ ToolsData.set('Slingshot5W2', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default5',
-    addition: 1,
+    addition: 90,
     firerate: 1/1,
     effectname: 'Shoot',
 
@@ -169,8 +169,8 @@ ToolsData.set('Slingshot6W2', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: new CFrame(0,0,0),
 
-    name: 'Default5',
-    addition: 1,
+    name: 'я четырнадцати летняя проститутка из Никгура',
+    addition: 140,
     firerate: 1/1,
     effectname: 'Shoot',
 
@@ -184,7 +184,7 @@ ToolsData.set('SlingshotD1W2', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default6',
-    addition: 1,
+    addition: 550,
     firerate: 1/1,
     effectname: 'Shoot',
 
@@ -272,7 +272,7 @@ ToolsData.set('Slingshot6W3', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: new CFrame(0,0,0),
 
-    name: 'Default5',
+    name: 'я четырнадцати летняя проститутка из Никгура',
     addition: 1,
     firerate: 1/1,
     effectname: 'Shoot',
