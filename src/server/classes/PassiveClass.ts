@@ -1,6 +1,7 @@
 import { Modding } from "@flamework/core";
 import { Constructor } from "@flamework/core/out/utility";
 import { IPassiveData, PassiveValues } from "shared/interfaces/PassiveData";
+import { IDBPetData } from "shared/interfaces/PetData";
 
 export abstract class PassiveClass implements IPassiveData {
 
@@ -15,13 +16,24 @@ export abstract class PassiveClass implements IPassiveData {
 
     public onStart = () => {}
     public onShoot = () => {}
-    public onValueAdded = (value: PassiveValues) => {}
+
+    public onStrengthChanged = (newvalue: number, oldvalue: number) => {}
+    public onWinsChanged = (newvalue: number, oldvalue: number) => {}
+    public onGemsChanged = (newvalue: number, oldvalue: number) => {}
+    public onStarsChanged = (newvalue: number, oldvalue: number) => {}
+    public onRebirthsChanged = (newvalue: number, oldvalue: number) => {}
+    public onValueChanged = (value: PassiveValues) => {}
+
+    public onFriendsChanged = () => {}
+    public onTick = () => {}
+
+    public onPetAdded = (pet: IDBPetData) => {}
 
 }
 
 export const Passives = new Map<string, (player?: Player) => PassiveClass>()
 
-export const AbilityDecorator = Modding.createDecorator<[string]>('Class', (descriptor, [name]) => {
+export const PassiveDecorator = Modding.createDecorator<[string]>('Class', (descriptor, [name]) => {
     Passives.set(name, (player?: Player) => {return new (descriptor.object as Constructor)(player as never) as PassiveClass})
 }) 
 

@@ -1,5 +1,5 @@
 import { Workspace } from "@rbxts/services"
-import { Evolutions, IPetData, Rarities, Sizes } from "shared/interfaces/PetData"
+import { Evolutions, IPetData, Mutations, Rarities, Sizes } from "shared/interfaces/PetData"
 
 export const PetsData = new Map<string, IPetData>()
 
@@ -7,6 +7,7 @@ PetsData.set('Cat',
 {
     name: 'Cat',
     locked: false,
+    equipped: false,
     multipliers: new Map([['strength', 1]]),
     stats: {
         rarity: Rarities.Common,
@@ -15,7 +16,8 @@ PetsData.set('Cat',
     },
     additional: {
         size: Sizes.Normal,
-        evolution: Evolutions.Normal
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
     },
     model: Workspace.WaitForChild('Enot') as Model
 })

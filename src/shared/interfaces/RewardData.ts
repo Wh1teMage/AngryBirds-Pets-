@@ -7,8 +7,13 @@ export interface IRewardData {
         Wins?: number
         Stars?: number
         Rebirths?: number
+        Gems?: number
     }
     Pets?: Array<{pet: IDBPetData, amount: number}>
     Potions?: Array<{potion: PotionType, amount: number}>
-    Time: number
+    Additional?: Array<{data: any, amount: number}>
+    Title?: string
+    
+    Time?: number
+    ProductId?: number
 }

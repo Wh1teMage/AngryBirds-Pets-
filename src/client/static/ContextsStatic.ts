@@ -16,6 +16,8 @@ Contexts.set('ClickEffect', {obj: Enum.UserInputType.MouseButton1, state: Enum.U
     let mouse = player.GetMouse()
     PlayEffect('ClickSound')
     PlayEffect('ClickEffect', new Map<string, any>([['position', new Vector2(mouse.X, mouse.Y)]]))
+    PlayEffect('ClickBind', new Map<string, any>([['bind', PlayerController.currentClicks]]))
+    PlayEffect('Click')
 }})
 
 // Contexts.set('click effect', {obj: Enum.UserInputType.Touch, state: Enum.UserInputState.Begin, callback: () => {

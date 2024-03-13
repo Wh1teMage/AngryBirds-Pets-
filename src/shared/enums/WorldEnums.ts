@@ -1,4 +1,5 @@
 export enum WorldType {
     Default = 'Default',
-    Desert = 'Desert',
+    Cyber = 'Cyber',
+    Space = 'Space',
 }

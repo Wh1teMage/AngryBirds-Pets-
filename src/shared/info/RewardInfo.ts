@@ -2,6 +2,7 @@ import { IRewardData } from "shared/interfaces/RewardData";
 
 export const SessionRewardsData = new Array<IRewardData>()
 export const DailyRewardsData = new Array<IRewardData>()
+export const RebirthsRewardsData = new Array<IRewardData>()
 export const CodesRewardsData = new Map<string, IRewardData>()
 
 export const SelectDailyReward = (time: number) => {
@@ -11,7 +12,7 @@ export const SelectDailyReward = (time: number) => {
 }
 
 export const SelectSessionReward = (rewardIndex: number) => {
-    let sortedRewards = SessionRewardsData.sort((a, b) => a.Time < b.Time)
+    let sortedRewards = SessionRewardsData.sort((a, b) => a.Time! < b.Time!)
     return sortedRewards[rewardIndex]
 }
 
@@ -34,4 +35,12 @@ CodesRewardsData.set('testcode', {
         Strength: 10
     },
     Time: 1
+})
+
+RebirthsRewardsData.push({
+    Values: {
+        Gems: 10
+    },
+    Title: 'Test',
+    Additional: [{data: 'Wins', amount: 10}, {data: 'Multiplier', amount: .1}],
 })

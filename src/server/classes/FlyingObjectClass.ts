@@ -33,7 +33,7 @@ export class FlyingObjectClass {
 
         this.startingVelocity = velocity
         this.position = position
-        this.koef = (velocity.X*info.gravity)/(velocity.Y*info.density)
+        this.koef = (-velocity.Z*info.gravity)/(velocity.Y*info.density)
 
         this.bounces = math.ceil( this.koef )
         this.overallSum = (1+this.bounces)*this.bounces/2
@@ -46,8 +46,8 @@ export class FlyingObjectClass {
         this.BodyVelocity.Velocity = velocity
 
         this.BodyPosition = new Instance('BodyPosition')
-        this.BodyPosition.MaxForce = new Vector3(0,0,9e99)
-        this.BodyPosition.Position = new Vector3(0, 0, position.Z)
+        this.BodyPosition.MaxForce = new Vector3(9e99,0,0)
+        this.BodyPosition.Position = new Vector3(position.X, 0, 0)
 
         this.BodyPosition.Parent = this.part
         this.BodyVelocity.Parent = this.part
@@ -79,7 +79,7 @@ export class FlyingObjectClass {
         camera.CameraType = Enum.CameraType.Track
         camera.CameraSubject = this.part
 
-        camera.CFrame = new CFrame(this.part.Position.add(new Vector3(0, this.startingVelocity.X/10, 0)), this.part.Position)
+        camera.CFrame = new CFrame(this.part.Position.add(new Vector3(0, this.startingVelocity.Z/10, 0)), this.part.Position)
     }
 
     public DetachCamera(humanoid: Humanoid) {
@@ -96,22 +96,22 @@ export class FlyingObjectClass {
 
         while (true) {
             task.wait(this.step)
+            //print(this.BodyVelocity.Velocity.Z, this.part.Position.Y)
+            this.TravelledDistance += -this.BodyVelocity.Velocity.Z*this.step+(this.density*this.step**2)/2
+            this.BodyVelocity.Velocity = this.BodyVelocity.Velocity.add(new Vector3(0, -this.gravity*this.step, this.density*this.step))
 
-            this.TravelledDistance += this.BodyVelocity.Velocity.X*this.step-(this.density*this.step**2)/2
-            this.BodyVelocity.Velocity = this.BodyVelocity.Velocity.add(new Vector3(-this.density*this.step, -this.gravity*this.step, 0))
-
-            if (this.part.Position.X - this.position.X >= this.length) {
+            if ((math.abs(this.part.Position.Z - this.position.Z)) >= this.length) {
                 this.part.Position = new Vector3(this.position.X, this.part.Position.Y, this.position.Z)
             }
 
-            if (this.BodyVelocity.Velocity.X <= 0) break
-            if (this.part.Position.Y < this.position.Y) {
+            if (this.BodyVelocity.Velocity.Z >= 0) break
+            if (this.part.Position.Y-5 < this.position.Y) {
                 if ( this.currentBounce <= 0 ) { this.BodyVelocity.Velocity = this.BodyVelocity.Velocity.add(new Vector3(0, this.gravity*this.step, 0)); continue }
 
                 this.bounceSum -= this.currentBounce
                 this.currentBounce -= 1
 
-                this.BodyVelocity.Velocity = new Vector3(this.BodyVelocity.Velocity.X, this.startingVelocity.Y*this.bounceSum/this.overallSum, 0)
+                this.BodyVelocity.Velocity = new Vector3(0, this.startingVelocity.Y*this.bounceSum/this.overallSum, this.BodyVelocity.Velocity.Z)
             }
 
         }

@@ -3,6 +3,7 @@ import { Controller, OnStart, OnInit, Dependency } from "@flamework/core";
 import { ReplicaController } from "@rbxts/replicaservice";
 import { Players } from "@rbxts/services";
 import Signal from "@rbxts/signal";
+import { Binding } from "client/classes/BindbingValues";
 import { ClientPlayerComponent, ClientPlayerFabric } from "client/components/PlayerComponent";
 import { ButtonFabric } from "client/components/UIComponents/ButtonComponent";
 import { FrameComponent, FrameFabric } from "client/components/UIComponents/FrameComponent";
@@ -16,6 +17,8 @@ export class PlayerController implements OnStart, OnInit, ILocalPlayer {
     public replica!: PlayerDataReplica
     public loadSignal = new Signal<() => void>()
     public fullyLoaded = false
+
+    static currentClicks = new Binding<number>(0)
 
     onInit() {
         

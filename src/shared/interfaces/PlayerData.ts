@@ -21,4 +21,5 @@ export interface IServerPlayerComponent {
     profile: Profile<IProfileData, ProfileMetaData>,
     replica: PlayerDataReplica
     session: ISessionData
+    instance: Player
 }

@@ -6,6 +6,7 @@ export interface IPetData {
     model: Model
 
     locked: boolean,
+    equipped: boolean,
     multipliers: Map<keyof IMultipliers, number>
 
     stats: {
@@ -14,19 +15,20 @@ export interface IPetData {
         rotationOffset: CFrame,
     }
 
-    additional: IDBPetData['additional']
-
+    additional: IDBPetData['additional'],
 }
 
 export interface IDBPetData {
     name: string,
     locked: boolean,
+    equipped: boolean,
     additional: {
         size: Sizes
         evolution: Evolutions
+        mutation: Mutations
         limit?: number
         perks?: Array<string>
-    }
+    },
 }
 
 export enum Rarities {
@@ -44,9 +46,23 @@ export enum Evolutions {
     Void = 'Void',
 }
 
+export enum Mutations {
+    Default = 'Default',
+    Primordial = 'Primordial',
+    Majestic = 'Majestic',
+    Elder = 'Elder',
+    Sacred = 'Sacred',
+}
+
 export enum PetOperationStatus {
     Equip = 'Equip',
     Unequip = 'Unequip',
+    Lock = 'Lock',
+    Delete = 'Delete',
+    CraftSize = 'CraftSize',
+    Evolve = 'Evolve',
+    Mutate = 'Mutate',
+    ClaimVoid = 'ClaimVoid',
 }
 
 //'Cat|Huge|Void|56'

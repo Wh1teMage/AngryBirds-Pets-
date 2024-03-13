@@ -9,7 +9,7 @@ interface Attributes {}
 export class ClientPlayerComponent extends BaseComponent<Attributes, Player> implements OnStart, IClientPlayerComponent {
     onStart() {
         task.wait(3)
-        Events.PurchasePrompt.fire(1701055226, this.instance.UserId)
+        //Events.PurchasePrompt.fire(1701055226, this.instance.UserId)
 
     }
 }

@@ -3,10 +3,14 @@ import { Events } from "client/network";
 import { EffectName } from "shared/enums/EffectEnums";
 import { EffectsUtilities } from "shared/utility/EffectsUtilities"
 import { TweenService } from "@rbxts/services";
+import { ToolOperationStatus } from "shared/interfaces/ToolData";
+import { Binding } from "client/classes/BindbingValues";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const player = Players.LocalPlayer
 //const circle = playerGui.WaitForChild('TestingStuff').WaitForChild('Frame') as Frame
+
+let canFireUseEvents = true
 
 export const PlayEffect = (name: string, additional?: Map<string, any>) => {
     if (!Effects.get(name)) { warn('Effects Doesnt Exist!'); return }
@@ -39,4 +43,17 @@ Effects.set('ClickEffect', (additional) => {
     task.wait(0.25)
     clonedCircle.Destroy()
     */
+})
+
+Effects.set('ChangeUseStatus', (additional) => {
+    canFireUseEvents = additional!.get('bool') as boolean
+})
+
+Effects.set('Click', () => {
+    if (canFireUseEvents) { Events.ManageTool.fire(ToolOperationStatus.Use, 'default') } 
+}) 
+
+Effects.set('ClickBind', (additional) => {
+    let bind = additional!.get('bind') as Binding<number>
+    bind.set(bind.get()+math.random(10, 30)/10)
 })

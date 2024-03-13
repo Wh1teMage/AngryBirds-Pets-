@@ -11,6 +11,8 @@ import { TradeManager } from "server/classes/TradeClass";
 import { ToolOperationStatus } from "shared/interfaces/ToolData";
 import { WorldOperationStatus } from "shared/interfaces/WorldData";
 import { WorldType } from "shared/enums/WorldEnums";
+import { RewardType } from "shared/enums/RewardEnums";
+import { FlyingObjectStatus } from "shared/enums/FlyingObjectEnums";
 
 @Service({})
 export class SignalService implements OnStart, OnInit {
@@ -67,13 +69,17 @@ export class SignalService implements OnStart, OnInit {
             }
         })
 
-        Events.ManagePet.connect((player: Player, operation: PetOperationStatus, pet: IDBPetData) => {
+        Events.ManagePet.connect((player: Player, operation: PetOperationStatus, pet: IDBPetData, count?: number) => {
             let playerComp = ServerPlayerFabric.GetPlayer(player)
             if (!playerComp) { return }
 
             if (operation === PetOperationStatus.Equip) { playerComp.EquipPet(pet) }
             if (operation === PetOperationStatus.Unequip) { playerComp.UnequipPet(pet) }
-
+            if (operation === PetOperationStatus.Lock) { playerComp.LockPet(pet) }
+            if (operation === PetOperationStatus.Delete) { playerComp.RemovePet(pet) }
+            if (operation === PetOperationStatus.CraftSize) { playerComp.UpgradePetSize(pet) }
+            if (operation === PetOperationStatus.Evolve) { playerComp.UpgradePetEvolution(pet, count) }
+            if (operation === PetOperationStatus.ClaimVoid) { playerComp.ClaimVoidPet(pet) }
         })
 
         Events.ManageTool.connect((player: Player, operation: ToolOperationStatus, toolname: string) => {
@@ -82,7 +88,7 @@ export class SignalService implements OnStart, OnInit {
 
             if (operation === ToolOperationStatus.Equip) { playerComp.EquipTool(toolname) }
             if (operation === ToolOperationStatus.Buy) { playerComp.BuyTool(toolname) }
-
+            if (operation === ToolOperationStatus.Use) { playerComp.UseTool() }
         })
 
         Events.ManageWorld.connect((player: Player, operation: WorldOperationStatus, world: WorldType) => {
@@ -92,11 +98,27 @@ export class SignalService implements OnStart, OnInit {
             if (operation === WorldOperationStatus.Buy) { playerComp.BuyMaxWorld(world) }
         })
 
-        Events.ShootObject.connect((player: Player) => {
+        Events.ShootObject.connect((player: Player, operation: FlyingObjectStatus, power?: number) => {
+            let playerComp = ServerPlayerFabric.GetPlayer(player)
+            if (!playerComp) { return }
+            
+            if (operation === FlyingObjectStatus.IniticalizeObject) { playerComp.InitializeObject() }
+            if (operation === FlyingObjectStatus.ShootObject) { 
+                let redactedPower = math.clamp(power!, .1, 1)*0.3+1
+                print(redactedPower)
+                playerComp.ShootObject(redactedPower)
+             }
+            
+        })
+
+        Events.ClaimReward.connect((player: Player, rewardtype: RewardType, info?: any) => {
             let playerComp = ServerPlayerFabric.GetPlayer(player)
             if (!playerComp) { return }
 
-            playerComp.ShootObject()
+            if (rewardtype === RewardType.PetQuest) { playerComp.ClaimPetQuestReward() } // make sure to comment ALL disabled pet quests (otherwise it will run poorly)
+            if (rewardtype === RewardType.Session) { playerComp.ClaimSessionReward(info!) }
+            if (rewardtype === RewardType.Daily) { playerComp.ClaimDailyReward() }
+            if (rewardtype === RewardType.Code) { playerComp.RedeemCode(info!) }
         })
 
     }

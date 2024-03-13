@@ -21,5 +21,6 @@ export interface IToolData {
 
 export enum ToolOperationStatus {
     Equip = 'Equip',
-    Buy   = 'Buy'
+    Buy   = 'Buy',
+    Use   = 'Use',
 }

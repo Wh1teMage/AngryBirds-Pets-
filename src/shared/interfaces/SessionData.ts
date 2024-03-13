@@ -16,18 +16,17 @@ export interface ISessionData {
 
     claimedRewards: Array<number>
     activePassives: Array<IPassiveData>
-    currentFlyingObject?: { partName: string }
+    currentFlyingObject?: { partName: string, part: BasePart, flying: boolean }
 
     multipliers: {
         other: IMultipliers
         pet: IMultipliers
         world: IMultipliers
         potion: IMultipliers
+        friends: IMultipliers
     }
 
-    //potionmultipliers: IMultipliers
-    //petmultipliers: IMultipliers
-    //worldmultipliers: IMultipliers
+    friendList: Array<string>
 }
 
 export interface IMultipliers {
@@ -65,9 +64,8 @@ export const SessionData: ISessionData = {
         pet: table.clone(DefaultMultipliers),
         world: table.clone(DefaultMultipliers),
         potion: table.clone(DefaultMultipliers),
-    }
+        friends: table.clone(DefaultMultipliers),
+    },
 
-    //potionmultipliers: table.clone(DefaultMultipliers),
-    //petmultipliers: table.clone(DefaultMultipliers),
-    //worldmultipliers: table.clone(DefaultMultipliers),
+    friendList: [],
 }

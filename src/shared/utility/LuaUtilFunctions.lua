@@ -3,6 +3,8 @@ local Functions = {}
 local compareIgnoreList = {
     'limit',
     'model',
+    'equipped',
+    'locked'
 }
 
 local function TableClone(transfer, template)
@@ -46,11 +48,11 @@ end
 local function CompareTables(t1, t2, useIgnore)
     local checks = true
     for index, value in t1 do
-
+        
         if useIgnore and table.find(compareIgnoreList, index) ~= nil and t2[index] ~= nil then continue end
 
         if typeof(value) == 'table' and typeof(t2[index]) == 'table' then
-            checks = checks and CompareTables(t1[index], t2[index])
+            checks = checks and CompareTables(t1[index], t2[index], useIgnore)
         else
             checks = checks and (value == t2[index])
         end
@@ -70,8 +72,8 @@ Functions.iterateObject = function(object, callback)
     end
 end
 
-Functions.compareObjects = function(obj1, obj2)
-    return CompareTables(obj1, obj2)
+Functions.compareObjects = function(obj1, obj2, useIgnore)
+    return CompareTables(obj1, obj2, useIgnore)
 end
 
 return Functions

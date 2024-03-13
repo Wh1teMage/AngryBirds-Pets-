@@ -1,4 +1,4 @@
-import { Evolutions, IDBPetData, IPetData, Sizes } from "shared/interfaces/PetData"
+import { Evolutions, IDBPetData, IPetData, Mutations, Sizes } from "shared/interfaces/PetData"
 import Functions from "./LuaUtilFunctions"
 import { petCallbacks } from "shared/configs/PetConfig"
 import { PetsData } from "shared/info/PetInfo"
@@ -22,6 +22,7 @@ export class PetUtilities {
         let pet: IPetData = {
             name: originalPet.name,
             locked: originalPet.locked,
+            equipped: originalPet.equipped,
             stats: table.clone( originalPet.stats ),
             additional: table.clone( info.additional ),
             multipliers: table.clone( originalPet.multipliers ),
@@ -46,9 +47,11 @@ export class PetUtilities {
         let pet: IDBPetData = {
             name: name,
             locked: false,
+            equipped: false,
             additional: {
                 size: Sizes.Normal,
-                evolution: Evolutions.Normal
+                evolution: Evolutions.Normal,
+                mutation: Mutations.Default,
             }
         }
 
@@ -89,6 +92,14 @@ export class PetUtilities {
 
     static ComparePets(pet1: IDBPetData, pet2: IDBPetData) {
         return Functions.compareObjects(pet1, pet2, true)
+    }
+
+    static GenerateUniqueEquipId(usedIDs: number[]) {
+        let id = math.random(-10e6, 10e6)
+        while (usedIDs.includes(id)) {
+            id = math.random(-10e6, 10e6)
+        }
+        return id
     }
 
     static GetWeldedPetModel(model: Model) {

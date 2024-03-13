@@ -22,7 +22,7 @@ export const petUpgradeConfig = {
     },
     EvolutionUpgrades: {
         Normal: { requirements: undefined, nextEvolution: Evolutions.Gold },
-        Gold: { requirements: { time: 1 }, nextEvolution: Evolutions.Void },
+        Gold: { requirements: { time: 10 }, nextEvolution: Evolutions.Void },
         Void: { requirements: undefined, nextEvolution: undefined },
     },
 

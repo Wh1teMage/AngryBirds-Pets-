@@ -47,7 +47,6 @@ export class PetModelManager {
 
         let petIndex = -1
         PetModelManager.GetPlayer(player)!.forEach((value, index) => { if (Functions.compareObjects(value.DB, pet)) { petIndex = index } })
-        print(petIndex)
         if (petIndex < 0) { return }
 
         PetModelManager.GetPlayer(player)![petIndex].Pet.model.Destroy()

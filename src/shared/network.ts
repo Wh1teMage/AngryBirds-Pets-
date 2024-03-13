@@ -6,6 +6,8 @@ import { IDBPetData, PetOperationStatus } from "./interfaces/PetData";
 import { ToolOperationStatus } from "./interfaces/ToolData";
 import { WorldOperationStatus } from "./interfaces/WorldData";
 import { WorldType } from "./enums/WorldEnums";
+import { RewardType } from "./enums/RewardEnums";
+import { FlyingObjectStatus } from "./enums/FlyingObjectEnums";
 
 interface ClientToServerEvents {
     PurchasePrompt: (productid: number, giftid?: number) => void
@@ -14,12 +16,14 @@ interface ClientToServerEvents {
 
     RequestTrade: (operation: RequestOperationStatus, otherplayer: Player) => void
     ManageTrade: (operation: TradeOperationStatus, status?: TradeUpdateStatus, pet?: IDBPetData) => void
-    ManagePet: (operation: PetOperationStatus, pet: IDBPetData) => void
+    ManagePet: (operation: PetOperationStatus, pet: IDBPetData, count?: number) => void
 
     ManageTool: (operation: ToolOperationStatus, toolname: string) => void
     ManageWorld: (operation: WorldOperationStatus, world: WorldType) => void
 
-    ShootObject: () => void
+    ClaimReward: (rewardtype: RewardType, info?: any) => void
+
+    ShootObject: (operation: FlyingObjectStatus, power?: number) => void
 }
 
 interface ServerToClientEvents {

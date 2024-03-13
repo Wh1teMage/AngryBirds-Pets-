@@ -8,6 +8,7 @@ export interface IProfileData {
         WinsVal: number
         StarsVal: number
         RebirthsVal: number
+        GemsVal: number
     }
 
     StatValues: {
@@ -18,10 +19,14 @@ export interface IProfileData {
         DayAmount: number
         IngameTime: number
         RobuxSpent: number
+
+        SpinCount: number
+        TestEggCount: number
     }
 
     Multipliers: {
         StrengthMul: number
+        GemsMul: number
         WinsMul: number
         StarsMul: number
         RebirthsMul: number
@@ -34,14 +39,17 @@ export interface IProfileData {
         MaxEquippedPets: number
         MaxPetsInVoidMachine: number
         MaxWorld: WorldType
+        RebirthTitle: string
     }
+
+    CompletedQuests: Array<string>
+    CurrentQuestsProgress: Map<string, Map<string, any>>
 
     ActiveBuffs: Array<{name: string, endTime: number, startTime: number, source: string}>
     Potions: Array<{potion: PotionType, amount: number}>
 
     Abilities: Array<string>
     Pets: Array<IDBPetData>
-    EquippedPets: Array<IDBPetData>
     Products: Array<string>
 
     PetIndex: Array<string>

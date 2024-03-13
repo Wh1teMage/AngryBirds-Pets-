@@ -11,6 +11,7 @@ export const defaultValue: IProfileData = {
         WinsVal: 0,
         StarsVal: 0,
         RebirthsVal: 0,
+        GemsVal: 0,
     },
 
     StatValues: {
@@ -21,10 +22,14 @@ export const defaultValue: IProfileData = {
         DayAmount: 0,
         IngameTime: 0,
         RobuxSpent: 0,
+
+        SpinCount: 0,
+        TestEggCount: 0
     },
 
     Multipliers: {
         StrengthMul: 1,
+        GemsMul: 1,
         WinsMul: 1,
         StarsMul: 1,
         RebirthsMul: 1,
@@ -36,21 +41,24 @@ export const defaultValue: IProfileData = {
         MaxPets: 100,
         MaxEquippedPets: 3,
         MaxPetsInVoidMachine: 5,
-        MaxWorld: WorldType.Default
+        MaxWorld: WorldType.Default,
+        RebirthTitle: 'Default',
     },
+
+    CompletedQuests: [],
+    CurrentQuestsProgress: new Map(),
 
     ActiveBuffs: [],
     Potions: [],
     
-    EquippedPets: [],
     Abilities: [],
     Products: [],
     Pets: [],
 
     PetIndex: [],
 
-    OwnedTools: ['Default'],
-    EquippedTool: 'Default',
+    OwnedTools: ['Slingshot1W1'],
+    EquippedTool: 'Slingshot1W1',
 
     VoidMachine: [],
     RedeemedCodes: [],
