@@ -684,7 +684,33 @@ export class UIController implements OnStart, OnInit {
     private setupDonations() {
 
         let accuracylist = new Map<string, number>([
-            ['1', 1762885895]
+            ['1', 1762885895],
+            ['2', 1762886150],
+            ['3', 1762886258],
+            ['4', 1762886345],
+            ['5', 1762886496],
+            ['6', 1762886599],
+            ['7', 1762886688]
+        ])
+
+        let winslist = new Map<string, number>([
+            ['1', 1762886863],
+            ['2', 1762886977],
+            ['3', 1762887049],
+            ['4', 1762887130],
+            ['5', 1762887254],
+            ['6', 1762887397],
+            ['7', 1762887501]
+        ])
+
+        let gemslist = new Map<string, number>([
+            ['1', 1762887630],
+            ['2', 1762887698],
+            ['3', 1762887934],
+            ['4', 1762888203],
+            ['5', 1762888316],
+            ['6', 1762888398],
+            ['7', 1762888472]
         ])
 
         let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
