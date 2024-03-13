@@ -408,78 +408,6 @@ export class UIController implements OnStart, OnInit {
         }
     }
 
-    private updateSlingshots(world: IWorldData) {
-        let obj = this.UIPath.SlingshotStore.get<ImageComponent>().instance
-        let store = obj.WaitForChild('ScrollingFrame') as ScrollingFrame;
-
-        let selectedStore: Frame | undefined;
-
-        for (let storeFrame of store.GetChildren()) {
-            if (!storeFrame.IsA('Frame')) { continue }
-            if (storeFrame.Name !== world.shopName) { storeFrame.Visible = false; continue }
-            storeFrame.Visible = true
-            selectedStore = storeFrame
-        }
-
-        if (!selectedStore) { return }
-
-        for (let button of selectedStore.GetDescendants()) {
-            if (!button.IsA('GuiButton')) { continue }
-            let slingshotFrame = button.Parent!
-
-            if (!slingshotFrame.FindFirstChild('Pointer')) { continue }
-            let toolName = (slingshotFrame.WaitForChild('Pointer') as StringValue).Value;
-
-            let owned = false
-            let tool = ToolsData.get(toolName)
-            if (!tool) { continue };
-
-            let equipFrame = (slingshotFrame.WaitForChild('UnlockButton').WaitForChild('Equip') as Frame)
-
-            if (this.ownedTools.includes(toolName)) { equipFrame.Visible = true; owned = true; (equipFrame.WaitForChild('Equip') as TextLabel).Text = 'Equip' }
-            if (this.equippedTool === toolName) { (equipFrame.WaitForChild('Equip') as TextLabel).Text = 'Equipped' }
-        }
-
-        /*
-        (store.WaitForChild(world.shopName) as Frame).Visible;
-
-
-        this.clearPets(obj.WaitForChild('ScrollingFrame')!, 'ImageLabel')
-        print(world)
-        for (let toolName of world.shop) {
-
-            let owned = false
-            let tool = ToolsData.get(toolName)
-            if (!tool) { continue }
-
-            let element = (obj.WaitForChild('Templates').WaitForChild('Slingshot') as ImageLabel).Clone();
-            if (tool.valuetype === ToolValueType.VBugs) { element = (obj.WaitForChild('Templates').WaitForChild('VipSlingshot') as ImageLabel).Clone(); };
-
-            (element.WaitForChild('Name') as TextLabel).Text = tool.name;
-            (element.WaitForChild('Value') as TextLabel).Text = '+'+tostring(tool.addition);
-            (element.WaitForChild('UnlockButton').WaitForChild('Value') as TextLabel).Text = tostring(tool.price);
-
-            if (this.ownedTools.includes(tool.name)) { (element.WaitForChild('UnlockButton').WaitForChild('Equip') as Frame).Visible = true; owned = true }
-
-            let button = ButtonFabric.CreateButton(element.WaitForChild('UnlockButton') as GuiButton)
-
-            if (this.equippedTool === toolName) { 
-                (element.WaitForChild('UnlockButton').WaitForChild('Equip').WaitForChild('Equip') as TextLabel).Text = 'Equipped'
-            }
-
-            button.BindToClick(() => {
-                if (this.equippedTool === toolName) { return }
-                if (owned) { Events.ManageTool.fire(ToolOperationStatus.Equip, toolName); return }
-                Events.ManageTool.fire(ToolOperationStatus.Buy, toolName)
-            })
-
-            element.Visible = true
-            element.Parent = obj.WaitForChild('ScrollingFrame')!
-        }
-        */
-
-    }
-
     private setupVoidPets() {
 
         let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
@@ -700,6 +628,19 @@ export class UIController implements OnStart, OnInit {
 
     }
 
+    public setupWorldTeleports() {
+        let worldsUI = this.UIPath.Teleport.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
+
+        for (let worldIcon of worldsUI.GetChildren()) {
+            if (!worldIcon.IsA('ImageLabel')) { continue }
+            if (!WorldsData.has(worldIcon.Name as WorldType)) { continue }
+
+            ButtonFabric.CreateButton(worldIcon.WaitForChild('TeleportButton') as GuiButton).BindToClick(() => {
+                Events.ManageWorld.fire(WorldOperationStatus.Teleport, worldIcon.Name as WorldType)
+            })
+        }
+    }
+
     private makeGift(gift: ImageButton) {
         let giftData = SessionRewardsData[gift.LayoutOrder]
         let timer = gift.WaitForChild('TimerFrame').WaitForChild('Timer') as TextLabel
@@ -886,6 +827,59 @@ export class UIController implements OnStart, OnInit {
 
         (rebirthUI.WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = tostring(wins)+'/'+tostring(additional.get('Wins')!)
         TweenService.Create(rebirthUI.WaitForChild('Wins').WaitForChild('stroke') as ImageLabel, new TweenInfo(.1), { 'Size': UDim2.fromScale(math.max(1, wins/additional.get('Wins')!), 1) })
+
+    }
+
+    
+    private updateSlingshots(world: IWorldData) {
+        let obj = this.UIPath.SlingshotStore.get<ImageComponent>().instance
+        let store = obj.WaitForChild('ScrollingFrame') as ScrollingFrame;
+
+        let selectedStore: Frame | undefined;
+
+        for (let storeFrame of store.GetChildren()) {
+            if (!storeFrame.IsA('Frame')) { continue }
+            if (storeFrame.Name !== world.shopName) { storeFrame.Visible = false; continue }
+            storeFrame.Visible = true
+            selectedStore = storeFrame
+        }
+
+        if (!selectedStore) { return }
+
+        for (let button of selectedStore.GetDescendants()) {
+            if (!button.IsA('GuiButton')) { continue }
+            let slingshotFrame = button.Parent!
+
+            if (!slingshotFrame.FindFirstChild('Pointer')) { continue }
+            let toolName = (slingshotFrame.WaitForChild('Pointer') as StringValue).Value;
+
+            let owned = false
+            let tool = ToolsData.get(toolName)
+            if (!tool) { continue };
+
+            let equipFrame = (slingshotFrame.WaitForChild('UnlockButton').WaitForChild('Equip') as Frame)
+
+            if (this.ownedTools.includes(toolName)) { equipFrame.Visible = true; owned = true; (equipFrame.WaitForChild('Equip') as TextLabel).Text = 'Equip' }
+            if (this.equippedTool === toolName) { (equipFrame.WaitForChild('Equip') as TextLabel).Text = 'Equipped' }
+        }
+
+    }
+
+    private updateWorldTeleports() {
+        let maxWorld = this._playerController.replica.Data.Profile.Config.MaxWorld
+        let worldsUI = this.UIPath.Teleport.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
+
+        let maxWorldData = WorldsData.get(maxWorld)
+
+        for (let worldIcon of worldsUI.GetChildren()) {
+            if (!worldIcon.IsA('ImageLabel')) { continue }
+            if (!WorldsData.has(worldIcon.Name as WorldType)) { continue }
+
+            let worldData = WorldsData.get(worldIcon.Name as WorldType)
+
+            if (worldData!.weight < maxWorldData!.weight) { (worldIcon.WaitForChild('Locked') as Frame).Visible = false; continue };
+            (worldIcon.WaitForChild('Locked') as Frame).Visible = true
+        }
 
     }
 
@@ -1409,6 +1403,10 @@ export class UIController implements OnStart, OnInit {
             gemsLabel.Text = tostring(newValue)
         })
 
+        this._playerController.replica.ListenToChange('Profile.Config.MaxWorld', (newValue, oldValue) => {
+            this.updateWorldTeleports()
+        })
+
         this._playerController.replica.ListenToChange('Session.currentWorld', (newValue, oldValue) => {
             let world = WorldsData.get(newValue)
             if (!world) { return }
@@ -1486,6 +1484,8 @@ export class UIController implements OnStart, OnInit {
         this.setupDaily()
         this.setupBigSlingshots()
         this.setupDonations()
+        this.updateWorldTeleports()
+        this.setupWorldTeleports()
 
         let voidMachine: Instance = this.UIPath.VoidMachine.get<ImageComponent>().instance;
 
@@ -1511,6 +1511,8 @@ export class UIController implements OnStart, OnInit {
                 if (currentVoidTime > 1) {
                     (voidMachine.WaitForChild('CraftInfo').WaitForChild('Button').WaitForChild('Craft') as TextLabel).Text = 'Skip';
                 }
+
+                Events.ManageWorld.fire(WorldOperationStatus.BuyAll)
 
             }
 

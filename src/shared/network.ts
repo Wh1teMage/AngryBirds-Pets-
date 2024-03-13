@@ -19,7 +19,7 @@ interface ClientToServerEvents {
     ManagePet: (operation: PetOperationStatus, pet: IDBPetData, count?: number) => void
 
     ManageTool: (operation: ToolOperationStatus, toolname: string) => void
-    ManageWorld: (operation: WorldOperationStatus, world: WorldType) => void
+    ManageWorld: (operation: WorldOperationStatus, world?: WorldType) => void
 
     ClaimReward: (rewardtype: RewardType, info?: any) => void
 

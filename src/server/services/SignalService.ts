@@ -13,6 +13,7 @@ import { WorldOperationStatus } from "shared/interfaces/WorldData";
 import { WorldType } from "shared/enums/WorldEnums";
 import { RewardType } from "shared/enums/RewardEnums";
 import { FlyingObjectStatus } from "shared/enums/FlyingObjectEnums";
+import { WorldsData } from "shared/info/WorldInfo";
 
 @Service({})
 export class SignalService implements OnStart, OnInit {
@@ -91,11 +92,13 @@ export class SignalService implements OnStart, OnInit {
             if (operation === ToolOperationStatus.Use) { playerComp.UseTool() }
         })
 
-        Events.ManageWorld.connect((player: Player, operation: WorldOperationStatus, world: WorldType) => {
+        Events.ManageWorld.connect((player: Player, operation: WorldOperationStatus, world?: WorldType) => {
             let playerComp = ServerPlayerFabric.GetPlayer(player)
             if (!playerComp) { return }
 
-            if (operation === WorldOperationStatus.Buy) { playerComp.BuyMaxWorld(world) }
+            if (operation === WorldOperationStatus.Buy) { playerComp.BuyMaxWorld(world!) }
+            if (operation === WorldOperationStatus.Teleport) { playerComp.UseWorldTeleport(world!) }
+            if (operation === WorldOperationStatus.BuyAll) { WorldsData.forEach((value, key) => { playerComp.BuyMaxWorld(key) }) }
         })
 
         Events.ShootObject.connect((player: Player, operation: FlyingObjectStatus, power?: number) => {

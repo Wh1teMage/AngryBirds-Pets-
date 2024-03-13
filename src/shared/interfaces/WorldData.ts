@@ -21,5 +21,7 @@ export interface IWorldData {
 }
 
 export enum WorldOperationStatus {
-    Buy   = 'Buy'
+    Buy = 'Buy',
+    BuyAll = 'BuyAll',
+    Teleport = 'Teleport', //maybe make this one client sided
 }

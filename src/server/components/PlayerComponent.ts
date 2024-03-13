@@ -99,6 +99,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
     public BuyMaxWorld = (world: WorldType) => this._playerWorldController.BuyMaxWorld(world)
     public ChangeWorld = () => this._playerWorldController.ChangeWorld()
+    public UseWorldTeleport = (world: WorldType) => this._playerWorldController.UseWorldTeleport(world)
 
     public InitializeObject = () => this._playerFlyingController.InitializeObject()
     public ShootObject = (power: number) => this._playerFlyingController.ShootObject(power)
@@ -1004,7 +1005,7 @@ class PlayerWorldController {
 
         this.player.SetStars(profileData.Values.StarsVal - worldInfo.price)
         profileData.Config.MaxWorld = world
-        this.ChangeWorld()
+        //this.ChangeWorld()
     }
 
     public UseWorldTeleport(world: WorldType) {
