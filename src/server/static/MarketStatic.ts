@@ -12,7 +12,7 @@ MarketCallbacks.set('test', (player) => {
 
 MarketCallbacks.set('tinypackgems', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -22,7 +22,7 @@ MarketCallbacks.set('tinypackgems', (player) => {
 
 MarketCallbacks.set('smallpackgems', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -32,7 +32,7 @@ MarketCallbacks.set('smallpackgems', (player) => {
 
 MarketCallbacks.set('mediumpackgems', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -42,7 +42,7 @@ MarketCallbacks.set('mediumpackgems', (player) => {
 
 MarketCallbacks.set('largepackgems', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -52,7 +52,7 @@ MarketCallbacks.set('largepackgems', (player) => {
 
 MarketCallbacks.set('hugepackgems', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -62,7 +62,7 @@ MarketCallbacks.set('hugepackgems', (player) => {
 
 MarketCallbacks.set('megapackgems', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -72,7 +72,7 @@ MarketCallbacks.set('megapackgems', (player) => {
 
 MarketCallbacks.set('megahugepackgems', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -82,7 +82,7 @@ MarketCallbacks.set('megahugepackgems', (player) => {
 
 MarketCallbacks.set('tinypackaccuracy', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -92,7 +92,7 @@ MarketCallbacks.set('tinypackaccuracy', (player) => {
 
 MarketCallbacks.set('smallpackaccuracy', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -102,7 +102,7 @@ MarketCallbacks.set('smallpackaccuracy', (player) => {
 
 MarketCallbacks.set('mediumpackaccuracy', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -112,7 +112,7 @@ MarketCallbacks.set('mediumpackaccuracy', (player) => {
 
 MarketCallbacks.set('largepackaccuracy', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -122,7 +122,7 @@ MarketCallbacks.set('largepackaccuracy', (player) => {
 
 MarketCallbacks.set('hugepackaccuracy', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -132,7 +132,7 @@ MarketCallbacks.set('hugepackaccuracy', (player) => {
 
 MarketCallbacks.set('megapackaccuracy', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -142,7 +142,7 @@ MarketCallbacks.set('megapackaccuracy', (player) => {
 
 MarketCallbacks.set('megahugepackaccuracy', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -152,7 +152,7 @@ MarketCallbacks.set('megahugepackaccuracy', (player) => {
 
 MarketCallbacks.set('tinypackwins', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -162,7 +162,7 @@ MarketCallbacks.set('tinypackwins', (player) => {
 
 MarketCallbacks.set('smallpackwins', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -172,7 +172,7 @@ MarketCallbacks.set('smallpackwins', (player) => {
 
 MarketCallbacks.set('mediumpackwins', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -182,7 +182,7 @@ MarketCallbacks.set('mediumpackwins', (player) => {
 
 MarketCallbacks.set('largepackwins', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -192,7 +192,7 @@ MarketCallbacks.set('largepackwins', (player) => {
 
 MarketCallbacks.set('hugepackwins', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -202,7 +202,7 @@ MarketCallbacks.set('hugepackwins', (player) => {
 
 MarketCallbacks.set('megapackwins', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
@@ -212,7 +212,7 @@ MarketCallbacks.set('megapackwins', (player) => {
 
 MarketCallbacks.set('megahugepackwins', (player) => {
     let profileData = player.profile.Data
-    let worldData = WorldsData.get(profileData.Config.MaxWorld) 
+    let worldData = WorldsData.get(profileData.Config.MaxWorld)
 
     if (!worldData) { return }
 
