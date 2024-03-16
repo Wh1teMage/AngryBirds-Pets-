@@ -17,7 +17,7 @@ MarketCallbacks.set('tinypackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi)
+    player.SetGems(100*multi+profileData.Values.GemsVal)
 })
 
 MarketCallbacks.set('smallpackgems', (player) => {
@@ -27,7 +27,7 @@ MarketCallbacks.set('smallpackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi)
+    player.SetGems(100*multi+profileData.Values.GemsVal)
 })
 
 MarketCallbacks.set('mediumpackgems', (player) => {
@@ -37,7 +37,7 @@ MarketCallbacks.set('mediumpackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi)
+    player.SetGems(100*multi+profileData.Values.GemsVal)
 })
 
 MarketCallbacks.set('largepackgems', (player) => {
@@ -47,7 +47,7 @@ MarketCallbacks.set('largepackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi)
+    player.SetGems(100*multi+profileData.Values.GemsVal)
 })
 
 MarketCallbacks.set('hugepackgems', (player) => {
@@ -57,7 +57,7 @@ MarketCallbacks.set('hugepackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi)
+    player.SetGems(100*multi+profileData.Values.GemsVal)
 })
 
 MarketCallbacks.set('megapackgems', (player) => {
@@ -67,7 +67,7 @@ MarketCallbacks.set('megapackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi)
+    player.SetGems(100*multi+profileData.Values.GemsVal)
 })
 
 MarketCallbacks.set('megahugepackgems', (player) => {
@@ -77,7 +77,7 @@ MarketCallbacks.set('megahugepackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi)
+    player.SetGems(100*multi+profileData.Values.GemsVal)
 })
 
 MarketCallbacks.set('tinypackaccuracy', (player) => {
@@ -87,7 +87,7 @@ MarketCallbacks.set('tinypackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi)
+    player.SetStrength(100*multi+profileData.Values.StrengthVal)
 })
 
 MarketCallbacks.set('smallpackaccuracy', (player) => {
@@ -97,7 +97,7 @@ MarketCallbacks.set('smallpackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi)
+    player.SetStrength(100*multi+profileData.Values.StrengthVal)
 })
 
 MarketCallbacks.set('mediumpackaccuracy', (player) => {
@@ -107,7 +107,7 @@ MarketCallbacks.set('mediumpackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi)
+    player.SetStrength(100*multi+profileData.Values.StrengthVal)
 })
 
 MarketCallbacks.set('largepackaccuracy', (player) => {
@@ -117,7 +117,7 @@ MarketCallbacks.set('largepackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi)
+    player.SetStrength(100*multi+profileData.Values.StrengthVal)
 })
 
 MarketCallbacks.set('hugepackaccuracy', (player) => {
@@ -127,7 +127,7 @@ MarketCallbacks.set('hugepackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi)
+    player.SetStrength(100*multi+profileData.Values.StrengthVal)
 })
 
 MarketCallbacks.set('megapackaccuracy', (player) => {
@@ -137,7 +137,7 @@ MarketCallbacks.set('megapackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi)
+    player.SetStrength(100*multi+profileData.Values.StrengthVal)
 })
 
 MarketCallbacks.set('megahugepackaccuracy', (player) => {
@@ -147,7 +147,7 @@ MarketCallbacks.set('megahugepackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi)
+    player.SetStrength(100*multi+profileData.Values.StrengthVal)
 })
 
 MarketCallbacks.set('tinypackwins', (player) => {
@@ -157,7 +157,7 @@ MarketCallbacks.set('tinypackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi)
+    player.SetWins(100*multi+profileData.Values.WinsVal)
 })
 
 MarketCallbacks.set('smallpackwins', (player) => {
@@ -167,7 +167,7 @@ MarketCallbacks.set('smallpackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi)
+    player.SetWins(100*multi+profileData.Values.WinsVal)
 })
 
 MarketCallbacks.set('mediumpackwins', (player) => {
@@ -177,7 +177,7 @@ MarketCallbacks.set('mediumpackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi)
+    player.SetWins(100*multi+profileData.Values.WinsVal)
 })
 
 MarketCallbacks.set('largepackwins', (player) => {
@@ -187,7 +187,7 @@ MarketCallbacks.set('largepackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi)
+    player.SetWins(100*multi+profileData.Values.WinsVal)
 })
 
 MarketCallbacks.set('hugepackwins', (player) => {
@@ -197,7 +197,7 @@ MarketCallbacks.set('hugepackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi)
+    player.SetWins(100*multi+profileData.Values.WinsVal)
 })
 
 MarketCallbacks.set('megapackwins', (player) => {
@@ -207,7 +207,7 @@ MarketCallbacks.set('megapackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi)
+    player.SetWins(100*multi+profileData.Values.WinsVal)
 })
 
 MarketCallbacks.set('megahugepackwins', (player) => {
@@ -217,7 +217,7 @@ MarketCallbacks.set('megahugepackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi)
+    player.SetWins(100*multi+profileData.Values.WinsVal)
 })
 
 MarketCallbacks.set('100storage', (player) => {

@@ -999,8 +999,8 @@ class PlayerWorldController {
     public BuyMaxWorld(world: WorldType) {
         let profileData = this.player.profile.Data
         let worldInfo = WorldsData.get(world)!
-        
-        if (worldInfo.weight < WorldsData.get(profileData.Config.MaxWorld)!.weight) { return }
+
+        if (worldInfo.weight <= WorldsData.get(profileData.Config.MaxWorld)!.weight) { return }
         if (profileData.Values.StarsVal < worldInfo.price) { return }
 
         this.player.SetStars(profileData.Values.StarsVal - worldInfo.price)
@@ -1012,8 +1012,8 @@ class PlayerWorldController {
         let profileData = this.player.profile.Data
         let worldInfo = WorldsData.get(world)!
 
-        if (worldInfo.weight < WorldsData.get(profileData.Config.MaxWorld)!.weight) { return }
-        if (profileData.Products.indexOf('SomeWorldTpgamepass') < 0) { return } //TODO
+        if (WorldsData.get(profileData.Config.MaxWorld)!.weight < worldInfo.weight) { return }
+        //if (profileData.Products.indexOf('SomeWorldTpgamepass') < 0) { return } //TODO
 
         this.player.session.character!.PrimaryPart!.CFrame = worldInfo.teleportPart.CFrame
     }
@@ -1151,14 +1151,17 @@ class PlayerRewardController {
     public ClaimDailyReward() {
 
         let profileData = this.player.profile.Data
-
-        if ((os.time() - profileData.StatValues.LastDayTime) < 24*60*60) { return }
+        print(os.time() - profileData.StatValues.LastDayTime)
+        if ((os.time() - profileData.StatValues.LastDayTime) < 10) { return } //24*60*60
 
         profileData.StatValues.LastDayTime = os.time()
         profileData.StatValues.DayAmount += 1
 
         let currentDay = profileData.StatValues.DayAmount%DailyRewardsData.size()
         let selectedReward = SelectDailyReward(currentDay)
+
+        this.player.replica.SetValue('Profile.StatValues.LastDayTime', profileData.StatValues.LastDayTime)
+        this.player.replica.SetValue('Profile.StatValues.DayAmount', profileData.StatValues.DayAmount)
 
         if (!selectedReward) { return }
         
@@ -1169,13 +1172,18 @@ class PlayerRewardController {
     public ClaimSessionReward(rewardindex: number) {
 
         let sessionData = this.player.session
-        let selectedReward = SelectSessionReward(rewardindex)
+        let profileData = this.player.profile.Data
+
+        let selectedReward = SelectSessionReward(rewardindex, profileData.Config.MaxWorld)
 
         if (!selectedReward) { return }
         if (sessionData.claimedRewards.includes(rewardindex)) { return }
         if (selectedReward.Time! > sessionData.sessionTime) { return }
 
         sessionData.claimedRewards.push(rewardindex)
+        this.player.replica.SetValue('Session.claimedRewards', sessionData.claimedRewards)
+
+        print(sessionData.claimedRewards)
 
         this.ApplyReward(selectedReward)
 

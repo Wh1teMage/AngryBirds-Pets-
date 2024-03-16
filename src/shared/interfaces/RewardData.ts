@@ -1,5 +1,6 @@
 import { PotionType } from "shared/enums/PotionEnum"
 import { IDBPetData } from "./PetData"
+import { WorldType } from "shared/enums/WorldEnums"
 
 export interface IRewardData {
     Values?: {
@@ -15,5 +16,6 @@ export interface IRewardData {
     Title?: string
     
     Time?: number
+    World?: WorldType
     ProductId?: number
 }

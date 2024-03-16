@@ -6,7 +6,7 @@ export class GlobalPassive extends PassiveClass {
     public description = 'test'
 
     public onStrengthChanged = (newvalue: number, oldvalue: number) => {
-
+        
     }
 
     public onWinsChanged = (newvalue: number, oldvalue: number) => {
