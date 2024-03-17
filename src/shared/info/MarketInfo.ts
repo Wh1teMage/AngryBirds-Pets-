@@ -1,4 +1,5 @@
 import { ProductType } from "shared/enums/MarketEnums";
+import { IServerPlayerComponent } from "shared/interfaces/PlayerData";
 import { IProductData } from "shared/interfaces/ProductData";
 
 export const MarketNamings = new Map<number, IProductData>([
@@ -27,4 +28,15 @@ export const MarketNamings = new Map<number, IProductData>([
     [1762888316, {name: 'hugepackgems', producttype: ProductType.DevProduct}],
     [1762888398, {name: 'megapackgems', producttype: ProductType.DevProduct}],
     [1762888472, {name: 'megahugepackgems', producttype: ProductType.DevProduct}],
+
+    [734124643, {name: 'doublegems', producttype: ProductType.Gamepass}],
+    [722093437, {name: 'luck1', producttype: ProductType.Gamepass}],
+    [722436217, {name: 'luck2', producttype: ProductType.Gamepass, checkCallback: (player: IServerPlayerComponent) => {
+        if (!player.profile.Data.Products.includes('luck1')) { return false }
+        return true
+    },}],
+    [722472169, {name: 'luck3', producttype: ProductType.Gamepass, checkCallback: (player: IServerPlayerComponent) => {
+        if (!player.profile.Data.Products.includes('luck1') || !player.profile.Data.Products.includes('luck2')) { return false }
+        return true
+    },}],
 ])
