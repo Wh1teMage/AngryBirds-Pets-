@@ -250,6 +250,22 @@ MarketCallbacks.set('doublestars', (player) => {
     profileData.Multipliers.StarsMul += 1
 })
 
+MarketCallbacks.set('instantpower', (player) => {
+    //! алямантера
+})
+
+MarketCallbacks.set('fasthatch', (player) => {
+    //! кокрочес
+})
+
+MarketCallbacks.set('3egghatch', (player) => {
+    //! алямантера
+})
+
+MarketCallbacks.set('autorebirth', (player) => {
+    //! алямантера
+})
+
 MarketCallbacks.set('doublewins', (player) => {
     let profileData = player.profile.Data
     profileData.Multipliers.WinsMul += 1
@@ -265,7 +281,7 @@ MarketCallbacks.set('triplewins', (player) => {
     profileData.Multipliers.WinsMul += 2
 })
 
-MarketCallbacks.set('vippack', (player) => {
+MarketCallbacks.set('vippass', (player) => {
     let profileData = player.profile.Data
     profileData.Multipliers.StrengthMul += .5
     profileData.Multipliers.WinsMul += .5
