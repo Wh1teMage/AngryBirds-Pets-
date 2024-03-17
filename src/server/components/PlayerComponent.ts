@@ -141,6 +141,10 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             PetModelManager.AddPet(this.instance, pet)
         }
 
+        for (let buff of this.profile.Data.ActiveBuffs) {
+            if (PotionsData.get(buff.source as PotionType)) { this.ApplyPotionEffect(buff.source as PotionType) }
+        }
+
         this.SetPetMultipliers()
 
         this.session.activePassives.forEach((value) => { value.onStart() })
@@ -588,6 +592,8 @@ class PlayerPotionController {
 
             potionInfo!.disableEffect(this.player)
             profileData.ActiveBuffs.remove(newBuffIndex)
+
+            this.player.replica.SetValue('Profile.ActiveBuffs', profileData.ActiveBuffs)
         })
 
         if ((activeBuff.endTime - activeBuff.startTime) <= potionInfo.duration-2) { potionInfo!.enableEffect(this.player) }
@@ -698,7 +704,15 @@ class PlayerEggController {
 
         for (let i = 0; i < amount; i++) {
             let petName = PetUtilities.RandomWeight(eggInfo.petchances, profileData.Config.Luck)
-            this.player.AppendPet(PetUtilities.NameToDBPetWithEgg(petName, eggInfo.name))
+            let pet = PetUtilities.NameToDBPetWithEgg(petName, eggInfo.name)
+
+            let goldenChance = math.random(1, 1000)
+            let voidChance = math.random(1, 1000)
+
+            if (goldenChance <= 10) { pet!.additional.evolution = Evolutions.Gold }
+            if (voidChance <= 5) { pet!.additional.evolution = Evolutions.Void }
+
+            this.player.AppendPet(pet)
         }
     }
 
@@ -719,10 +733,15 @@ class PlayerEggController {
 
                 if (profileData.Values.WinsVal < eggInfo.price) {return}
                 print(eggInfo, 1)
+
+                this.OpenEggBypass(name, buytype)
+
+                /*
                 for (let i = 0; i < amount; i++) {
                     let petName = PetUtilities.RandomWeight(eggInfo.petchances, profileData.Config.Luck)
                     this.player.AppendPet(PetUtilities.NameToDBPetWithEgg(petName, eggInfo.name)!)
                 }
+                */
 
                 this.player.SetWins(profileData.Values.WinsVal - eggInfo.price)
 

@@ -24,3 +24,25 @@ PotionsData.set(PotionType.StrengthPotion, {
         player.session.multipliers.potion.strength -= 1.1
     }
 })
+
+PotionsData.set(PotionType.GoldPotion, {
+    duration: 10,
+    buffname: 'GoldPotionBuff',
+    enableEffect: (player) => {
+        player.session.stats.set('GoldPotionBuff', true)
+    },
+    disableEffect: (player) => {
+        player.session.stats.delete('GoldPotionBuff')
+    }
+})
+
+PotionsData.set(PotionType.VoidPotion, {
+    duration: 10,
+    buffname: 'VoidPotionBuff',
+    enableEffect: (player) => {
+        player.session.stats.set('VoidPotionBuff', true)
+    },
+    disableEffect: (player) => {
+        player.session.stats.delete('VoidPotionBuff')
+    }
+})

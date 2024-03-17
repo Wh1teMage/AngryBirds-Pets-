@@ -26,6 +26,7 @@ export interface ISessionData {
         friends: IMultipliers
     }
 
+    stats: Map<string, any>
     friendList: Array<string>
 }
 
@@ -67,5 +68,6 @@ export const SessionData: ISessionData = {
         friends: table.clone(DefaultMultipliers),
     },
 
+    stats: new Map<string, any>(),
     friendList: [],
 }

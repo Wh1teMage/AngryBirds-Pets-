@@ -933,15 +933,15 @@ export class UIController implements OnStart, OnInit {
         let wins = this._playerController.replica.Data.Profile.Values.WinsVal
         let holder = rebirthUI.WaitForChild('StatsHolder');
 
-        (holder.WaitForChild('Stats1').WaitForChild('Boost').WaitForChild('Value') as TextLabel).Text = tostring(currentAdditional.get('Multiplier')!);
-        (holder.WaitForChild('Stats1').WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = tostring(gems);
-        (holder.WaitForChild('Stats1').WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = tostring(wins);
+        (holder.WaitForChild('Stats1').WaitForChild('Boost').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(currentAdditional.get('Multiplier')!);
+        (holder.WaitForChild('Stats1').WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(gems);
+        (holder.WaitForChild('Stats1').WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(wins);
 
-        (holder.WaitForChild('Stats2').WaitForChild('Boost').WaitForChild('Value') as TextLabel).Text = tostring(additional.get('Multiplier')!);
-        (holder.WaitForChild('Stats2').WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = tostring(gems+(nextRebirthData.Values!.Gems || 0));
-        (holder.WaitForChild('Stats2').WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = tostring(wins+(nextRebirthData.Values!.Wins || 0));
+        (holder.WaitForChild('Stats2').WaitForChild('Boost').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(additional.get('Multiplier')!);
+        (holder.WaitForChild('Stats2').WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(gems+(nextRebirthData.Values!.Gems || 0));
+        (holder.WaitForChild('Stats2').WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(wins+(nextRebirthData.Values!.Wins || 0));
 
-        (rebirthUI.WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = tostring(wins)+'/'+tostring(additional.get('Wins')!)
+        (rebirthUI.WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(wins)+'/'+GUIUtilities.getSIPrefixSymbol(additional.get('Wins')!)
         TweenService.Create(rebirthUI.WaitForChild('Wins').WaitForChild('stroke') as ImageLabel, new TweenInfo(.1), { 'Size': UDim2.fromScale(math.max(1, wins/additional.get('Wins')!), 1) })
 
     }
@@ -1015,14 +1015,6 @@ export class UIController implements OnStart, OnInit {
 
         let world = this._playerController.replica.Data.Profile.Config.MaxWorld
         let worldData = WorldsData.get(world)
-        
-        let luckFrame = storeFrame.WaitForChild('EggLuckPasses').WaitForChild('Passes')
-
-        let luckList = new Map<string, string>([
-            ['Lucky1', 'luck1'],
-            ['Lucky2', 'luck2'],
-            ['Lucky3', 'luck3'],
-        ])
 
         if (!worldData) { return }
 
@@ -1035,9 +1027,26 @@ export class UIController implements OnStart, OnInit {
             label.Text = '+'+GUIUtilities.getSIPrefixSymbol(obj.Value * (worldData!.multipliers.get('product') || 1))+' '+obj.Parent!.Parent!.Parent!.Name
         }
 
-        for (let obj of luckFrame.GetChildren()) {
-            if (!obj.IsA('ImageLabel')) { continue }
-            //if ()
+    }
+
+    private updateStoreLuck() {
+        let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
+        let luckFrame = storeFrame.WaitForChild('EggLuckPasses').WaitForChild('Passes')
+
+        let luckList = new Map<string, string>([
+            ['luck1', 'Lucky2'],
+            ['luck2', 'Lucky3'],
+        ])
+
+        for (let pass of this._playerController.replica.Data.Profile.Products) {
+            if (!luckList.get(pass)) { continue }
+
+            for (let obj of luckFrame.GetChildren()) {
+                if (!obj.IsA('ImageLabel')) { continue }
+                if (obj.Name !== luckList.get(pass)) { continue }
+                (obj.WaitForChild('Locked') as Frame).Visible = false
+            }
+
         }
 
     }
@@ -1620,6 +1629,10 @@ export class UIController implements OnStart, OnInit {
 
         })
 
+        this._playerController.replica.ListenToChange('Profile.Products', (newValue) => {
+            this.updateStoreLuck()
+        })
+
         this._playerController.replica.ListenToChange('Session.currentFlyingObject', (newValue) => {
             print(newValue)
             if (newValue) {
@@ -1662,6 +1675,7 @@ export class UIController implements OnStart, OnInit {
         this.updateStorePacks()
         this.setupStoreUpperButtons()
         this.updateGiftRewards()
+        this.updateStoreLuck()
 
         let voidMachine: Instance = this.UIPath.VoidMachine.get<ImageComponent>().instance;
 

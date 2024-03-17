@@ -66,13 +66,19 @@ export class MarketService implements OnStart, OnInit {
         MarketplaceService.PromptGamePassPurchaseFinished.Connect((player, productId, isPurchased) => {
             let playerComponent = this._completePurchase(player.UserId, productId, isPurchased)
             
-            if (playerComponent) { playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) }
+            if (!playerComponent) { return }
+
+            playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) 
+            playerComponent.replica.SetValue('Profile.Products', playerComponent.profile.Data.Products)
         })
 
         MarketService.purchased.Connect((userId, productId) => {
             let playerComponent = this._completePurchase(userId, productId, true)
 
-            if (playerComponent) { playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) }
+            if (!playerComponent) { return }
+
+            playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) 
+            playerComponent.replica.SetValue('Profile.Products', playerComponent.profile.Data.Products)
         })
 
     }
