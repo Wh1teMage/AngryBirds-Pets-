@@ -271,3 +271,17 @@ MarketCallbacks.set('vippack', (player) => {
     profileData.Multipliers.WinsMul += .5
 })
 
+MarketCallbacks.set('luck1', (player) => {
+    let profileData = player.profile.Data
+    profileData.Config.Luck += .5
+})
+
+MarketCallbacks.set('luck2', (player) => {
+    let profileData = player.profile.Data
+    profileData.Config.Luck += .5
+})
+
+MarketCallbacks.set('luck3', (player) => {
+    let profileData = player.profile.Data
+    profileData.Config.Luck += .5
+})

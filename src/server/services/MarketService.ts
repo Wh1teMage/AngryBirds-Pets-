@@ -1,4 +1,5 @@
 import { Service, OnStart, OnInit } from "@flamework/core";
+import ObjectEvent from "@rbxts/object-event";
 import { MarketplaceService, Players } from "@rbxts/services";
 import { ServerPlayerFabric } from "server/components/PlayerComponent";
 import { MarketCallbacks } from "server/static/MarketStatic";
@@ -14,7 +15,8 @@ let productCheck = (product: IProductData, userId: number) => {
 }
 
 let prompts = new Map<ProductType, (player: Player, productId: number) => void>([
-    [ProductType.DevProduct, (player: Player, productId: number) => { MarketplaceService.PromptProductPurchase(player, productId) }]
+    [ProductType.DevProduct, (player: Player, productId: number) => { MarketplaceService.PromptProductPurchase(player, productId) }],
+    [ProductType.Gamepass, (player: Player, productId: number) => { MarketplaceService.PromptGamePassPurchase(player, productId) }],
 ])
 
 let giftingQueue = new Map<number, number | undefined>([]) //maybe later on remake this system into array one
@@ -22,6 +24,8 @@ let giftingQueue = new Map<number, number | undefined>([]) //maybe later on rema
 
 @Service({})
 export class MarketService implements OnStart, OnInit {
+
+    public static purchased = new ObjectEvent<[number, number]>
 
     private _onFailedPurchase() {
 
@@ -65,6 +69,12 @@ export class MarketService implements OnStart, OnInit {
             if (playerComponent) { playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) }
         })
 
+        MarketService.purchased.Connect((userId, productId) => {
+            let playerComponent = this._completePurchase(userId, productId, true)
+
+            if (playerComponent) { playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) }
+        })
+
     }
 
     public static MakePurchase(userId: number, productId: number, giftId?: number) {
@@ -76,16 +86,42 @@ export class MarketService implements OnStart, OnInit {
         if (giftId && !Players.GetPlayerByUserId(giftId)) { warn('Gifted Player Doesnt Exist!'); return }
 
         let playerComponent = ServerPlayerFabric.GetPlayer(player)
-        
-        if (!playerComponent || !playerComponent.profile) { warn('Something Went Wrong With Data!'); return }
-        if (playerComponent.profile.Data.Products.indexOf(product.name) > 0) { warn('Product Was Purchased!'); return }
-        if ((product.producttype === ProductType.Gamepass) && (MarketplaceService.UserOwnsGamePassAsync(userId, productId))) { warn('Product Was Purchased!'); return }
 
-        if (giftId) {giftingQueue.set(userId, giftId)}
+        if (giftId) {
+            let giftPlayerComponent = ServerPlayerFabric.GetPlayer(player)
+
+            if (product.checkCallback && !product.checkCallback(giftPlayerComponent)) { return }
+            if (!giftPlayerComponent || !giftPlayerComponent.profile) { warn('Something Went Wrong With Data!'); return }
+            if (giftPlayerComponent.profile.Data.Products.includes(product.name)) { warn('Product Was Purchased!'); return }
+            if ((product.producttype === ProductType.Gamepass) && (MarketplaceService.UserOwnsGamePassAsync(giftId, productId))) { warn('Product Was Purchased!'); return }
+    
+            giftingQueue.set(userId, giftId)
+
+            if (product.producttype === ProductType.Gamepass) { prompts.get(ProductType.DevProduct)!(player, product.correspondingGiftId!); return } 
+        }
+        else {
+            if (product.checkCallback && !product.checkCallback(playerComponent)) { return }
+            if (!playerComponent || !playerComponent.profile) { warn('Something Went Wrong With Data!'); return }
+            if (playerComponent.profile.Data.Products.includes(product.name)) { warn('Product Was Purchased!'); return }
+            if ((product.producttype === ProductType.Gamepass) && (MarketplaceService.UserOwnsGamePassAsync(userId, productId))) { warn('Product Was Purchased!'); return }
+        }
+
         prompts.get(product.producttype)!(player, productId)
-
+        
     }
     
+    public static GamepassCheck(userId: number, productId: number) {
+        let product = MarketNamings.get(productId) as IProductData
+        let player = Players.GetPlayerByUserId(userId) as Player
+        let playerComponent = ServerPlayerFabric.GetPlayer(player)
+        
+        if (!productCheck(product, userId)) { return }
+        if (product.producttype !== ProductType.Gamepass) { return }
+        if (playerComponent.profile.Data.Products.includes(product.name)) { return }
+
+        this.purchased.Fire(userId, productId)
+    }
+
     onStart() {
         
     }

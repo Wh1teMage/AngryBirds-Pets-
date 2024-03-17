@@ -343,7 +343,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 export class ServerPlayerFabric {
 
     static CreatePlayer(player: Player) {
-        Dependency<Components>().addComponent<ServerPlayerComponent>(player)
+        return Dependency<Components>().addComponent<ServerPlayerComponent>(player)
     }
 
     static GetPlayer(player: Player) {

@@ -299,7 +299,7 @@ export class UIController implements OnStart, OnInit {
         let mainStats = petInfo.WaitForChild('Stats').WaitForChild('Main') as Frame;
 
         (petInfo.WaitForChild('Stats').WaitForChild('Number') as Frame).Visible = false;
-        (petInfo.WaitForChild('Stats').WaitForChild('Boost') as TextLabel).Text = tostring(formattedPet.multipliers.get('strength'))+'x Boost';
+        (petInfo.WaitForChild('Stats').WaitForChild('Boost') as TextLabel).Text = CreationUtilities.getSIPrefixSymbol(formattedPet.multipliers.get('strength') || 1)+'x Boost';
         (petInfo.WaitForChild('PetName') as TextLabel).Text = formattedPet.name;
         (petInfo.WaitForChild('Equip').WaitForChild('TextLabel') as TextLabel).Text = 'Equip';
         //mainStats.Mutation // TO DO
@@ -1007,7 +1007,7 @@ export class UIController implements OnStart, OnInit {
 
             let label = obj.Parent!.WaitForChild('Amount') as TextLabel
 
-            label.Text = '+'+tostring(obj.Value * (worldData!.multipliers.get('product') || 1))+' '+obj.Parent!.Parent!.Parent!.Name
+            label.Text = '+'+CreationUtilities.getSIPrefixSymbol(obj.Value * (worldData!.multipliers.get('product') || 1))+' '+obj.Parent!.Parent!.Parent!.Name
         }
 
     }
@@ -1525,7 +1525,7 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.StrengthVal', (newValue, oldValue) => {
-            accuracyLabel.Text = tostring(newValue)
+            accuracyLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.RebirthsVal', (newValue, oldValue) => {
@@ -1533,15 +1533,15 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.StarsVal', (newValue, oldValue) => {
-            starsLabel.Text = tostring(newValue)
+            starsLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.WinsVal', (newValue, oldValue) => {
-            winsLabel.Text = tostring(newValue)
+            winsLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.GemsVal', (newValue, oldValue) => {
-            gemsLabel.Text = tostring(newValue)
+            gemsLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Config.MaxWorld', (newValue, oldValue) => {
