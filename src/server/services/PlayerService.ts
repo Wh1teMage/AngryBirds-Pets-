@@ -13,6 +13,8 @@ export class PlayerService implements OnStart, OnInit {
         Players.PlayerAdded.Connect((player) => {
             let component = ServerPlayerFabric.CreatePlayer(player)
 
+            while (!component.isLoaded) { task.wait() }
+
             MarketNamings.forEach((val, key) => {
                 MarketService.GamepassCheck(component.instance.UserId, key)
             })

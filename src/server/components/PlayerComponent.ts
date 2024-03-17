@@ -45,6 +45,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public profile!: Profile<IProfileData, ProfileMetaData>;
     public replica!: PlayerDataReplica
     public session: ISessionData = table.clone(SessionData)
+    public isLoaded: boolean = false
     
     //private _character!: ICharacter
     private _playerPetController = new PlayerPetController(this)
@@ -310,6 +311,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
 
         })
+
+        this.isLoaded = true
 
     }
 

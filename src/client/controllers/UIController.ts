@@ -299,7 +299,7 @@ export class UIController implements OnStart, OnInit {
         let mainStats = petInfo.WaitForChild('Stats').WaitForChild('Main') as Frame;
 
         (petInfo.WaitForChild('Stats').WaitForChild('Number') as Frame).Visible = false;
-        (petInfo.WaitForChild('Stats').WaitForChild('Boost') as TextLabel).Text = CreationUtilities.getSIPrefixSymbol(formattedPet.multipliers.get('strength') || 1)+'x Boost';
+        (petInfo.WaitForChild('Stats').WaitForChild('Boost') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(formattedPet.multipliers.get('strength') || 1)+'x Boost';
         (petInfo.WaitForChild('PetName') as TextLabel).Text = formattedPet.name;
         (petInfo.WaitForChild('Equip').WaitForChild('TextLabel') as TextLabel).Text = 'Equip';
         //mainStats.Mutation // TO DO
@@ -650,10 +650,18 @@ export class UIController implements OnStart, OnInit {
             ['7', 1762888472]
         ])
 
+        let luckList = new Map<string, number>([
+            ['Lucky1', 722093437],
+            ['Lucky2', 722436217],
+            ['Lucky3', 722472169],
+        ])
+
         let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
         let accuracyFrame = storeFrame.WaitForChild('Accuracy').WaitForChild('AccuracyList')
         let winsFrame = storeFrame.WaitForChild('Wins').WaitForChild('WinsList')
         let gemsFrame = storeFrame.WaitForChild('Gems').WaitForChild('GemsList')
+
+        let luckFrame = storeFrame.WaitForChild('EggLuckPasses').WaitForChild('Passes')
 
         for (let obj of accuracyFrame.GetChildren()) {
             if (!obj.IsA('GuiButton')) { continue }
@@ -690,6 +698,14 @@ export class UIController implements OnStart, OnInit {
         ButtonFabric.CreateButton(gemsFrame.Parent!.WaitForChild('Huge Pack') as GuiButton).BindToClick(() => {
             Events.PurchasePrompt.fire(gemslist.get('7')!)
         })
+
+        for (let obj of luckFrame.GetChildren()) {
+            if (!obj.IsA('ImageLabel')) { continue }
+            ButtonFabric.CreateButton(obj.WaitForChild('Buy') as GuiButton).BindToClick(() => {
+                if (!luckList.get(obj.Name)) { return }
+                Events.PurchasePrompt.fire(luckList.get(obj.Name)!)
+            })
+        }
 
     }
 
@@ -996,9 +1012,18 @@ export class UIController implements OnStart, OnInit {
 
     private updateStorePacks() {
         let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
+
         let world = this._playerController.replica.Data.Profile.Config.MaxWorld
         let worldData = WorldsData.get(world)
         
+        let luckFrame = storeFrame.WaitForChild('EggLuckPasses').WaitForChild('Passes')
+
+        let luckList = new Map<string, string>([
+            ['Lucky1', 'luck1'],
+            ['Lucky2', 'luck2'],
+            ['Lucky3', 'luck3'],
+        ])
+
         if (!worldData) { return }
 
         for (let obj of storeFrame.GetDescendants()) {
@@ -1007,7 +1032,12 @@ export class UIController implements OnStart, OnInit {
 
             let label = obj.Parent!.WaitForChild('Amount') as TextLabel
 
-            label.Text = '+'+CreationUtilities.getSIPrefixSymbol(obj.Value * (worldData!.multipliers.get('product') || 1))+' '+obj.Parent!.Parent!.Parent!.Name
+            label.Text = '+'+GUIUtilities.getSIPrefixSymbol(obj.Value * (worldData!.multipliers.get('product') || 1))+' '+obj.Parent!.Parent!.Parent!.Name
+        }
+
+        for (let obj of luckFrame.GetChildren()) {
+            if (!obj.IsA('ImageLabel')) { continue }
+            //if ()
         }
 
     }
@@ -1427,7 +1457,7 @@ export class UIController implements OnStart, OnInit {
 
         //print(CreationUtilities.getSIPrefixSymbol(1550), 'TestNumber')
         //print(CreationUtilities.getSIPrefixSymbol(1230000), 'TestNumber')
-        print(CreationUtilities.getSIPrefixSymbol(10667865604675647), 'TestNumber')
+        print(GUIUtilities.getSIPrefixSymbol(10667865604675647), 'TestNumber')
 
 
         inviteButton.BindToClick(() => { pcall(() => { SocialService.PromptGameInvite(this._playerController.component.instance) }) })
@@ -1525,7 +1555,7 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.StrengthVal', (newValue, oldValue) => {
-            accuracyLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
+            accuracyLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.RebirthsVal', (newValue, oldValue) => {
@@ -1533,15 +1563,15 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.StarsVal', (newValue, oldValue) => {
-            starsLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
+            starsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.WinsVal', (newValue, oldValue) => {
-            winsLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
+            winsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.GemsVal', (newValue, oldValue) => {
-            gemsLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
+            gemsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Config.MaxWorld', (newValue, oldValue) => {

@@ -18,8 +18,9 @@ declare global {
 export type PlayerDataReplica = Replica<'PlayerData'>;
 
 export interface IServerPlayerComponent {
-    profile: Profile<IProfileData, ProfileMetaData>,
+    profile: Profile<IProfileData, ProfileMetaData>
     replica: PlayerDataReplica
     session: ISessionData
     instance: Player
+    isLoaded: boolean
 }
