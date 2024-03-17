@@ -23,7 +23,7 @@ export const SelectSessionReward = (rewardIndex: number, world: WorldType) => {
 
 SessionRewardsData.push({
     Values: {
-        Strength: 100
+        Strength: 500
     },
     Time: 1,
     World: WorldType.Default,
@@ -31,7 +31,7 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Strength: 100
+        Wins: 20
     },
     Time: 2,
     World: WorldType.Default,
@@ -39,42 +39,428 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Strength: 100
+        Strength: 1000
     },
-    Time: 1,
-    World: WorldType.Space,
+    Time: 3,
+    World: WorldType.Default,
 })
 
 SessionRewardsData.push({
     Values: {
-        Strength: 100
+        //! Strength: 1000
     },
-    Time: 20,
-    World: WorldType.Space,
+    Time: 4,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Strength: 1000
+    },
+    Time: 5,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Strength: 2000
+    },
+    Time: 6,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Strength: 1000
+    },
+    Time: 7,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Wins: 300
+    },
+    Time: 8,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 9,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 10,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 11,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Wins: 500
+    },
+    Time: 12,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 13,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 14,
+    World: WorldType.Default,
+})
+
+// ! world 2 \/
+
+SessionRewardsData.push({
+    Values: {
+        Strength: 500000
+    },
+    Time: 1,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Wins: 500
+    },
+    Time: 2,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Strength: 1000000
+    },
+    Time: 3,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Strength: 1000
+    },
+    Time: 4,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Strength: 1000
+    },
+    Time: 5,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Strength: 1500000
+    },
+    Time: 6,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Strength: 1000
+    },
+    Time: 7,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Wins: 3000
+    },
+    Time: 8,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 9,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 10,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 11,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Wins: 5000
+    },
+    Time: 12,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 13,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 14,
+    World: WorldType.Default,
+})
+
+// ! world 3\/
+
+SessionRewardsData.push({
+    Values: {
+        Strength: 50000000
+    },
+    Time: 1,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Wins: 100000
+    },
+    Time: 2,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Strength: 100000000
+    },
+    Time: 3,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Strength: 1000
+    },
+    Time: 4,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Strength: 1000
+    },
+    Time: 5,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Strength: 150000000
+    },
+    Time: 6,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Strength: 1000
+    },
+    Time: 7,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Wins: 300000
+    },
+    Time: 8,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 9,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 10,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 11,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        Wins: 500000
+    },
+    Time: 12,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 13,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 14,
+    World: WorldType.Default,
 })
 
 
 
 DailyRewardsData.push({
     Values: {
-        Strength: 10
+        Wins: 10
     },
     Time: 1
 })
 
 DailyRewardsData.push({
     Values: {
-        Strength: 10
+        //! Strength: 10
     },
     Time: 2
 })
 
 DailyRewardsData.push({
     Values: {
-        Strength: 10
+        //! Strength: 10
     },
     Time: 3
 })
+
+DailyRewardsData.push({
+    Values: {
+        //! Strength: 10
+    },
+    Time: 4
+})
+
+DailyRewardsData.push({
+    Values: {
+        Gems: 10
+    },
+    Time: 5
+})
+
+DailyRewardsData.push({
+    Values: {
+        Wins: 100000
+    },
+    Time: 6
+})
+
+DailyRewardsData.push({
+    Values: {
+        //! Wins: 100000
+    },
+    Time: 7
+})
+
+DailyRewardsData.push({
+    Values: {
+        //! Wins: 100000
+    },
+    Time: 8
+})
+
+DailyRewardsData.push({
+    Values: {
+        //! Wins: 100000
+    },
+    Time: 9
+})
+
+DailyRewardsData.push({
+    Values: {
+        //! Wins: 100000
+    },
+    Time: 10
+})
+
+DailyRewardsData.push({
+    Values: {
+        Gems: 20
+    },
+    Time: 11
+})
+
+DailyRewardsData.push({
+    Values: {
+        //! Gems: 20
+    },
+    Time: 12
+})
+
+DailyRewardsData.push({
+    Values: {
+        Gems: 20
+    },
+    Time: 13
+})
+
+DailyRewardsData.push({
+    Values: {
+        //! Gems: 20
+    },
+    Time: 14
+})
+
 
 CodesRewardsData.set('testcode', {
     Values: {

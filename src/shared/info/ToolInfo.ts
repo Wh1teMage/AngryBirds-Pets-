@@ -91,7 +91,7 @@ ToolsData.set('SlingshotD1W1', {
     productid: 123
 })
 
-// World 2
+// ! World 2
 ToolsData.set('Slingshot1W2', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World2').WaitForChild('Common') as Model,
     sizeOffset: new Vector3(0,0,0),
@@ -102,7 +102,7 @@ ToolsData.set('Slingshot1W2', {
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: 100,
+    price: 0,
     valuetype: ToolValueType.Strength
 })
 
@@ -116,7 +116,7 @@ ToolsData.set('Slingshot2W2', {
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 150000,
     valuetype: ToolValueType.Strength
 })
 
@@ -130,7 +130,7 @@ ToolsData.set('Slingshot3W2', {
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 400000,
     valuetype: ToolValueType.Strength
 })
 
@@ -145,7 +145,7 @@ ToolsData.set('Slingshot4W2', {
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 1200000,
     valuetype: ToolValueType.Strength
 })
 
@@ -160,7 +160,7 @@ ToolsData.set('Slingshot5W2', {
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 4000000,
     valuetype: ToolValueType.Strength
 })
 
@@ -174,7 +174,7 @@ ToolsData.set('Slingshot6W2', {
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 12000000,
     valuetype: ToolValueType.Strength
 })
 
@@ -194,18 +194,18 @@ ToolsData.set('SlingshotD1W2', {
 })
 
 
-// World 3
+// !World 3
 ToolsData.set('Slingshot1W3', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World3').WaitForChild('Common') as Model,
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default1',
-    addition: 1,
+    addition: 200,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: 100,
+    price: 0,
     valuetype: ToolValueType.Strength
 })
 
@@ -215,11 +215,11 @@ ToolsData.set('Slingshot2W3', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default2',
-    addition: 1,
+    addition: 300,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 50000000,
     valuetype: ToolValueType.Strength
 })
 
@@ -229,11 +229,11 @@ ToolsData.set('Slingshot3W3', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default3',
-    addition: 1,
+    addition: 450,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 200000000,
     valuetype: ToolValueType.Strength
 })
 
@@ -244,11 +244,11 @@ ToolsData.set('Slingshot4W3', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default4',
-    addition: 1,
+    addition: 650,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 700000000,
     valuetype: ToolValueType.Strength
 })
 
@@ -259,11 +259,11 @@ ToolsData.set('Slingshot5W3', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default5',
-    addition: 1,
+    addition: 950,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 3000000000,
     valuetype: ToolValueType.Strength
 })
 
@@ -273,11 +273,11 @@ ToolsData.set('Slingshot6W3', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'я четырнадцати летняя проститутка из Никгура',
-    addition: 1,
+    addition: 1400,
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: -1,
+    price: 10000000000,
     valuetype: ToolValueType.Strength
 })
 
@@ -287,7 +287,7 @@ ToolsData.set('SlingshotD1W3', {
     rotationOffset: new CFrame(0,0,0),
 
     name: 'Default6',
-    addition: 1,
+    addition: 5500,
     firerate: 1/1,
     effectname: 'Shoot',
 

@@ -32,7 +32,15 @@ export interface IDBPetData {
 }
 
 export enum Rarities {
-    Common = 'Common'
+    Common = 'Common',
+    Uncommon = 'Uncommon',
+    Rare = 'Rare',
+    Epic = 'Epic',
+    Legendary = 'Legendary',
+    Mythic = 'Mythic',
+    Secret = 'Secret',
+    Exclusive = 'Exclusive',
+    Limited = 'Limited',
 }
 
 export enum Sizes {

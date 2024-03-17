@@ -69,4 +69,12 @@ export class GUIUtilities {
         return strToReturn;
     }
 
+
+    static GuiTimeFormatter(time: number) {
+        function getTimeRemaining(){
+            return [math.floor( time/(60*60*24) ), math.floor( (time/(60*60)) % 24 ), math.floor( (time/60) % 60 ), math.floor( (time) % 60 )]
+        }
+        let t = getTimeRemaining()
+        return `${t[0]} ${t[1]}:${t[2]}:${t[3]}`
+    }
 }
