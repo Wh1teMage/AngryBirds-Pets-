@@ -299,7 +299,7 @@ export class UIController implements OnStart, OnInit {
         let mainStats = petInfo.WaitForChild('Stats').WaitForChild('Main') as Frame;
 
         (petInfo.WaitForChild('Stats').WaitForChild('Number') as Frame).Visible = false;
-        (petInfo.WaitForChild('Stats').WaitForChild('Boost') as TextLabel).Text = CreationUtilities.getSIPrefixSymbol(formattedPet.multipliers.get('strength') || 1)+'x Boost';
+        (petInfo.WaitForChild('Stats').WaitForChild('Boost') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(formattedPet.multipliers.get('strength') || 1)+'x Boost';
         (petInfo.WaitForChild('PetName') as TextLabel).Text = formattedPet.name;
         (petInfo.WaitForChild('Equip').WaitForChild('TextLabel') as TextLabel).Text = 'Equip';
         //mainStats.Mutation // TO DO
@@ -1032,7 +1032,7 @@ export class UIController implements OnStart, OnInit {
 
             let label = obj.Parent!.WaitForChild('Amount') as TextLabel
 
-            label.Text = '+'+CreationUtilities.getSIPrefixSymbol(obj.Value * (worldData!.multipliers.get('product') || 1))+' '+obj.Parent!.Parent!.Parent!.Name
+            label.Text = '+'+GUIUtilities.getSIPrefixSymbol(obj.Value * (worldData!.multipliers.get('product') || 1))+' '+obj.Parent!.Parent!.Parent!.Name
         }
 
         for (let obj of luckFrame.GetChildren()) {
@@ -1457,7 +1457,7 @@ export class UIController implements OnStart, OnInit {
 
         //print(CreationUtilities.getSIPrefixSymbol(1550), 'TestNumber')
         //print(CreationUtilities.getSIPrefixSymbol(1230000), 'TestNumber')
-        print(CreationUtilities.getSIPrefixSymbol(10667865604675647), 'TestNumber')
+        print(GUIUtilities.getSIPrefixSymbol(10667865604675647), 'TestNumber')
 
 
         inviteButton.BindToClick(() => { pcall(() => { SocialService.PromptGameInvite(this._playerController.component.instance) }) })
@@ -1555,7 +1555,7 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.StrengthVal', (newValue, oldValue) => {
-            accuracyLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
+            accuracyLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.RebirthsVal', (newValue, oldValue) => {
@@ -1563,15 +1563,15 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.StarsVal', (newValue, oldValue) => {
-            starsLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
+            starsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.WinsVal', (newValue, oldValue) => {
-            winsLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
+            winsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.GemsVal', (newValue, oldValue) => {
-            gemsLabel.Text = CreationUtilities.getSIPrefixSymbol(newValue)
+            gemsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
         })
 
         this._playerController.replica.ListenToChange('Profile.Config.MaxWorld', (newValue, oldValue) => {
