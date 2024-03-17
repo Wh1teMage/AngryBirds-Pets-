@@ -650,10 +650,18 @@ export class UIController implements OnStart, OnInit {
             ['7', 1762888472]
         ])
 
+        let luckList = new Map<string, number>([
+            ['Lucky1', 722093437],
+            ['Lucky2', 722436217],
+            ['Lucky3', 722472169],
+        ])
+
         let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
         let accuracyFrame = storeFrame.WaitForChild('Accuracy').WaitForChild('AccuracyList')
         let winsFrame = storeFrame.WaitForChild('Wins').WaitForChild('WinsList')
         let gemsFrame = storeFrame.WaitForChild('Gems').WaitForChild('GemsList')
+
+        let luckFrame = storeFrame.WaitForChild('EggLuckPasses').WaitForChild('Passes')
 
         for (let obj of accuracyFrame.GetChildren()) {
             if (!obj.IsA('GuiButton')) { continue }
@@ -690,6 +698,14 @@ export class UIController implements OnStart, OnInit {
         ButtonFabric.CreateButton(gemsFrame.Parent!.WaitForChild('Huge Pack') as GuiButton).BindToClick(() => {
             Events.PurchasePrompt.fire(gemslist.get('7')!)
         })
+
+        for (let obj of luckFrame.GetChildren()) {
+            if (!obj.IsA('ImageLabel')) { continue }
+            ButtonFabric.CreateButton(obj.WaitForChild('Buy') as GuiButton).BindToClick(() => {
+                if (!luckList.get(obj.Name)) { return }
+                Events.PurchasePrompt.fire(luckList.get(obj.Name)!)
+            })
+        }
 
     }
 
@@ -996,9 +1012,18 @@ export class UIController implements OnStart, OnInit {
 
     private updateStorePacks() {
         let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
+
         let world = this._playerController.replica.Data.Profile.Config.MaxWorld
         let worldData = WorldsData.get(world)
         
+        let luckFrame = storeFrame.WaitForChild('EggLuckPasses').WaitForChild('Passes')
+
+        let luckList = new Map<string, string>([
+            ['Lucky1', 'luck1'],
+            ['Lucky2', 'luck2'],
+            ['Lucky3', 'luck3'],
+        ])
+
         if (!worldData) { return }
 
         for (let obj of storeFrame.GetDescendants()) {
@@ -1008,6 +1033,11 @@ export class UIController implements OnStart, OnInit {
             let label = obj.Parent!.WaitForChild('Amount') as TextLabel
 
             label.Text = '+'+CreationUtilities.getSIPrefixSymbol(obj.Value * (worldData!.multipliers.get('product') || 1))+' '+obj.Parent!.Parent!.Parent!.Name
+        }
+
+        for (let obj of luckFrame.GetChildren()) {
+            if (!obj.IsA('ImageLabel')) { continue }
+            //if ()
         }
 
     }

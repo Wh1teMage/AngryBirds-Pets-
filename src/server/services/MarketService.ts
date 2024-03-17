@@ -118,6 +118,7 @@ export class MarketService implements OnStart, OnInit {
         if (!productCheck(product, userId)) { return }
         if (product.producttype !== ProductType.Gamepass) { return }
         if (playerComponent.profile.Data.Products.includes(product.name)) { return }
+        if (!MarketplaceService.UserOwnsGamePassAsync(userId, productId)) { return }
 
         this.purchased.Fire(userId, productId)
     }

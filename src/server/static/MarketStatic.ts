@@ -284,4 +284,5 @@ MarketCallbacks.set('luck2', (player) => {
 MarketCallbacks.set('luck3', (player) => {
     let profileData = player.profile.Data
     profileData.Config.Luck += .5
+    MarketCallbacks.get('largepackwins')!(player)
 })
