@@ -38,6 +38,7 @@ export class PetModelManager {
         let newPet = PetUtilities.DBToPetTransfer(pet) as IPetData
         newPet.model.Parent = Workspace.FindFirstChild('Pets')!.WaitForChild(player.UserId)
         newPet.model.PivotTo(new CFrame(0,0,0))
+        newPet.model.PrimaryPart!.Anchored = true
 
         PetModelManager.GetPlayer(player)!.push({Pet: newPet, DB: pet})
     }

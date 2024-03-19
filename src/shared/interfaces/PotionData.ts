@@ -6,3 +6,7 @@ export interface IPotionData {
     enableEffect: (player: IServerPlayerComponent) => void
     disableEffect: (player: IServerPlayerComponent) => void
 }
+
+export enum PotionOperationStatus {
+    Use = 'Use'
+}

@@ -63,3 +63,13 @@ EggsData.set('Donate', {
 
     productid: 1701055226
 })
+
+EggsData.set('Shadow', {
+    name: 'Shadow',
+    price: 1,
+    valuetype: EggValueType.Stored,
+    petchances: [
+        { weight: 10, name: 'Cat' },
+        { weight: 15, name: 'Cat' },
+    ],
+})

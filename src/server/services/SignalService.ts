@@ -3,7 +3,7 @@ import { Events } from "server/network";
 import { MarketService } from "./MarketService";
 import { ContextCallbacks } from "server/static/ContextStatic";
 import { ServerPlayerFabric } from "server/components/PlayerComponent";
-import { BuyType } from "shared/interfaces/EggData";
+import { EggBuyType } from "shared/interfaces/EggData";
 import { RequestOperationStatus, TradeOperationStatus, TradeUpdateStatus } from "shared/interfaces/TradeData";
 import { TradeRequest, TradeRequestManager } from "server/classes/TradeRequestClass";
 import { IDBPetData, PetOperationStatus } from "shared/interfaces/PetData";
@@ -14,6 +14,8 @@ import { WorldType } from "shared/enums/WorldEnums";
 import { RewardType } from "shared/enums/RewardEnums";
 import { FlyingObjectStatus } from "shared/enums/FlyingObjectEnums";
 import { WorldsData } from "shared/info/WorldInfo";
+import { PotionOperationStatus } from "shared/interfaces/PotionData";
+import { PotionType } from "shared/enums/PotionEnum";
 
 @Service({})
 export class SignalService implements OnStart, OnInit {
@@ -31,7 +33,7 @@ export class SignalService implements OnStart, OnInit {
             ContextCallbacks.get(name+state)!(ServerPlayerFabric.GetPlayer(player)!)
         })
 
-        Events.BuyEgg.connect((player: Player, name: string, buytype: BuyType) => {
+        Events.BuyEgg.connect((player: Player, name: string, buytype: EggBuyType) => {
             if (!ServerPlayerFabric.GetPlayer(player)) { return }
             ServerPlayerFabric.GetPlayer(player)!.BuyEgg(name, buytype)
         })
@@ -118,10 +120,19 @@ export class SignalService implements OnStart, OnInit {
             let playerComp = ServerPlayerFabric.GetPlayer(player)
             if (!playerComp) { return }
 
-            if (rewardtype === RewardType.PetQuest) { playerComp.ClaimPetQuestReward() } // make sure to comment ALL disabled pet quests (otherwise it will run poorly)
+            //if (rewardtype === RewardType.PetQuest) { playerComp.ClaimPetQuestReward() } // make sure to comment ALL disabled pet quests (otherwise it will run poorly)
             if (rewardtype === RewardType.Session) { playerComp.ClaimSessionReward(info!) }
             if (rewardtype === RewardType.Daily) { playerComp.ClaimDailyReward() }
             if (rewardtype === RewardType.Code) { playerComp.RedeemCode(info!) }
+            if (rewardtype === RewardType.Rebirth) { playerComp.DoRebirth() }
+            if (rewardtype === RewardType.FollowQuest) { playerComp.ClaimFollowReward() }
+        })
+
+        Events.ManagePotion.connect((player: Player, operation: PotionOperationStatus, potiontype: PotionType) => {
+            let playerComp = ServerPlayerFabric.GetPlayer(player)
+            if (!playerComp) { return }
+
+            if (operation === PotionOperationStatus.Use) { playerComp.UsePotion(potiontype) }
         })
 
     }

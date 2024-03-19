@@ -1,7 +1,8 @@
-import { Workspace } from "@rbxts/services"
+import { ReplicatedStorage } from "@rbxts/services"
 import { Evolutions, IPetData, Mutations, Rarities, Sizes } from "shared/interfaces/PetData"
 
 export const PetsData = new Map<string, IPetData>()
+const Pets = ReplicatedStorage.WaitForChild('Pets') as Folder
 
 // !World 1 \/
 
@@ -17,11 +18,11 @@ PetsData.set('Cat', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Cat') as Model
+    model: Pets.WaitForChild('Cat', 40) as Model
 })
 
 PetsData.set('Dog', {
@@ -35,15 +36,15 @@ PetsData.set('Dog', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Dog') as Model
+    model: Pets.WaitForChild('Dog', 40) as Model
 })
 
 PetsData.set('White Bunny', {
-    name: 'White Bunny',
+    name: 'White Bunny', // чучело (ненавидим)
     locked: false,
     equipped: false,
     multipliers: new Map([['strength', 2.3]]),
@@ -53,11 +54,11 @@ PetsData.set('White Bunny', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('White Bunny') as Model
+    model: Pets.WaitForChild('White Bunny', 40) as Model
 })
 
 PetsData.set('Elephant', {
@@ -71,11 +72,11 @@ PetsData.set('Elephant', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Elephant') as Model
+    model: Pets.WaitForChild('Elephant', 40) as Model
 })
 
 PetsData.set('Butterfly', {
@@ -89,11 +90,11 @@ PetsData.set('Butterfly', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Butterfly') as Model
+    model: Pets.WaitForChild('Butterfly', 40) as Model
 })
 
 // * Ore egg
@@ -109,11 +110,11 @@ PetsData.set('Fox', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Fox') as Model
+    model: Pets.WaitForChild('Fox', 40) as Model
 })
 
 PetsData.set('Monkey', {
@@ -127,11 +128,11 @@ PetsData.set('Monkey', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Monkey') as Model
+    model: Pets.WaitForChild('Monkey', 40) as Model
 })
 
 PetsData.set('Dragon', {
@@ -145,11 +146,11 @@ PetsData.set('Dragon', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Dragon') as Model
+    model: Pets.WaitForChild('Dragon', 40) as Model
 })
 
 PetsData.set('Raccoon', {
@@ -163,11 +164,11 @@ PetsData.set('Raccoon', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Raccoon') as Model
+    model: Pets.WaitForChild('Raccoon', 40) as Model
 })
 
 PetsData.set('CandyCane Unicorn', {
@@ -181,11 +182,11 @@ PetsData.set('CandyCane Unicorn', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('CandyCane Unicorn') as Model
+    model: Pets.WaitForChild('CandyCane Unicorn', 40) as Model
 })
 
 // * Rail egg
@@ -201,11 +202,11 @@ PetsData.set('Cow', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Cow') as Model
+    model: Pets.WaitForChild('Cow', 40) as Model
 })
 
 PetsData.set('Pig', {
@@ -219,11 +220,11 @@ PetsData.set('Pig', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Pig') as Model
+    model: Pets.WaitForChild('Pig', 40) as Model
 })
 
 PetsData.set('Fish', {
@@ -237,11 +238,11 @@ PetsData.set('Fish', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Fish') as Model
+    model: Pets.WaitForChild('Fish', 40) as Model
 })
 
 PetsData.set('Crab', {
@@ -255,11 +256,11 @@ PetsData.set('Crab', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Crab') as Model
+    model: Pets.WaitForChild('Crab', 40) as Model
 })
 
 PetsData.set('Peacock', {
@@ -273,11 +274,11 @@ PetsData.set('Peacock', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Peacock') as Model
+    model: Pets.WaitForChild('Peacock', 40) as Model
 })
 
 // * Diamond egg (donat)
@@ -293,11 +294,11 @@ PetsData.set('Glacier', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Glacier') as Model
+    model: Pets.WaitForChild('Glacier', 40) as Model
 })
 
 PetsData.set('Mega Amythest Dragon', {
@@ -311,11 +312,11 @@ PetsData.set('Mega Amythest Dragon', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Mega Amythest Dragon') as Model
+    model: Pets.WaitForChild('Mega Amythest Dragon', 40) as Model
 })
 
 PetsData.set('Sinister Hydra', {
@@ -329,11 +330,11 @@ PetsData.set('Sinister Hydra', {
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
-        size: Sizes.Normal,
+        size: Sizes.Baby,
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Workspace.WaitForChild('Sinister Hydra') as Model
+    model: Pets.WaitForChild('Sinister Hydra', 40) as Model
 })
 // !World 1 /\
 

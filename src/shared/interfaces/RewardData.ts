@@ -1,6 +1,7 @@
 import { PotionType } from "shared/enums/PotionEnum"
 import { IDBPetData } from "./PetData"
 import { WorldType } from "shared/enums/WorldEnums"
+import { EggBuyType, EggValueType } from "./EggData"
 
 export interface IRewardData {
     Values?: {
@@ -12,7 +13,8 @@ export interface IRewardData {
     }
     Pets?: Array<{pet: IDBPetData, amount: number}>
     Potions?: Array<{potion: PotionType, amount: number}>
-    Additional?: Array<{data: any, amount: number}>
+    Eggs?: Array<{egg: string, amount: number, type: EggBuyType}>
+    Additional?: Map<string, number>
     Title?: string
     
     Time?: number

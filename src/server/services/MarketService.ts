@@ -2,6 +2,7 @@ import { Service, OnStart, OnInit } from "@flamework/core";
 import ObjectEvent from "@rbxts/object-event";
 import { MarketplaceService, Players } from "@rbxts/services";
 import { ServerPlayerFabric } from "server/components/PlayerComponent";
+import { Events } from "server/network";
 import { MarketCallbacks } from "server/static/MarketStatic";
 import { ProductType } from "shared/enums/MarketEnums";
 import { MarketNamings } from "shared/info/MarketInfo";
@@ -15,8 +16,11 @@ let productCheck = (product: IProductData, userId: number) => {
 }
 
 let prompts = new Map<ProductType, (player: Player, productId: number) => void>([
-    [ProductType.DevProduct, (player: Player, productId: number) => { MarketplaceService.PromptProductPurchase(player, productId) }],
-    [ProductType.Gamepass, (player: Player, productId: number) => { MarketplaceService.PromptGamePassPurchase(player, productId) }],
+    [ProductType.DevProduct, (player: Player, productId: number) => 
+        { MarketplaceService.PromptProductPurchase(player, productId); Events.ReplicateEffect.fire(player, 'DonationStarted') }],
+
+    [ProductType.Gamepass, (player: Player, productId: number) => 
+        { MarketplaceService.PromptGamePassPurchase(player, productId); Events.ReplicateEffect.fire(player, 'DonationStarted') }],
 ])
 
 let giftingQueue = new Map<number, number | undefined>([]) //maybe later on remake this system into array one
@@ -27,12 +31,12 @@ export class MarketService implements OnStart, OnInit {
 
     public static purchased = new ObjectEvent<[number, number]>
 
-    private _onFailedPurchase() {
-
+    private _onFailedPurchase(userId: number) {
+        Events.ReplicateEffect.fire(Players.GetPlayerByUserId(userId)!, 'DonationEnded')
     }
 
-    private _onSuccesfulPurchase() {
-        
+    private _onSuccesfulPurchase(userId: number) {
+        Events.ReplicateEffect.fire(Players.GetPlayerByUserId(userId)!, 'DonationEnded')
     }
 
     private _completePurchase(userId: number, productId: number, isPurchased: boolean) {
@@ -41,7 +45,7 @@ export class MarketService implements OnStart, OnInit {
         let player = Players.GetPlayerByUserId(userId) as Player
         let giftId = giftingQueue.get(userId)
 
-        if (!isPurchased) { this._onFailedPurchase(); return }
+        if (!isPurchased) { this._onFailedPurchase(userId); return }
         if (!productCheck(product, userId)) { return }
         if (giftId && !Players.GetPlayerByUserId(giftId)) { warn('Gifted Player Doesnt Exist!'); return }
 
@@ -51,7 +55,7 @@ export class MarketService implements OnStart, OnInit {
         }
 
         MarketCallbacks.get(product.name)!(ServerPlayerFabric.GetPlayer(player))
-        this._onSuccesfulPurchase()
+        this._onSuccesfulPurchase(userId)
 
         return ServerPlayerFabric.GetPlayer(player)!
     }

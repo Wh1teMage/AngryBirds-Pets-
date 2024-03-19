@@ -15,7 +15,7 @@ import { PetUtilities } from "shared/utility/PetUtilities";
 import { petUpgradeConfig } from "shared/configs/PetConfig";
 import Functions from "shared/utility/LuaUtilFunctions";
 import { AbilityFabric } from "server/classes/AbilityClass";
-import { BuyType, EggValueType } from "shared/interfaces/EggData";
+import { EggBuyType, EggValueType } from "shared/interfaces/EggData";
 import { BuyTypeConfig } from "shared/configs/EggConfig";
 import { EggsData } from "shared/info/EggInfo";
 import { ITradingPlayer, TradeUpdateStatus } from "shared/interfaces/TradeData";
@@ -36,6 +36,7 @@ import { PassiveValues } from "shared/interfaces/PassiveData";
 import { FlyingObjectClass } from "server/classes/FlyingObjectClass";
 import { PetQuestsData } from "shared/info/QuestInfo";
 import { IncomeSource } from "shared/enums/IncomeEnums";
+import { Passives } from "server/classes/PassiveClass";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -78,8 +79,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public SetStars = (value: number, source?: IncomeSource) => this._playerValueController.SetStars(value, source)
     public SetStrength = (value: number, source?: IncomeSource) => this._playerValueController.SetStrength(value, source)
 
-    public BuyEgg = (name: string, buytype: BuyType) => this._playerEggController.BuyEgg(name, buytype)
-    public OpenEggBypass = (name: string, buytype: BuyType) => this._playerEggController.OpenEggBypass(name, buytype)
+    public BuyEgg = (name: string, buytype: EggBuyType) => this._playerEggController.BuyEgg(name, buytype)
+    public OpenEggBypass = (name: string, buytype: EggBuyType) => this._playerEggController.OpenEggBypass(name, buytype)
 
     public SetupTrade = (trade: Trade) => this._playerTradeController.SetupTrade(trade)
     public UpdateTrade = (pet: IDBPetData, status: TradeUpdateStatus) => this._playerTradeController.UpdateTrade(pet, status)
@@ -114,6 +115,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public RedeemCode = (code: string) => this._playerRewardController.RedeemCode(code)
     public DoRebirth = (skip?: boolean) => this._playerRewardController.DoRebirth(skip)
 
+    public ClaimFollowReward = () => this._playerRewardController.ClaimFollowReward()
+
     onStart() {
 
         this.instance
@@ -145,6 +148,18 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             if (PotionsData.get(buff.source as PotionType)) { this.ApplyPotionEffect(buff.source as PotionType) }
         }
 
+        let defaultPassives = [
+            'EggQuest', 'FriendQuest', 'PetQuest', 'PetIndexQuest'
+        ]
+
+        for (let passiveName of defaultPassives) {
+            let passive = Passives.get(passiveName)!() 
+            passive.setOwner(this.instance)
+            this.session.activePassives.push(passive)
+        }
+
+        print(this.session.leftToFollow)
+
         this.SetPetMultipliers()
 
         this.session.activePassives.forEach((value) => { value.onStart() })
@@ -162,36 +177,36 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             component.session.activePassives.forEach((value) => { value.onFriendsChanged() })
         })
 
-        this.session.activePassives.forEach((value) => { value.onFriendsChanged() })
+        this.session.activePassives.forEach((value) => { print(value); value.onFriendsChanged() })
 
         task.spawn(() => {
             this.AppendPotion(PotionType.LuckPotion)
             this.UsePotion(PotionType.LuckPotion)
 
-            /*
-            for (let i = 0; i<8; i++) {
+            
+            for (let i = 0; i<3; i++) {
                 
                 this.AppendPet(
                     {
-                        name: 'Cat',
+                        name: 'White Bunny',
                         locked: false,
                         equipped: false,
                         additional: {
-                            size: Sizes.Normal,
+                            size: Sizes.Baby,
                             evolution: Evolutions.Normal,
                             mutation: Mutations.Default,
                         }
                     }
                 )
                 
-                /*
+                
                 this.EquipPet(
                     {
-                        name: 'Cat',
+                        name: 'White Bunny',
                         locked: false,
                         equipped: false,
                         additional: {
-                            size: Sizes.Normal,
+                            size: Sizes.Baby,
                             evolution: Evolutions.Normal,
                             mutation: Mutations.Default,
                         }
@@ -200,7 +215,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                 task.wait()
                 
             }
-            */
+            
            
             /*
             
@@ -694,7 +709,7 @@ class PlayerEggController {
         this.player = player
     }
 
-    public OpenEggBypass(name: string, buytype: BuyType) {
+    public OpenEggBypass(name: string, buytype: EggBuyType) {
         let profileData = this.player.profile.Data
 
         let amount = BuyTypeConfig[buytype]
@@ -716,7 +731,7 @@ class PlayerEggController {
         }
     }
 
-    public BuyEgg(name: string, buytype: BuyType) {
+    public BuyEgg(name: string, buytype: EggBuyType) {
         if (!this.player.profile) { return }
         let profileData = this.player.profile.Data
 
@@ -731,7 +746,7 @@ class PlayerEggController {
         switch (eggInfo.valuetype) {
             case EggValueType.Wins:
 
-                if (profileData.Values.WinsVal < eggInfo.price) {return}
+                if (profileData.Values.WinsVal < eggInfo.price*amount) {return}
                 print(eggInfo, 1)
 
                 this.OpenEggBypass(name, buytype)
@@ -743,7 +758,7 @@ class PlayerEggController {
                 }
                 */
 
-                this.player.SetWins(profileData.Values.WinsVal - eggInfo.price)
+                this.player.SetWins(profileData.Values.WinsVal - eggInfo.price*amount)
 
                 break
             case EggValueType.VBugs:
@@ -751,6 +766,22 @@ class PlayerEggController {
                 Events.ReplicateEffect.fire(this.player.instance, EffectName.ReplicatePurchase, new Map<string, number>([['productId', eggInfo.productid!]]))
 
                 // should rebuilt this egg system btw (esp with paid once)
+                break
+            case EggValueType.Stored:
+
+                let foundIndex = -1
+                profileData.StoredEggs.forEach((val, index) => { if (val.name === name) { foundIndex = index } })
+                print(foundIndex)
+                if (foundIndex < 0) { return }
+                if (profileData.StoredEggs[foundIndex].amount < eggInfo.price*amount) { return }
+
+                this.OpenEggBypass(name, buytype)
+
+                profileData.StoredEggs[foundIndex].amount -= eggInfo.price*amount
+                print(profileData.StoredEggs[foundIndex].amount)
+
+                this.player.replica.SetValue('Profile.StoredEggs', profileData.StoredEggs)
+
                 break
             default:
             
@@ -1164,6 +1195,16 @@ class PlayerRewardController {
             }
         })
 
+        reward.Eggs?.forEach((value) => {
+            for (let i = 0; i < value.amount; i++) {
+                this.player.OpenEggBypass(value.egg, value.type)
+            }
+        })
+
+        if (reward.Additional?.get('MaxEquippedPets')) { this.player.profile.Data.Config.MaxEquippedPets += reward.Additional?.get('MaxEquippedPets')! }
+        if (reward.Additional?.get('MaxPets')) { this.player.profile.Data.Config.MaxPets += reward.Additional?.get('MaxPets')! }
+        if (reward.Additional?.get('SpinCount')) { this.player.profile.Data.StatValues.SpinCount += reward.Additional?.get('SpinCount')! }
+
         this.player.SetStrength(profile.Values.StrengthVal + (reward.Values?.Strength || 0))
         this.player.SetStars(profile.Values.StarsVal + (reward.Values?.Stars || 0))
         this.player.SetWins(profile.Values.WinsVal + (reward.Values?.Wins || 0))
@@ -1252,16 +1293,36 @@ class PlayerRewardController {
         if (!nextRebirthData) { return }
 
         let additional = new Map<string, number>()
-        nextRebirthData.Additional!.forEach((value) => { additional.set(value.data, value.amount) })
+        nextRebirthData.Additional!.forEach((value, key) => { additional.set(key, value) })
 
         let currentAdditional = new Map<string, number>()
-        currentRebirthData.Additional!.forEach((value) => { additional.set(value.data, value.amount) })
+        currentRebirthData.Additional!.forEach((value, key) => { currentAdditional.set(key, value) })
         
         if ((profileData.Values.WinsVal < additional.get('Wins')!) && !skip) { return }
 
         this.player.SetStrength(0)
-        this.ApplyReward(nextRebirthData) // Change multi
-        profileData.Multipliers.StrengthMul = profileData.Multipliers.StrengthMul - currentAdditional.get('Wins')! + additional.get('Wins')!
+        profileData.Multipliers.StrengthMul = profileData.Multipliers.StrengthMul - currentAdditional.get('Multiplier')! + additional.get('Multiplier')!
+
+        this.ApplyReward(nextRebirthData)
+        profileData.Values.RebirthsVal += 1
+
+        this.player.replica.SetValue('Profile.Values.RebirthsVal', profileData.Values.RebirthsVal)
+
+    }
+
+    public ClaimFollowReward() {
+
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        print('Claimed!', sessionData.leftToFollow)
+
+        if (sessionData.leftToFollow.size() !== 0) { return }
+        if (profileData.CompletedQuests.includes('PetQuest1')) { return }
+
+        print('Done!')
+
+        profileData.CompletedQuests.push('PetQuest1')
 
     }
 

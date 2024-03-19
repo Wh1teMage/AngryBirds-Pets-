@@ -41,18 +41,42 @@ export const MarketNamings = new Map<number, IProductData>([
     [722111374, {name: '3equipped',      producttype: ProductType.Gamepass, correspondingGiftId: 1762883009}],
     [721938617, {name: '5equipped',      producttype: ProductType.Gamepass, correspondingGiftId: 1762882789}],
     [722336327, {name: 'doublestars',    producttype: ProductType.Gamepass, correspondingGiftId: 1762882615}],
-    // [722092789, {name: 'vippass',        producttype: ProductType.Gamepass, correspondingGiftId: id}],
+    [722092789, {name: 'vippass',        producttype: ProductType.Gamepass, correspondingGiftId: 1762884549}],
     [733950750, {name: 'autorebirth',    producttype: ProductType.Gamepass, correspondingGiftId: 1768846202}],
 
     [722093437, {name: 'luck1', producttype: ProductType.Gamepass}],
-    [722436217, {name: 'luck2', producttype: ProductType.Gamepass, checkCallback: (player: IServerPlayerComponent) => {
+    [1779469996, {name: 'luck2', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
         if (!player.profile.Data.Products.includes('luck1')) { return false }
         return true
     },}],
-    [722472169, {name: 'luck3', producttype: ProductType.Gamepass, checkCallback: (player: IServerPlayerComponent) => {
+    [1779470301, {name: 'luck3', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
         if (!player.profile.Data.Products.includes('luck1') || !player.profile.Data.Products.includes('luck2')) { return false }
         return true
     },}],
-])
 
-//1762897969
+    [1762897969, {name: 'rebirthskip1', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
+        if (player.profile.Data.StatValues.RebirthSkips !== 0) { return false }
+        return true
+    },}],
+    [1762898131, {name: 'rebirthskip2', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
+        if (player.profile.Data.StatValues.RebirthSkips !== 1) { return false }
+        return true
+    },}],
+    [1762898290, {name: 'rebirthskip3', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
+        if (player.profile.Data.StatValues.RebirthSkips !== 2) { return false }
+        return true
+    },}],
+    [1762898515, {name: 'rebirthskip4', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
+        if (player.profile.Data.StatValues.RebirthSkips !== 3) { return false }
+        return true
+    },}],
+    [1762898792, {name: 'rebirthskip5', producttype: ProductType.DevProduct}],
+
+    [1762884667, {name: 'x2winspotion', producttype: ProductType.DevProduct}],
+    [1779471423, {name: 'luckpotion', producttype: ProductType.DevProduct}],
+    [1779471655, {name: 'goldpotion', producttype: ProductType.DevProduct}],
+    [1779471915, {name: 'voidpotion', producttype: ProductType.DevProduct}],
+    [1779472537, {name: 'allpotions', producttype: ProductType.DevProduct}],
+    
+    [1779423116, {name: 'bundle', producttype: ProductType.DevProduct}]
+])

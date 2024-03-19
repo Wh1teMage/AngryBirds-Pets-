@@ -4,7 +4,8 @@ import { Evolutions, IPetData, Rarities, Sizes } from "shared/interfaces/PetData
 export const multipliersConfig = {
     
     size: {
-        Normal: 1,
+        Baby: 1,
+        Big: 1.5,
         Huge: 2,
     },
     evolution: {
@@ -17,7 +18,8 @@ export const multipliersConfig = {
 export const petUpgradeConfig = {
 
     SizeUpgrades: {
-        Normal: { requirements: new Map<Sizes, number>([[Sizes.Normal, 4]]), nextSize: Sizes.Huge },
+        Baby: { requirements: new Map<Sizes, number>([[Sizes.Baby, 3]]), nextSize: Sizes.Big },
+        Big: { requirements: new Map<Sizes, number>([[Sizes.Big, 3]]), nextSize: Sizes.Huge },
         Huge: { requirements: new Map<Sizes, number>([[Sizes.Huge, 999]]), nextSize: undefined },
     },
     EvolutionUpgrades: {

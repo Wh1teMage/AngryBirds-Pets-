@@ -60,7 +60,10 @@ export class GUIUtilities {
     }
 
     static getSIPrefixSymbol(num: number) {
-        let strToReturn = '';
+        let strToReturn = tostring(math.round(num * 100)/100);
+
+        if (math.abs(num) < 1000) { return strToReturn };
+
         PrefixSymbols.forEach((value, key) => {
             if (((num / key) >= 1) && ((num / key) <= 1000)) {
                 strToReturn = (tostring(math.round(num / key * 100)/100) + value);

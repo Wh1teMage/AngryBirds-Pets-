@@ -21,7 +21,9 @@ export interface IProfileData {
         RobuxSpent: number
 
         SpinCount: number
-        TestEggCount: number
+        RebirthSkips: number
+        FriendsCount: number
+        
     }
 
     Multipliers: {
@@ -59,6 +61,8 @@ export interface IProfileData {
 
     VoidMachine: Array<{pet: IDBPetData, endTime: number, startTime: number}>
     RedeemedCodes: Array<string>
+
+    StoredEggs: Array<{name: string, amount: number}>
 
     CONSTANTS: {
         VERSION: number

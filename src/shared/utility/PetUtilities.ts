@@ -49,7 +49,7 @@ export class PetUtilities {
             locked: false,
             equipped: false,
             additional: {
-                size: Sizes.Normal,
+                size: Sizes.Baby,
                 evolution: Evolutions.Normal,
                 mutation: Mutations.Default,
             }

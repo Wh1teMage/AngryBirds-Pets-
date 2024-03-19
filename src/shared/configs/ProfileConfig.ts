@@ -24,7 +24,8 @@ export const defaultValue: IProfileData = {
         RobuxSpent: 0,
 
         SpinCount: 0,
-        TestEggCount: 0
+        RebirthSkips: 0,
+        FriendsCount: 0,
     },
 
     Multipliers: {
@@ -62,6 +63,7 @@ export const defaultValue: IProfileData = {
 
     VoidMachine: [],
     RedeemedCodes: [],
+    StoredEggs: [],
 
     CONSTANTS: {
         VERSION: VERSION,

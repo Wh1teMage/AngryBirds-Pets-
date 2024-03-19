@@ -5,34 +5,49 @@ import { PassiveValues } from "shared/interfaces/PassiveData";
 import { IServerPlayerComponent } from "shared/interfaces/PlayerData";
 
 @PassiveDecorator('EggQuest')
-export class PetQuest extends PassiveClass {
+export class EggQuest extends PassiveClass {
 
     public name = 'EggQuest'
     public description = 'fuck me'
 
     private component?: ServerPlayerComponent
-    
-    constructor() {
-        super()
-        if (!this.player) { return }
-        this.component = ServerPlayerFabric.GetPlayer(this.player)
-    }
+
+    public setOwner = (player: Player) => {
+        this.player = player
+    };
 
     public onTick = () => {
-
-        if (!this.component) { return }
+        if (!this.player) { return }
         
-        let profileData = this.component.profile.Data
-        let sessionData = this.component.session
+        let component = ServerPlayerFabric.GetPlayer(this.player)
+        if (!component) { return }
+        
+        let profileData = component.profile.Data
+        let sessionData = component.session
 
         EggQuestsData.forEach((value, key) => {
-            if (!value.checkCallback || !value.checkCallback(this.component as IServerPlayerComponent)) { return }
 
-            value.reward.Additional!.forEach((value) => { profileData.StatValues[value.data as keyof typeof profileData.StatValues] += value.amount })
-            this.component!.ApplyReward(value.reward)
+            if (value.checkCallback) { value.checkCallback(component as IServerPlayerComponent) }
+            if (!value.checkCallback || !value.checkCallback(component as IServerPlayerComponent)) { return }
+
+            value.reward.Additional!.forEach((value2, key2) => { 
+
+                let foundIndex = -1
+                profileData.StoredEggs.forEach((val3, index3) => { if (val3.name === key2) { foundIndex = index3 } })
+
+                if (foundIndex < 0) { 
+                    profileData.StoredEggs.push({ name: key2, amount: 0 })
+                    foundIndex = profileData.StoredEggs.size()-1
+                 }
+
+                 profileData.StoredEggs[foundIndex]!.amount += value2
+
+            })
+            component!.ApplyReward(value.reward)
         })
 
-        this.component.replica.SetValues('Profile.StatValues', profileData.StatValues)
+        component.replica.SetValues('Profile.StatValues', profileData.StatValues)
+        component.replica.SetValue('Profile.StoredEggs', profileData.StoredEggs)
 
     }
 

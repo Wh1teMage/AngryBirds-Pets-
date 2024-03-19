@@ -12,7 +12,58 @@ FriendQuestsData.set('FriendQuest1', {
     reward: {
         Values: {
             Wins: 10
-        }
+        },
+        Additional: new Map([['SpinCount', 1]])
+    }
+})
+
+FriendQuestsData.set('FriendQuest2', {
+    requirements: new Map([['friends', 3]]),
+    reward: {
+        Values: {
+            Wins: 10
+        },
+        Additional: new Map([['SpinCount', 1]])
+    }
+})
+
+FriendQuestsData.set('FriendQuest3', {
+    requirements: new Map([['friends', 5]]),
+    reward: {
+        Values: {
+            Wins: 10
+        },
+        Additional: new Map([['SpinCount', 1]])
+    }
+})
+
+FriendQuestsData.set('FriendQuest4', {
+    requirements: new Map([['friends', 10]]),
+    reward: {
+        Values: {
+            Wins: 10
+        },
+        Additional: new Map([['SpinCount', 1]])
+    }
+})
+
+FriendQuestsData.set('FriendQuest5', {
+    requirements: new Map([['friends', 30]]),
+    reward: {
+        Values: {
+            Wins: 10
+        },
+        Additional: new Map([['SpinCount', 1]])
+    }
+})
+
+FriendQuestsData.set('FriendQuest6', {
+    requirements: new Map([['friends', 99]]),
+    reward: {
+        Values: {
+            Wins: 10
+        },
+        Additional: new Map([['SpinCount', 1]])
     }
 })
 
@@ -24,6 +75,7 @@ PetQuestsData.set('PetQuest1', {
         }
     },
     checkCallback: (player) => {
+
         let profileData = player.profile.Data
         let progress = profileData.CurrentQuestsProgress
 
@@ -31,35 +83,38 @@ PetQuestsData.set('PetQuest1', {
             [['strength', profileData.Values.StrengthVal]]
         ))
 
+        player.replica.SetValue('Profile.CurrentQuestsProgress', progress)
+
         if (player.instance.Name === 'Icecrush121' && progress.get('PetQuest1')!.get('strength') as number > 10) {
             print('yipee')
             return true
         }
+
+
         return false
     }
 })
 
-EggQuestsData.set('TestEgg', {
+EggQuestsData.set('Shadow', {
     requirements: new Map([['time', 10]]),
     reward: {
         Values: {
             Wins: 10
         },
-        Additional: [{
-            data: 'TestEggCount',
-            amount: 1,
-        }]
+        Additional: new Map([['Shadow', 1]])
     },
     checkCallback: (player) => {
         let profileData = player.profile.Data
         let sessionData = player.session
         let progress = profileData.CurrentQuestsProgress
 
-        progress.set('TestEgg', new Map( 
+        progress.set('Shadow', new Map( 
             [['time', sessionData.sessionTime%10]]
         ))
 
-        if (player.instance.Name === 'Icecrush121' && progress.get('TestEgg')!.get('time') === 0) {
+        player.replica.SetValue('Profile.CurrentQuestsProgress', progress)
+
+        if (player.instance.Name === 'Icecrush121' && progress.get('Shadow')!.get('time') === 0) {
             print('yipee2')
             return true
         }
@@ -70,8 +125,7 @@ EggQuestsData.set('TestEgg', {
 PetIndexQuestsData.set('PetIndexQuest1', {
     requirements: new Map<string, any>([['pets', 10], ['tier', 'Tier 1']]),
     reward: {
-        Values: {
-            Wins: 10
-        },
+        Values: {},
+        Additional: new Map([['MaxEquippedPets', 1]]),
     }
 })

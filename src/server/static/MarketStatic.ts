@@ -1,12 +1,13 @@
 import { ServerPlayerComponent } from "server/components/PlayerComponent";
+import { PotionType } from "shared/enums/PotionEnum";
 import { WorldsData } from "shared/info/WorldInfo";
-import { BuyType } from "shared/interfaces/EggData";
+import { EggBuyType } from "shared/interfaces/EggData";
 
 export const MarketCallbacks = new Map<string, (player: ServerPlayerComponent) => void>([])
 
 MarketCallbacks.set('test', (player) => {
     print('Purchased!')
-    player.OpenEggBypass('Donate', BuyType.Single)
+    player.OpenEggBypass('Donate', EggBuyType.Single)
     print(player.profile.Data)
 })
 
@@ -295,10 +296,87 @@ MarketCallbacks.set('luck1', (player) => {
 MarketCallbacks.set('luck2', (player) => {
     let profileData = player.profile.Data
     profileData.Config.Luck += .5
+    profileData.Products.push('luck2')
 })
 
 MarketCallbacks.set('luck3', (player) => {
     let profileData = player.profile.Data
     profileData.Config.Luck += .5
     MarketCallbacks.get('largepackwins')!(player)
+    profileData.Products.push('luck3')
+})
+
+MarketCallbacks.set('rebirthskip1', (player) => {
+    let profileData = player.profile.Data
+    profileData.StatValues.RebirthSkips += 1
+    if (profileData.StatValues.RebirthSkips !== 1) { return }
+    player.DoRebirth(true)
+    player.replica.SetValue('Profile.StatValues.RebirthSkips', profileData.StatValues.RebirthSkips)
+})
+
+MarketCallbacks.set('rebirthskip2', (player) => {
+    let profileData = player.profile.Data
+    profileData.StatValues.RebirthSkips += 1
+    if (profileData.StatValues.RebirthSkips !== 2) { return }
+    player.DoRebirth(true)
+    player.replica.SetValue('Profile.StatValues.RebirthSkips', profileData.StatValues.RebirthSkips)
+})
+
+MarketCallbacks.set('rebirthskip3', (player) => {
+    let profileData = player.profile.Data
+    profileData.StatValues.RebirthSkips += 1
+    if (profileData.StatValues.RebirthSkips !== 3) { return }
+    player.DoRebirth(true)
+    player.replica.SetValue('Profile.StatValues.RebirthSkips', profileData.StatValues.RebirthSkips)
+})
+
+MarketCallbacks.set('rebirthskip4', (player) => {
+    let profileData = player.profile.Data
+    profileData.StatValues.RebirthSkips += 1
+    if (profileData.StatValues.RebirthSkips !== 4) { return }
+    player.DoRebirth(true)
+    player.replica.SetValue('Profile.StatValues.RebirthSkips', profileData.StatValues.RebirthSkips)
+})
+
+MarketCallbacks.set('rebirthskip5', (player) => {
+    let profileData = player.profile.Data
+    profileData.StatValues.RebirthSkips += 1
+    player.DoRebirth(true)
+    player.replica.SetValue('Profile.StatValues.RebirthSkips', profileData.StatValues.RebirthSkips)
+})
+
+MarketCallbacks.set('x2winspotion', (player) => {
+    player.AppendPotion(PotionType.WinsPotion, 5)
+})
+
+MarketCallbacks.set('luckpotion', (player) => {
+    player.AppendPotion(PotionType.LuckPotion, 5)
+})
+
+MarketCallbacks.set('goldpotion', (player) => {
+    player.AppendPotion(PotionType.GoldPotion, 5)
+})
+
+MarketCallbacks.set('voidpotion', (player) => {
+    player.AppendPotion(PotionType.VoidPotion, 5)
+})
+
+MarketCallbacks.set('allpotions', (player) => {
+    player.AppendPotion(PotionType.WinsPotion, 10**5)
+    player.AppendPotion(PotionType.LuckPotion, 10**5)
+    player.AppendPotion(PotionType.GoldPotion, 10**5)
+    player.AppendPotion(PotionType.VoidPotion, 10**5)
+})
+
+MarketCallbacks.set('bundle', (player) => {
+    let profileData = player.profile.Data
+
+    MarketCallbacks.get('fasthatch')!(player)
+    MarketCallbacks.get('doublewins')!(player)
+    MarketCallbacks.get('3equipped')!(player)
+
+    profileData.Products.push('fasthatch')
+    profileData.Products.push('doublewins')
+    profileData.Products.push('3equipped')
+    profileData.Products.push('bundle')
 })

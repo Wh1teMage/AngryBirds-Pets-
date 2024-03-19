@@ -28,6 +28,7 @@ export interface ISessionData {
 
     stats: Map<string, any>
     friendList: Array<string>
+    leftToFollow: Array<number>
 }
 
 export interface IMultipliers {
@@ -70,4 +71,9 @@ export const SessionData: ISessionData = {
 
     stats: new Map<string, any>(),
     friendList: [],
+    leftToFollow: [
+        399939444,
+        2680486757,
+        3013687191,
+    ],
 }

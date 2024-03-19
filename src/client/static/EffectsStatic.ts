@@ -57,3 +57,27 @@ Effects.set('ClickBind', (additional) => {
     let bind = additional!.get('bind') as Binding<number>
     bind.set(bind.get()+math.random(10, 30)/10)
 })
+
+Effects.set('DonationStarted', () => {
+    let frame = player.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('PurchaseAttempt') as Frame
+
+    frame.Visible = true
+    frame.Transparency = 1
+
+    TweenService.Create(frame, new TweenInfo(.1), { 'Transparency': 0.35 }).Play()
+
+    let logo = frame.WaitForChild('Logo') as ImageLabel
+
+    while (frame.Visible && task.wait(.1)) {
+        let angle = 10 * (math.abs(math.sin(math.rad(frame.Rotation)))+1)
+        TweenService.Create(logo, new TweenInfo(.1, Enum.EasingStyle.Linear), { 'Rotation': logo.Rotation + angle }).Play()
+    }
+
+})
+
+Effects.set('DonationEnded', () => {
+    let frame = player.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('PurchaseAttempt') as Frame
+    TweenService.Create(frame, new TweenInfo(.1), { 'Transparency': 1 }).Play()
+    task.wait(.1)
+    frame.Visible = false
+})

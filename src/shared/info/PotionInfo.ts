@@ -14,14 +14,14 @@ PotionsData.set(PotionType.LuckPotion, {
     }
 })
 
-PotionsData.set(PotionType.StrengthPotion, {
+PotionsData.set(PotionType.WinsPotion, {
     duration: 10,
-    buffname: 'StrengthPotionBuff',
+    buffname: 'WinPotionBuff',
     enableEffect: (player) => {
-        player.session.multipliers.potion.strength += 1.1
+        player.session.multipliers.potion.wins += 1
     },
     disableEffect: (player) => {
-        player.session.multipliers.potion.strength -= 1.1
+        player.session.multipliers.potion.wins -= 1
     }
 })
 

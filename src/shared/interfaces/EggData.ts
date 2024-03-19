@@ -3,9 +3,10 @@ import { IDBPetData, IPetData } from "./PetData"
 export enum EggValueType {
     VBugs = 'VBugs',
     Wins = 'Wins',
+    Stored = 'Stored',
 }
 
-export enum BuyType {
+export enum EggBuyType {
     Single = 'Single',
     Triple = 'Triple',
 }

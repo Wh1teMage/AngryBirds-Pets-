@@ -44,7 +44,8 @@ export enum Rarities {
 }
 
 export enum Sizes {
-    Normal = 'Normal',
+    Baby = 'Baby',
+    Big = 'Big',
     Huge = 'Huge',
 }
 

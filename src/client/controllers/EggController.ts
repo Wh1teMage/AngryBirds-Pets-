@@ -4,7 +4,7 @@ import { ButtonFabric } from "client/components/UIComponents/ButtonComponent";
 import { Events } from "client/network";
 import { EggsData } from "shared/info/EggInfo";
 import { PetsData } from "shared/info/PetInfo";
-import { BuyType } from "shared/interfaces/EggData";
+import { EggBuyType } from "shared/interfaces/EggData";
 
 //basically initializer
 
@@ -67,7 +67,7 @@ export class EggController implements OnStart, OnInit {
             task.wait(4)
             print('Bought')
             for (let i = 0; i < 3; i++) {
-                Events.BuyEgg(name, BuyType.Single)
+                Events.BuyEgg(name, EggBuyType.Single)
             }
             
 

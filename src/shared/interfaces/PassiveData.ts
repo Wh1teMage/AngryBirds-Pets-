@@ -28,4 +28,5 @@ export interface IPassiveData {
 
     onPetAdded: (pet: IDBPetData) => void
 
+    setOwner: (player: Player) => void
 }

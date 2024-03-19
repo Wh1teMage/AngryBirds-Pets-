@@ -8,7 +8,7 @@ export abstract class PassiveClass implements IPassiveData {
     public abstract name: string
     public abstract description: string
 
-    protected player: Player | undefined
+    public player: Player | undefined
 
     constructor(player?: Player) {
         this.player = player
@@ -29,12 +29,14 @@ export abstract class PassiveClass implements IPassiveData {
 
     public onPetAdded = (pet: IDBPetData) => {}
 
+    public setOwner = (player: Player) => {}
+
 }
 
 export const Passives = new Map<string, (player?: Player) => PassiveClass>()
 
 export const PassiveDecorator = Modding.createDecorator<[string]>('Class', (descriptor, [name]) => {
-    Passives.set(name, (player?: Player) => {return new (descriptor.object as Constructor)(player as never) as PassiveClass})
+    Passives.set(name, (player?: Player) => {return new (descriptor.object as Constructor)() as PassiveClass})
 }) 
 
 export class PassiveFabric {

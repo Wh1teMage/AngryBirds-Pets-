@@ -1,6 +1,6 @@
 import { Networking } from "@flamework/networking";
 import { EffectName } from "./enums/EffectEnums";
-import { BuyType } from "./interfaces/EggData";
+import { EggBuyType } from "./interfaces/EggData";
 import { RequestOperationStatus, TradeOperationStatus, TradeUpdateStatus } from "./interfaces/TradeData";
 import { IDBPetData, PetOperationStatus } from "./interfaces/PetData";
 import { ToolOperationStatus } from "./interfaces/ToolData";
@@ -8,11 +8,13 @@ import { WorldOperationStatus } from "./interfaces/WorldData";
 import { WorldType } from "./enums/WorldEnums";
 import { RewardType } from "./enums/RewardEnums";
 import { FlyingObjectStatus } from "./enums/FlyingObjectEnums";
+import { PotionOperationStatus } from "./interfaces/PotionData";
+import { PotionType } from "./enums/PotionEnum";
 
 interface ClientToServerEvents {
     PurchasePrompt: (productid: number, giftid?: number) => void
     RegisterInput: (name: string, state: Enum.UserInputState) => void
-    BuyEgg: (name: string, buytype: BuyType) => void
+    BuyEgg: (name: string, buytype: EggBuyType) => void
 
     RequestTrade: (operation: RequestOperationStatus, otherplayer: Player) => void
     ManageTrade: (operation: TradeOperationStatus, status?: TradeUpdateStatus, pet?: IDBPetData) => void
@@ -20,6 +22,7 @@ interface ClientToServerEvents {
 
     ManageTool: (operation: ToolOperationStatus, toolname: string) => void
     ManageWorld: (operation: WorldOperationStatus, world?: WorldType) => void
+    ManagePotion: (operation: PotionOperationStatus, potiontype: PotionType) => void
 
     ClaimReward: (rewardtype: RewardType, info?: any) => void
 

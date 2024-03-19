@@ -1,4 +1,5 @@
 import { WorldType } from "shared/enums/WorldEnums";
+import { Evolutions, Mutations, Sizes } from "shared/interfaces/PetData";
 import { IRewardData } from "shared/interfaces/RewardData";
 
 export const SessionRewardsData = new Array<IRewardData>()
@@ -371,23 +372,29 @@ DailyRewardsData.push({
 })
 
 DailyRewardsData.push({
-    Values: {
-        //! Strength: 10
-    },
+    Values: {},
+    Pets: [{pet: {
+        name: "Pixie",
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    }, amount: 1}],
     Time: 2
 })
 
 DailyRewardsData.push({
-    Values: {
-        //! Strength: 10
-    },
+    Values: {},
+    Additional: new Map([['MaxEquippedPets', 1]]),
     Time: 3
 })
 
 DailyRewardsData.push({
-    Values: {
-        //! Strength: 10
-    },
+    Values: {},
+    Additional: new Map([['MaxPets', 1]]),
     Time: 4
 })
 
@@ -406,16 +413,23 @@ DailyRewardsData.push({
 })
 
 DailyRewardsData.push({
-    Values: {
-        //! Wins: 100000
-    },
+    Values: {},
+    Pets: [{pet: {
+        name: "The Ultra Banana Split",
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    }, amount: 1}],
     Time: 7
 })
 
 DailyRewardsData.push({
-    Values: {
-        //! Wins: 100000
-    },
+    Values: {},
+    Additional: new Map([['SpinCount', 5]]),
     Time: 8
 })
 
@@ -474,5 +488,13 @@ RebirthsRewardsData.push({
         Gems: 10
     },
     Title: 'Test',
-    Additional: [{data: 'Wins', amount: 10}, {data: 'Multiplier', amount: .1}],
+    Additional: new Map([['Wins', 10], ['Multiplier', .1]]) //[{data: 'Wins', amount: 10}, {data: 'Multiplier', amount: .1}],
+})
+
+RebirthsRewardsData.push({
+    Values: {
+        Gems: 10
+    },
+    Title: 'Test2',
+    Additional: new Map([['Wins', 10], ['Multiplier', .2]]) //[{data: 'Wins', amount: 10}, {data: 'Multiplier', amount: .2}],
 })
