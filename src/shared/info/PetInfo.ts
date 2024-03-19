@@ -432,23 +432,23 @@ PetsData.set('Aqua Dragon', {
     model: Pets.WaitForChild('Aqua Dragon', 40) as Model
 })
 
-//! PetsData.set('White Bear', {
-//!     name: 'White Bear',
-//!     locked: false,
-//!     equipped: false,
-//!     multipliers: new Map([['strength', 1]]),
-//!     stats: {
-//!         rarity: Rarities.Common,
-//!         sizeOffset: new Vector3(0,0,0),
-//!         rotationOffset: new CFrame(0,0,0),
-//!     },
-//!     additional: {
-//!         size: Sizes.Baby,
-//!         evolution: Evolutions.Normal,
-//!         mutation: Mutations.Default
-//!     },
-//!     model: Pets.WaitForChild('White Bear', 40) as Model
-//! })
+PetsData.set('Blue Something', {
+    name: 'Blue Something',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1]]),
+    stats: {
+        rarity: Rarities.Common,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Blue Something', 40) as Model
+})
 
 PetsData.set('White Bear', {
     name: 'White Bear',
@@ -1315,6 +1315,24 @@ PetsData.set('Shadow Demon', {
         mutation: Mutations.Default
     },
     model: Pets.WaitForChild('Shadow Demon', 40) as Model
+})
+
+PetsData.set('Pixie', {
+    name: 'Pixie',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1]]),
+    stats: {
+        rarity: Rarities.Common,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Pixie', 40) as Model
 })
 
 PetsData.set('Midnight', {
