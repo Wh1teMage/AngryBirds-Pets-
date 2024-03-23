@@ -83,6 +83,8 @@ export class SignalService implements OnStart, OnInit {
             if (operation === PetOperationStatus.CraftSize) { playerComp.UpgradePetSize(pet) }
             if (operation === PetOperationStatus.Evolve) { playerComp.UpgradePetEvolution(pet, count) }
             if (operation === PetOperationStatus.ClaimVoid) { playerComp.ClaimVoidPet(pet) }
+            if (operation === PetOperationStatus.Mutate) { playerComp.UpgradePetMutation(pet, count!) }
+            if (operation === PetOperationStatus.RemoveMutation) { playerComp.RemovePetMutation(pet) }
         })
 
         Events.ManageTool.connect((player: Player, operation: ToolOperationStatus, toolname: string) => {
@@ -126,6 +128,9 @@ export class SignalService implements OnStart, OnInit {
             if (rewardtype === RewardType.Code) { playerComp.RedeemCode(info!) }
             if (rewardtype === RewardType.Rebirth) { playerComp.DoRebirth() }
             if (rewardtype === RewardType.FollowQuest) { playerComp.ClaimFollowReward() }
+            if (rewardtype === RewardType.SpinWheel) { playerComp.ClaimSpinReward() }
+            if (rewardtype === RewardType.DailyChest) { playerComp.ClaimDailyChest() }
+            if (rewardtype === RewardType.GroupChest) { playerComp.ClaimGroupChest() }
         })
 
         Events.ManagePotion.connect((player: Player, operation: PotionOperationStatus, potiontype: PotionType) => {

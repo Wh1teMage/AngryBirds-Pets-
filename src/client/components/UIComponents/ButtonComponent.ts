@@ -86,7 +86,12 @@ export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implem
 export class ButtonFabric {
 
     static CreateButton(guibutton: GuiButton) {
+        //if (ButtonFabric.GetButton(guibutton)) { return ButtonFabric.GetButton(guibutton)! }
         return Dependency<Components>().addComponent<ButtonComponent>(guibutton)
+    }
+
+    static GetButton(guibutton: GuiButton) {
+        return Dependency<Components>().getComponent<ButtonComponent>(guibutton)
     }
 
 }

@@ -81,3 +81,38 @@ Effects.set('DonationEnded', () => {
     task.wait(.1)
     frame.Visible = false
 })
+
+Effects.set('SpinStarted', (additional) => {
+    print(additional, 'SpinStarted')
+    let spinHolder = player.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('WheelSpin').WaitForChild('SpinHolder') as ImageLabel
+
+    let rewardName = additional!.get('Reward') as string
+    let spinTime = additional!.get('SpinTime') as number
+
+    let rewardsList = new Map<string, {nameUI: string, rotation: number}>([
+        ['Wins1', { nameUI: '1', rotation: 0 }],
+        ['Wins2', { nameUI: '1', rotation: 0 }],
+    ])
+
+    spinHolder.Rotation = 0
+    
+    let delta = .1
+    let newSpinTime = spinTime/delta
+    let maxDegree = 360*5 + rewardsList.get(rewardName)!.rotation
+
+    let angularSpeed = maxDegree*2/newSpinTime
+    let currentangularspeed = angularSpeed
+    let decrease = angularSpeed/newSpinTime
+    
+    let i = 0
+
+    while (i < maxDegree) {
+        i += math.abs(currentangularspeed)
+        i = math.clamp(math.round(i), 0, maxDegree)
+        currentangularspeed -= decrease
+
+        TweenService.Create(spinHolder, new TweenInfo(delta, Enum.EasingStyle.Linear), { 'Rotation': i }).Play()
+        task.wait(delta)
+    }
+
+})

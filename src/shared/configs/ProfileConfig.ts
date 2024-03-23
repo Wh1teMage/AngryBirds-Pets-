@@ -17,7 +17,10 @@ export const defaultValue: IProfileData = {
     StatValues: {
         FirstJoin: os.time(),
         LastJoined: os.time(),
+        LastSpinTime: 0,
+
         LastDayTime: 0, // os.time()
+        LastDailyChestTime: 0,
 
         DayAmount: 0,
         IngameTime: 0,

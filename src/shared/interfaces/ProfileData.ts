@@ -14,7 +14,10 @@ export interface IProfileData {
     StatValues: {
         FirstJoin: number
         LastJoined: number
+        LastSpinTime: number
+
         LastDayTime: number
+        LastDailyChestTime: number
 
         DayAmount: number
         IngameTime: number

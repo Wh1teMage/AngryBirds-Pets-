@@ -1,4 +1,6 @@
+import { PotionType } from "shared/enums/PotionEnum";
 import { WorldType } from "shared/enums/WorldEnums";
+import { EggBuyType } from "shared/interfaces/EggData";
 import { Evolutions, Mutations, Sizes } from "shared/interfaces/PetData";
 import { IRewardData } from "shared/interfaces/RewardData";
 
@@ -434,16 +436,14 @@ DailyRewardsData.push({
 })
 
 DailyRewardsData.push({
-    Values: {
-        //! Wins: 100000
-    },
+    Values: {},
+    Potions: [{potion: PotionType.WinsPotion, amount: 5}],
     Time: 9
 })
 
 DailyRewardsData.push({
-    Values: {
-        //! Wins: 100000
-    },
+    Values: {},
+    Eggs: [{egg: 'Party', amount: 1, type: EggBuyType.Triple}],
     Time: 10
 })
 
@@ -455,9 +455,8 @@ DailyRewardsData.push({
 })
 
 DailyRewardsData.push({
-    Values: {
-        //! Gems: 20
-    },
+    Values: {},
+    Eggs: [{egg: 'Party', amount: 1, type: EggBuyType.Single}],
     Time: 12
 })
 
@@ -469,9 +468,8 @@ DailyRewardsData.push({
 })
 
 DailyRewardsData.push({
-    Values: {
-        //! Gems: 20
-    },
+    Values: {},
+    Eggs: [{egg: 'Nightmare', amount: 1, type: EggBuyType.Triple}],
     Time: 14
 })
 
@@ -498,3 +496,51 @@ RebirthsRewardsData.push({
     Title: 'Test2',
     Additional: new Map([['Wins', 10], ['Multiplier', .2]]) //[{data: 'Wins', amount: 10}, {data: 'Multiplier', amount: .2}],
 })
+
+export const SpinRewardData: IRewardData = {
+    Chances: [
+        {weight: 10, name: 'Wins1', reward: {
+            Values: {
+                Wins: 10,
+            }
+        }},
+        {weight: 10, name: 'Wins2', reward: {
+            Values: {
+                Wins: 10,
+            }
+        }},
+        
+    ]
+} 
+
+export const DailyChestRewardData: IRewardData = {
+    Chances: [
+        {weight: 10, name: 'Wins1', reward: {
+            Values: {
+                Wins: 100000,
+            }
+        }},
+        {weight: 10, name: 'Wins2', reward: {
+            Values: {
+                Wins: 100000,
+            }
+        }},
+        
+    ]
+} 
+
+export const GroupChestRewardData: IRewardData = {
+    Chances: [
+        {weight: 10, name: 'Wins1', reward: {
+            Values: {
+                Wins: 100000,
+            }
+        }},
+        {weight: 10, name: 'Wins2', reward: {
+            Values: {
+                Wins: 100000,
+            }
+        }},
+        
+    ]
+} 

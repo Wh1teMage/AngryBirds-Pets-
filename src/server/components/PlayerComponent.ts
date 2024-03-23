@@ -30,7 +30,7 @@ import { ToolsData } from "shared/info/ToolInfo";
 import { IToolData, ToolValueType } from "shared/interfaces/ToolData";
 import { WorldType } from "shared/enums/WorldEnums";
 import { CreationUtilities } from "shared/utility/CreationUtilities";
-import { CodesRewardsData, DailyRewardsData, RebirthsRewardsData, SelectDailyReward, SelectSessionReward } from "shared/info/RewardInfo";
+import { CodesRewardsData, DailyChestRewardData, DailyRewardsData, GroupChestRewardData, RebirthsRewardsData, SelectDailyReward, SelectSessionReward, SpinRewardData } from "shared/info/RewardInfo";
 import { IRewardData } from "shared/interfaces/RewardData";
 import { PassiveValues } from "shared/interfaces/PassiveData";
 import { FlyingObjectClass } from "server/classes/FlyingObjectClass";
@@ -45,7 +45,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     
     public profile!: Profile<IProfileData, ProfileMetaData>;
     public replica!: PlayerDataReplica
-    public session: ISessionData = table.clone(SessionData)
+    public session: ISessionData = table.clone(SessionData) //deep table clone
     public isLoaded: boolean = false
     
     //private _character!: ICharacter
@@ -72,6 +72,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
     public UpgradePetSize = (pet: IDBPetData) => this._playerPetController.UpgradePetSize(pet)
     public CheckSpaceForPets = (value: number) => this._playerPetController.CheckSpaceForPets(value)
+    public RemovePetMutation = (pet: IDBPetData) => this._playerPetController.RemovePetMutation(pet)
+    public UpgradePetMutation = (pet: IDBPetData, count: number) => this._playerPetController.UpgradePetMutation(pet, count)
     public UpgradePetEvolution = (pet: IDBPetData, count?: number) => this._playerPetController.UpgradePetEvolution(pet, count)
 
     public SetWins = (value: number, source?: IncomeSource) => this._playerValueController.SetWins(value, source)
@@ -97,6 +99,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public UseTool = () => this._playerToolController.UseTool()
     public BuyTool = (toolname: string) => this._playerToolController.BuyTool(toolname)
     public EquipTool = (toolname: string) => this._playerToolController.EquipTool(toolname)
+    public AppendTool = (toolname: string) => this._playerToolController.AppendTool(toolname)
     public ReplicateModel = () => this._playerToolController.ReplicateModel()
 
     public BuyMaxWorld = (world: WorldType) => this._playerWorldController.BuyMaxWorld(world)
@@ -116,6 +119,10 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public DoRebirth = (skip?: boolean) => this._playerRewardController.DoRebirth(skip)
 
     public ClaimFollowReward = () => this._playerRewardController.ClaimFollowReward()
+    public ApplySpin = () => this._playerRewardController.ApplySpin() 
+    public ClaimSpinReward = () => this._playerRewardController.ClaimSpinReward()
+    public ClaimDailyChest = () => this._playerRewardController.ClaimDailyChest()
+    public ClaimGroupChest = () => this._playerRewardController.ClaimGroupChest()
 
     onStart() {
 
@@ -143,6 +150,9 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             if (!pet.equipped) { continue }
             PetModelManager.AddPet(this.instance, pet)
         }
+
+        this.profile.Data.StatValues.LastJoined = os.time()
+        this.replica.SetValue('Profile.StatValues.LastJoined', this.profile.Data.StatValues.LastJoined)
 
         for (let buff of this.profile.Data.ActiveBuffs) {
             if (PotionsData.get(buff.source as PotionType)) { this.ApplyPotionEffect(buff.source as PotionType) }
@@ -319,6 +329,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                     print(this.session.multipliers.pet.strength)
                     //this.session.character!.Humanoid.WalkSpeed += 120
                     this.ChangeWorld()
+                    this.ApplySpin()
 
                     this.session.activePassives.forEach((passive) => { passive.onTick() })
 
@@ -944,6 +955,53 @@ class PlayerPetController {
         this.AppendPet(formatted)
     }
 
+    public UpgradePetMutation(pet: IDBPetData, count: number) {
+        let profileData = this.player.profile.Data
+        let selectedPet = this.FindPet(pet)
+
+        count = math.clamp(count, 1, 15)
+
+        if (!selectedPet) { return }
+        if (selectedPet.additional.mutation !== Mutations.Default) { return }
+        if (profileData.Values.GemsVal < count) { return }
+
+        let allMutations = [Mutations.Elder, Mutations.Majestic, Mutations.Primordial, Mutations.Sacred]
+        let mutations: {weight: number, name: string}[] = []
+
+        for (let name of allMutations) {
+            if (name === Mutations.Default) { continue }
+            mutations.push({weight: petUpgradeConfig.MutationUpgrades[name].requirements.weight, name: name})
+        }
+
+        let mutationName = PetUtilities.RandomWeight(mutations, (1-0.088)+count*0.088)
+        print(mutationName)
+        this.player.SetGems(profileData.Values.GemsVal - count)
+
+        this.RemovePet(pet)
+
+        let formatted = pet
+        formatted.additional.mutation = mutationName as Mutations
+
+        this.AppendPet(formatted)
+    }
+
+    public RemovePetMutation(pet: IDBPetData) {
+        let profileData = this.player.profile.Data
+        let selectedPet = this.FindPet(pet)
+
+        if (!selectedPet) { return }
+        if (selectedPet.additional.mutation === Mutations.Default) { return }
+
+        this.player.SetGems(profileData.Values.GemsVal - 1)
+
+        this.RemovePet(pet)
+
+        let formatted = pet
+        formatted.additional.mutation = Mutations.Default
+
+        this.AppendPet(formatted)
+    }
+
     public UpgradePetEvolution(pet: IDBPetData, count?: number) {
         let profileData = this.player.profile.Data
         let formatted = pet
@@ -1178,8 +1236,28 @@ class PlayerRewardController {
 
     private player: ServerPlayerComponent
 
+    private spinCD = 7
+    private lastSpin = 0
+
     constructor(player: ServerPlayerComponent) {
         this.player = player
+    }
+
+    public GetChanceReward(reward: IRewardData) {
+        let chances: {name: string, weight: number}[] = []
+
+        reward.Chances?.forEach((val, key) => {
+            chances.push({name: val.name, weight: val.weight})
+        })
+
+        let rewardName = PetUtilities.RandomWeight(chances, 1)!
+        let selectedReward : IRewardData = {}
+
+        reward.Chances?.forEach((val, key) => {
+            if (rewardName === val.name) { selectedReward = val.reward }
+        })
+
+        return {name: rewardName, reward: selectedReward}
     }
 
     public ApplyReward(reward: IRewardData) {
@@ -1208,7 +1286,6 @@ class PlayerRewardController {
         this.player.SetStrength(profile.Values.StrengthVal + (reward.Values?.Strength || 0))
         this.player.SetStars(profile.Values.StarsVal + (reward.Values?.Stars || 0))
         this.player.SetWins(profile.Values.WinsVal + (reward.Values?.Wins || 0))
-        
     }
 
     public ClaimDailyReward() {
@@ -1324,6 +1401,68 @@ class PlayerRewardController {
 
         profileData.CompletedQuests.push('PetQuest1')
 
+    }
+
+    public ApplySpin() {
+
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        if ((os.time() - profileData.StatValues.LastSpinTime) < 10) { return }
+
+        profileData.StatValues.LastSpinTime = os.time()
+        profileData.StatValues.SpinCount += 1
+
+        this.player.replica.SetValue('Profile.StatValues.LastSpinTime', profileData.StatValues.LastSpinTime)
+        this.player.replica.SetValue('Profile.StatValues.SpinCount', profileData.StatValues.SpinCount)
+
+    }
+
+    public ClaimSpinReward() { //TO DO make some kind of different worlds rewards (so we can change rewards depending on the max world)
+
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        if ((profileData.StatValues.SpinCount) < 1) { return }
+        if ((os.time() - this.lastSpin) < this.spinCD) { return }
+
+        profileData.StatValues.SpinCount -= 1 
+        this.lastSpin = os.time()
+
+        let data = this.GetChanceReward(SpinRewardData)
+        Events.ReplicateEffect.fire(this.player.instance, 'SpinStarted', new Map<string, any>([['Reward', data.name], ['SpinTime', this.spinCD-1.5]]))
+
+        task.wait(this.spinCD)
+
+        this.ApplyReward(data.reward)
+
+    }
+ 
+    public ClaimDailyChest() {
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        if ((os.time() - profileData.StatValues.LastDailyChestTime) < 10) { return }
+
+        profileData.StatValues.LastDailyChestTime = os.time()
+
+        let data = this.GetChanceReward(DailyChestRewardData)
+        this.ApplyReward(data.reward)
+
+        this.player.replica.SetValue('Profile.StatValues.LastDailyChestTime', profileData.StatValues.LastDailyChestTime)
+    }
+
+    public ClaimGroupChest() {
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        if (!this.player.instance.IsInGroup(32554726)) { return } 
+        if (profileData.CompletedQuests.includes('GroupChest')) { return }
+
+        profileData.CompletedQuests.push('GroupChest')
+
+        let data = this.GetChanceReward(GroupChestRewardData)
+        this.ApplyReward(data.reward)
     }
 
 }

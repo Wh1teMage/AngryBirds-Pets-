@@ -2,6 +2,7 @@ import { ServerPlayerComponent } from "server/components/PlayerComponent";
 import { PotionType } from "shared/enums/PotionEnum";
 import { WorldsData } from "shared/info/WorldInfo";
 import { EggBuyType } from "shared/interfaces/EggData";
+import { Evolutions, Mutations, Sizes } from "shared/interfaces/PetData";
 
 export const MarketCallbacks = new Map<string, (player: ServerPlayerComponent) => void>([])
 
@@ -379,4 +380,71 @@ MarketCallbacks.set('bundle', (player) => {
     profileData.Products.push('doublewins')
     profileData.Products.push('3equipped')
     profileData.Products.push('bundle')
+})
+
+MarketCallbacks.set('spacepack', (player) => {
+    let profileData = player.profile.Data
+
+    profileData.Config.MaxEquippedPets += 2
+    player.SetGems(profileData.Values.GemsVal + 100)
+    player.SetWins(profileData.Values.WinsVal + 2.5*(10**6))
+    player.OpenEggBypass('Nightmare', EggBuyType.Single)
+
+    player.replica.SetValue('Profile.Config.MaxEquippedPets', profileData.Config.MaxEquippedPets)
+    profileData.Products.push('spacepack')
+})
+
+MarketCallbacks.set('cavepack', (player) => {
+    let profileData = player.profile.Data
+
+    profileData.Config.MaxEquippedPets += 1
+    player.SetWins(profileData.Values.WinsVal + 200)
+    player.AppendTool('SlingshotD1W1')
+    player.AppendPet({
+        name: 'Soul Golem',
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    })
+
+    player.replica.SetValue('Profile.Config.MaxEquippedPets', profileData.Config.MaxEquippedPets)
+    profileData.Products.push('cavepack')
+})
+
+MarketCallbacks.set('neonpack', (player) => {
+    let profileData = player.profile.Data
+
+    profileData.Config.MaxEquippedPets += 1
+    profileData.Config.MaxPets += 50
+    player.AppendPotion(PotionType.WinsPotion, 1)
+    player.OpenEggBypass('Party', EggBuyType.Single)
+
+    player.replica.SetValue('Profile.Config.MaxEquippedPets', profileData.Config.MaxPets)
+    player.replica.SetValue('Profile.Config.MaxEquippedPets', profileData.Config.MaxEquippedPets)
+    profileData.Products.push('neonpack')
+})
+
+MarketCallbacks.set('buy1spin', (player) => {
+    let profileData = player.profile.Data
+
+    profileData.StatValues.SpinCount += 1
+    player.replica.SetValue('Profile.StatValues.SpinCount', profileData.StatValues.SpinCount)
+})
+
+MarketCallbacks.set('buy10spin', (player) => {
+    let profileData = player.profile.Data
+
+    profileData.StatValues.SpinCount += 10
+    player.replica.SetValue('Profile.StatValues.SpinCount', profileData.StatValues.SpinCount)
+})
+
+MarketCallbacks.set('buy100spin', (player) => {
+    let profileData = player.profile.Data
+
+    profileData.StatValues.SpinCount += 100
+    player.replica.SetValue('Profile.StatValues.SpinCount', profileData.StatValues.SpinCount)
 })
