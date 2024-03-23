@@ -78,5 +78,12 @@ export const MarketNamings = new Map<number, IProductData>([
     [1779471915, {name: 'voidpotion', producttype: ProductType.DevProduct}],
     [1779472537, {name: 'allpotions', producttype: ProductType.DevProduct}],
     
-    [1779423116, {name: 'bundle', producttype: ProductType.DevProduct}]
+    [1779423116, {name: 'bundle', producttype: ProductType.DevProduct}],
+    [1779439494, {name: 'cavepack', producttype: ProductType.DevProduct}],
+    [1779439942, {name: 'neonpack', producttype: ProductType.DevProduct}],
+    [1779440646, {name: 'spacepack', producttype: ProductType.DevProduct}],
+
+    [1762896093, {name: 'buy1spin', producttype: ProductType.DevProduct}],
+    [1762896251, {name: 'buy10spin', producttype: ProductType.DevProduct}],
+    [1762896353, {name: 'buy100spin', producttype: ProductType.DevProduct}],
 ])

@@ -4,5 +4,8 @@ export enum RewardType {
     Daily = 'Daily',
     Session = 'Session',
     PetQuest = 'PetQuest',
-    FollowQuest = 'FollowQuest'
+    FollowQuest = 'FollowQuest',
+    SpinWheel = 'SpinWheel',
+    DailyChest = 'DailyChest',
+    GroupChest = 'GroupChest',
 }

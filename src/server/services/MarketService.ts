@@ -64,7 +64,11 @@ export class MarketService implements OnStart, OnInit {
         
         MarketplaceService.PromptProductPurchaseFinished.Connect((userId, productId, isPurchased) => { 
             //product dont have any DB saves (unless Bundles). Futher DB saves will be written in callbacks (profiles).
-            this._completePurchase(userId, productId, isPurchased)
+            let playerComponent = this._completePurchase(userId, productId, isPurchased)
+
+            if (!playerComponent) { return }
+
+            playerComponent.replica.SetValue('Profile.Products', playerComponent.profile.Data.Products)
         })
 
         MarketplaceService.PromptGamePassPurchaseFinished.Connect((player, productId, isPurchased) => {
