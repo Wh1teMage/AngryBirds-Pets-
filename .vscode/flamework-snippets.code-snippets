@@ -37,6 +37,30 @@
 		]
 	},
 
+    "PET": {
+		"prefix":[ "PET", "pet"],
+		"description": "Create a pet info paste",
+		"body": [
+            "PetsData.set('${1:}', {",
+            "    name: '${1:}',",
+            "    locked: false,",
+            "    equipped: false,",
+            "    multipliers: new Map([['strength', 1]]),",
+            "    stats: {",
+            "        rarity: Rarities.Common,",
+            "        sizeOffset: new Vector3(0,0,0),",
+            "        rotationOffset: new CFrame(0,0,0),",
+            "    },",
+            "    additional: {",
+            "        size: Sizes.Baby,",
+            "        evolution: Evolutions.Normal,",
+            "        mutation: Mutations.Default",
+            "    },",
+            "    model: Pets.WaitForChild('${1:}', 40) as Model",
+            "})"
+		]
+	},
+
 	"Flamework Component": {
 		"prefix":[ "component", "flameworkcomponent"],
 		"description": "Create a Flamework component",
