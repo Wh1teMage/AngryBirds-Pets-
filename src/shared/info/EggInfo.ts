@@ -38,7 +38,10 @@ EggsData.set('Default', {
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 1, name: 'Cat' },
-        { weight: 10, name: 'Cat' },
+        { weight: 10, name: 'Dog' },
+        { weight: 10, name: 'White Bunny' },
+        { weight: 10, name: 'Elephant' },
+        { weight: 10, name: 'Butterfly' },
     ],
     //model: Workspace.WaitForChild('TestEgg') as IEggModel
 })
