@@ -432,6 +432,8 @@ PetsData.set('Aqua Dragon', {
     model: Pets.WaitForChild('Aqua Dragon', 5) as Model
 })
 
+// *
+
 PetsData.set('Blue Something', {
     name: 'Blue Something',
     locked: false,
@@ -521,6 +523,8 @@ PetsData.set('The Clown', {
     },
     model: Pets.WaitForChild('The Clown', 5) as Model
 })
+
+// *
 
 PetsData.set('Polar', {
     name: 'Polar',
@@ -613,6 +617,8 @@ PetsData.set('Crystal Lord', {
     model: Pets.WaitForChild('Crystal Lord', 5) as Model
 })
 
+// *
+
 PetsData.set('Sus Cat', {
     name: 'Sus Cat',
     locked: false,
@@ -666,6 +672,8 @@ PetsData.set('Cake', {
     },
     model: Pets.WaitForChild('Cake', 5) as Model
 })
+
+// !
 
 PetsData.set('Garden Wraith', {
     name: 'Garden Wraith',
@@ -757,6 +765,8 @@ PetsData.set('King Ant', {
     model: Pets.WaitForChild('King Ant', 5) as Model
 })
 
+// *
+
 PetsData.set('Mystery Cat', {
     name: 'Mystery Cat',
     locked: false,
@@ -847,6 +857,8 @@ PetsData.set('Moon Bird', {
     model: Pets.WaitForChild('Moon Bird', 5) as Model
 })
 
+// *
+
 PetsData.set('Hacked Doggy', {
     name: 'Hacked Doggy',
     locked: false,
@@ -936,6 +948,8 @@ PetsData.set('Dark Hydra', {
     },
     model: Pets.WaitForChild('Dark Hydra', 5) as Model
 })
+
+// *
 
 PetsData.set('Mega Galaxy Doggy', {
     name: 'Mega Galaxy Doggy',
@@ -1152,6 +1166,8 @@ PetsData.set('DJ Demon', {
     },
     model: Pets.WaitForChild('DJ Demon', 5) as Model
 })
+
+// !
 
 PetsData.set('Shadow Chameleon', {
     name: 'Shadow Chameleon',
