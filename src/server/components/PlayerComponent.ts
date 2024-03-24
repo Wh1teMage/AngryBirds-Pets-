@@ -76,6 +76,11 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public UpgradePetMutation = (pet: IDBPetData, count: number) => this._playerPetController.UpgradePetMutation(pet, count)
     public UpgradePetEvolution = (pet: IDBPetData, count?: number) => this._playerPetController.UpgradePetEvolution(pet, count)
 
+    public UnequipAll = () => this._playerPetController.UnequipAll()
+    public EquipBest = () => this._playerPetController.EquipBest()
+    public CraftAll = () => this._playerPetController.CraftAll()
+    public RemovePets = (pets: IDBPetData[]) => this._playerPetController.RemovePets(pets)
+
     public SetWins = (value: number, source?: IncomeSource) => this._playerValueController.SetWins(value, source)
     public SetGems = (value: number, source?: IncomeSource) => this._playerValueController.SetGems(value, source)
     public SetStars = (value: number, source?: IncomeSource) => this._playerValueController.SetStars(value, source)
@@ -928,6 +933,47 @@ class PlayerPetController {
 
         profileData.Pets.remove(petIndex)
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
+    }
+
+    public RemovePets(pets: IDBPetData[]) {
+        pets.forEach((val) => { this.RemovePet(val) })
+    }
+
+    public CraftAll() {
+        let profileData = this.player.profile.Data
+        profileData.Pets.forEach((val) => {
+            this.UpgradePetSize(val)
+        })
+    }
+
+    public EquipBest() {
+        let profileData = this.player.profile.Data
+        profileData.Pets.sort((a, b) => {
+            let petData1 = PetUtilities.DBToPetTransfer(a)!
+            let petData2 = PetUtilities.DBToPetTransfer(b)!
+
+            return petData1.multipliers!.get('strength')! > petData2.multipliers!.get('strength')!
+        })
+
+        for (let i = 0; i < math.min(profileData.Config.MaxEquippedPets, profileData.Pets.size()) ; i++) {
+            this.EquipPet(profileData.Pets[i])
+        }
+    }
+
+    public UnequipAll() {
+        let profileData = this.player.profile.Data
+        let unequipList: IDBPetData[] = []
+
+        profileData.Pets.forEach((val) => {
+            if (!val.equipped) { return }
+            unequipList.push(table.clone(val))
+        })
+
+        unequipList.forEach((val) => {
+            this.UnequipPet(val)
+        })
+
+        unequipList = []
     }
 
     public LockPet(pet: IDBPetData) {

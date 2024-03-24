@@ -20,6 +20,8 @@ interface ClientToServerEvents {
     ManageTrade: (operation: TradeOperationStatus, status?: TradeUpdateStatus, pet?: IDBPetData) => void
     ManagePet: (operation: PetOperationStatus, pet: IDBPetData, count?: number) => void
 
+    ManagePets: (operation: PetOperationStatus, pets?: IDBPetData[] | string) => void
+
     ManageTool: (operation: ToolOperationStatus, toolname: string) => void
     ManageWorld: (operation: WorldOperationStatus, world?: WorldType) => void
     ManagePotion: (operation: PotionOperationStatus, potiontype: PotionType) => void

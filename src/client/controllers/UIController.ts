@@ -45,6 +45,8 @@ const templates =  mainUI.WaitForChild('Templates') as Folder
 
 const camera = Workspace.CurrentCamera!
 
+const defaultPet = PetUtilities.PetToDBTransfer(PetsData.get('Cat')!)!
+
 const mainUIInterface = 
     [   {name: 'UpperList', objComponent: 'Frame', children: [
             {name: 'Accuracy', objComponent: 'Image'},
@@ -58,6 +60,9 @@ const mainUIInterface =
                 {name: 'Codes', objComponent: 'Button'},
                 {name: 'Daily', objComponent: 'Button'},
                 {name: 'Settings', objComponent: 'Button'},
+            ]},
+            {name: 'Bundles', objComponent: 'Frame', children: [
+                {name: 'StarterPack', objComponent: 'Button'},
             ]},
             {name: 'AutoShoot', objComponent: 'Button'},
             {name: 'AutoTrain', objComponent: 'Button'},
@@ -156,7 +161,23 @@ const mainUIInterface =
                     {name: 'Craft', objComponent: 'Button'},
                 ]},
             ]},
-            {name: 'PetsFrame', objComponent: 'Frame'}
+            {name: 'PetsFrame', objComponent: 'Frame'},
+            {name: 'MassDeleteButtons', objComponent: 'Frame', children: [
+                {name: 'Cancel', objComponent: 'Button'},
+                {name: 'SelectAll', objComponent: 'Button'},
+                {name: 'Delete', objComponent: 'Button'},
+                {name: 'Search', objComponent: 'Frame'},
+            ]},
+            {name: 'Buttons', objComponent: 'Frame', children: [
+                {name: 'Lock', objComponent: 'Button'},
+                {name: 'Delete', objComponent: 'Button'},
+                {name: 'EquipBest', objComponent: 'Button'},
+                {name: 'CraftAll', objComponent: 'Button'},
+                {name: 'Search', objComponent: 'Frame'},
+            ]},
+            {name: 'Search', objComponent: 'Frame', children: [
+                {name: 'Search', objComponent: 'Frame'},
+            ]}
         ]},
         {name: 'Quest', objComponent: 'Image', children:[
             {name: 'Close', objComponent: 'Button'}
@@ -253,6 +274,12 @@ export class UIController implements OnStart, OnInit {
     private currentGiftTime = new Binding<number>(0)
     private currentDailyTime = new Binding<number>(0)
 
+    private selectedDeleteUIObjects: GuiObject[] = []
+    private selectedDeletePets: IDBPetData[] = []
+    private allDeletingPets?: Map<GuiObject, IDBPetData>
+
+    private currentlySearching?: string
+
     private ownedTools: string[] = []
     private equippedTool?: string
 
@@ -273,6 +300,7 @@ export class UIController implements OnStart, OnInit {
     private createPetExamples(parent: Instance, callback: (pet: IDBPetData, obj: GuiButton) => void) {
 
         let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
+        let petsUI = new Map<GuiObject, IDBPetData>()
 
         for (let pet of this.Pets) {
 
@@ -280,6 +308,7 @@ export class UIController implements OnStart, OnInit {
             if (parent.Parent!.Parent!.Name === 'VoidMachine' && (pet.additional.evolution !== Evolutions.Gold || pet.locked)) { continue }
             if (parent.Parent!.Parent!.Name === 'MutationMachine' && (pet.additional.mutation !== Mutations.Default || pet.locked)) { continue }
             if (parent.Parent!.Parent!.Name === 'CleanseMachine' && (pet.additional.mutation === Mutations.Default || pet.locked)) { continue }
+            if (this.currentlySearching !== undefined && this.currentlySearching.size() > 0 && pet.name.lower().find(this.currentlySearching.lower()).size() < 1) { continue }
 
             let obj = petInventory.WaitForChild('Template')!.WaitForChild('PetExample')!.Clone() as GuiButton;
             obj.Parent = parent
@@ -289,14 +318,21 @@ export class UIController implements OnStart, OnInit {
             (obj.WaitForChild('Equip') as TextLabel).Visible = pet.equipped;
             (obj.WaitForChild('Lock') as ImageLabel).Visible = pet.locked;
     
+            if (!pet.equipped) { obj.LayoutOrder = 1 }
+
             let button = ButtonFabric.CreateButton(obj)
             button.BindToClick(() => { callback(pet, obj) })
+
+            petsUI.set(button.instance, pet)
         }
 
+        return petsUI
     }
 
     private updatePets() {
         let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
+        let equipBestButton = this.UIPath.PetInventory.Buttons.EquipBest.get<ButtonComponent>().instance
+        let uneqipButton = equipBestButton.WaitForChild('NoPets') as GuiButton
 
         this.clearPets(petInventory.WaitForChild('PetsFrame').WaitForChild('ScrollingFrame')!)
         
@@ -305,6 +341,13 @@ export class UIController implements OnStart, OnInit {
 
         equipAmount.Text = tostring(this.EquippedPets.size())+'/'+tostring(this._playerController.replica.Data.Profile.Config.MaxEquippedPets)
         backpackAmount.Text = tostring(this.Pets.size())+'/'+tostring(this._playerController.replica.Data.Profile.Config.MaxPets)
+
+        if (this.EquippedPets.size() === this._playerController.replica.Data.Profile.Config.MaxEquippedPets) {
+            uneqipButton.Visible = true
+        }
+        else {
+            uneqipButton.Visible = false
+        }
 
         this.createPetExamples(petInventory.WaitForChild('PetsFrame').WaitForChild('ScrollingFrame')!, (pet, object) => { this.displayPet(pet, object) })
     }
@@ -389,6 +432,152 @@ export class UIController implements OnStart, OnInit {
             }
 
         })
+    }
+
+    private setupInventoryButtons() {
+        let inventoryButtons = this.UIPath.PetInventory.Buttons.get<FrameComponent>().instance
+        let massDeleteButtons = this.UIPath.PetInventory.MassDeleteButtons.get<FrameComponent>().instance
+
+        let deleteButton = this.UIPath.PetInventory.Buttons.Delete.get<ButtonComponent>()
+        let equipBestButton = this.UIPath.PetInventory.Buttons.EquipBest.get<ButtonComponent>()
+        let craftAllButton = this.UIPath.PetInventory.Buttons.CraftAll.get<ButtonComponent>()
+        let lockButton = this.UIPath.PetInventory.Buttons.Lock.get<ButtonComponent>()
+        let search = this.UIPath.PetInventory.Search.Search.get<FrameComponent>().instance.WaitForChild('Type') as TextBox
+
+        massDeleteButtons.Visible = false
+        inventoryButtons.Visible = true
+
+        deleteButton.BindToClick(() => {
+            massDeleteButtons.Visible = true
+            inventoryButtons.Visible = false
+
+            this.selectedDeletePets = []
+            this.selectedDeleteUIObjects = []
+
+            this.setupMassDeleteFrame()
+        })
+
+        equipBestButton.BindToClick(() => { Events.ManagePets.fire(PetOperationStatus.EquipBest, 'nil') })
+        craftAllButton.BindToClick(() => { Events.ManagePets.fire(PetOperationStatus.CraftAll, 'nil') })
+
+        ButtonFabric.CreateButton(equipBestButton.instance.WaitForChild('NoPets') as GuiButton).BindToClick(() => {
+            Events.ManagePets.fire(PetOperationStatus.UnequipAll, 'nil')
+        })
+
+        search.InputChanged.Connect(() => {
+            print('Ended')
+            this.currentlySearching = search.Text
+
+            if (inventoryButtons.Visible) { this.updatePets() }
+            if (massDeleteButtons.Visible) { this.updateMassDelete() }
+        })
+    }
+
+    private setupMassDelete() {
+        let inventoryButtons = this.UIPath.PetInventory.Buttons.get<FrameComponent>().instance
+        let massDeleteButtons = this.UIPath.PetInventory.MassDeleteButtons.get<FrameComponent>().instance
+        
+        let cancelButton = this.UIPath.PetInventory.MassDeleteButtons.Cancel.get<ButtonComponent>()
+        let deleteButton = this.UIPath.PetInventory.MassDeleteButtons.Delete.get<ButtonComponent>()
+        let selectAllButton = this.UIPath.PetInventory.MassDeleteButtons.SelectAll.get<ButtonComponent>()
+
+        this.selectedDeletePets = []
+        this.selectedDeleteUIObjects = [];
+
+        (deleteButton.instance.WaitForChild('TextLabel') as TextLabel).Text = 'Delete ('+this.selectedDeletePets.size()+')'
+
+        cancelButton.BindToClick(() => {
+            massDeleteButtons.Visible = false
+            inventoryButtons.Visible = true
+
+            this.selectedDeletePets = []
+            this.selectedDeleteUIObjects = []
+
+            this.updatePets()
+        })
+
+        deleteButton.BindToClick(() => {
+            if (!this.selectedDeletePets) { return }
+            Events.ManagePets.fire(PetOperationStatus.MultiDelete, this.selectedDeletePets)
+
+            this.selectedDeletePets = []
+            this.selectedDeleteUIObjects = []
+        });
+
+        selectAllButton.BindToClick(() => {
+            if (!this.allDeletingPets) { return }
+            this.allDeletingPets.forEach((pet, guiobject) => {
+                if (this.selectedDeleteUIObjects.includes(guiobject)) { return }
+
+                (guiobject.WaitForChild('X') as ImageLabel).Visible = true;
+
+                this.selectedDeleteUIObjects.push(guiobject)
+                this.selectedDeletePets.push(pet)
+            });
+
+            (deleteButton.instance.WaitForChild('TextLabel') as TextLabel).Text = 'Delete ('+this.selectedDeletePets.size()+')'
+        })
+
+    }
+
+    private setupMassDeleteFrame() {
+        let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
+        let deleteButton = this.UIPath.PetInventory.MassDeleteButtons.Delete.get<ButtonComponent>().instance;
+
+        (deleteButton.WaitForChild('TextLabel') as TextLabel).Text = 'Delete ('+this.selectedDeletePets.size()+')'
+
+        this.UIPath.PetInventory.PetsFrame.get<FrameComponent>().Close()
+        this.UIPath.PetInventory.PetInfo.get<FrameComponent>().Close()
+
+        let equipAmount = petInventory.WaitForChild('Backpack').WaitForChild('AmountInfo').WaitForChild('Equip').WaitForChild('Amount')! as TextLabel
+        let backpackAmount = equipAmount.Parent!.Parent!.WaitForChild('Backpack').WaitForChild('Amount')! as TextLabel
+
+        equipAmount.Text = tostring(this.EquippedPets.size())+'/'+tostring(this._playerController.replica.Data.Profile.Config.MaxEquippedPets)
+        backpackAmount.Text = tostring(this.Pets.size())+'/'+tostring(this._playerController.replica.Data.Profile.Config.MaxPets)
+
+        this.clearPets(petInventory.WaitForChild('PetsFrame').WaitForChild('ScrollingFrame')!)
+        this.allDeletingPets = this.createPetExamples(petInventory.WaitForChild('PetsFrame').WaitForChild('ScrollingFrame')!, (pet, object) => { this.displayDeletePet(pet, object) })
+    }
+
+    private updateMassDelete() {
+        if (!this.allDeletingPets) { return }
+        if (!this.currentlySearching || this.currentlySearching.size() < 1) { return }
+
+        this.allDeletingPets.forEach((pet, guiobject) => {
+            if (pet.name.lower().find(this.currentlySearching!.lower()).size() < 1) { 
+                guiobject.Visible = false
+                return 
+            }
+
+            guiobject.Visible = true
+        })
+    }
+
+    private displayDeletePet(pet: IDBPetData, object: GuiObject) {
+        if (!pet)
+
+        print(object, 'fffffff111111')
+
+        if (object && this.selectedDeleteUIObjects.includes(object)) {
+            let selectedIndex = -1
+
+            this.selectedDeleteUIObjects.remove(this.selectedDeleteUIObjects.indexOf(object))
+            this.selectedDeletePets.forEach((val, index) => { if (Functions.compareObjects(val, pet)) {selectedIndex = index} });
+
+            (object.WaitForChild('X') as ImageLabel).Visible = false
+
+            if (selectedIndex < 0) { return }
+            this.selectedDeletePets.remove(selectedIndex)
+        }
+        else {
+            this.selectedDeleteUIObjects.push(object)
+            this.selectedDeletePets.push(pet);
+            
+            (object.WaitForChild('X') as ImageLabel).Visible = true
+        }
+
+        let deleteButton = this.UIPath.PetInventory.MassDeleteButtons.Delete.get<ButtonComponent>().instance;
+        (deleteButton.WaitForChild('TextLabel') as TextLabel).Text = 'Delete ('+this.selectedDeletePets.size()+')'
     }
 
     private getEquippedPets(pets: IDBPetData[]) {
@@ -1527,6 +1716,20 @@ export class UIController implements OnStart, OnInit {
         if (timeLeft <= 0) { timer.Text = 'Claim' }
     }
 
+    private updateStarterPack() {
+        let profileData = this._playerController.replica.Data.Profile
+        let currentTime = os.time() - profileData.StatValues.FirstJoin
+        let pack = this.UIPath.RightList.Bundles.StarterPack.get<ButtonComponent>().instance
+
+        if ( currentTime < 5 || currentTime > 15000 || profileData.Products.includes('starterpack')) {
+            pack.Visible = false
+            return
+        }
+
+        pack.Visible = true;
+        (pack.WaitForChild('Timer') as TextLabel).Text = GUIUtilities.GuiTimeFormatter(profileData.StatValues.FirstJoin+15000-os.time())
+    }
+
     public updateMutations(val: number) {
 
         let mutationMachine = this.UIPath.MutationMachine.get<ImageComponent>().instance as Instance
@@ -2075,6 +2278,8 @@ export class UIController implements OnStart, OnInit {
         this.UIPath.WheelSpin.Buy10.get<ButtonComponent>().BindToClick(() => { Events.PurchasePrompt.fire(1762896251) })
         this.UIPath.WheelSpin.Buy100.get<ButtonComponent>().BindToClick(() => { Events.PurchasePrompt.fire(1762896353) })
 
+        this.UIPath.RightList.Bundles.StarterPack.get<ButtonComponent>().BindToClick(() => { Events.PurchasePrompt.fire(1779438971) })
+
         this.UIPath.MutationMachine.MutationInfo.Buttons.Plus.get<ButtonComponent>().BindToClick((obj) => {
             this.currentMutationGems.set(math.clamp(this.currentMutationGems.get()+1, 1, 15))
         })
@@ -2203,21 +2408,29 @@ export class UIController implements OnStart, OnInit {
 
         this._playerController.replica.ListenToChange('Profile.Pets', (newValue, oldValue) => {
             this.Pets = newValue
-            let newEquippedPets = this.getEquippedPets(this.Pets)
 
-            if (newEquippedPets.size() > this.EquippedPets.size()) {
-                this.selectedPetStatus = PetOperationStatus.Unequip
-                if (this.selectedPet) { this.selectedPet.equipped = true }
+            if (this.UIPath.PetInventory.Buttons.get<FrameComponent>().instance.Visible) {
+                let newEquippedPets = this.getEquippedPets(this.Pets)
+
+                if (newEquippedPets.size() > this.EquippedPets.size()) {
+                    this.selectedPetStatus = PetOperationStatus.Unequip
+                    if (this.selectedPet) { this.selectedPet.equipped = true }
+                }
+    
+                if (this.EquippedPets.size() > newEquippedPets.size()) {
+                    this.selectedPetStatus = PetOperationStatus.Equip
+                    if (this.selectedPet) { this.selectedPet.equipped = false }
+                }
+    
+                this.EquippedPets = newEquippedPets
+                this.updatePets()
+                this.displayPet(this.selectedPet!)
+            }
+            else {
+                this.setupMassDeleteFrame()
             }
 
-            if (this.EquippedPets.size() > newEquippedPets.size()) {
-                this.selectedPetStatus = PetOperationStatus.Equip
-                if (this.selectedPet) { this.selectedPet.equipped = false }
-            }
 
-            this.EquippedPets = newEquippedPets
-            this.updatePets()
-            this.displayPet(this.selectedPet!)
 
             if (goldCircle.enabled) { this.setupGoldenGui() }
             if (voidPart.enabled) { this.setupVoidPets() }
@@ -2372,6 +2585,8 @@ export class UIController implements OnStart, OnInit {
         this.setupStorePotions()
         this.setupStoreGamepasses()
         this.setupPacks()
+        this.setupInventoryButtons()
+        this.setupMassDelete()
 
         this.updateGiftRewards()
         this.updateStoreLuck()
@@ -2397,6 +2612,7 @@ export class UIController implements OnStart, OnInit {
                 if (this.autoRebirth) { Events.ClaimReward.fire(RewardType.Rebirth) }
                 this.updateWheelSpin()
                 this.updateDailyChestBillboard()
+                this.updateStarterPack()
 
                 let voidTime = (this.stopVoidTime - this.startVoidTime)*this._playerController.replica.Data.Profile.Multipliers.VoidMachineMul
                 let currentVoidTime = this.startVoidTime+voidTime-os.time();

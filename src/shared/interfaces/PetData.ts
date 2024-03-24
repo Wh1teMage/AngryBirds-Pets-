@@ -73,6 +73,11 @@ export enum PetOperationStatus {
     Mutate = 'Mutate',
     ClaimVoid = 'ClaimVoid',
     RemoveMutation = 'RemoveMutation',
+
+    MultiDelete = 'MultiDelete',
+    EquipBest = 'EquipBest',
+    UnequipAll = 'UnequipAll',
+    CraftAll = 'CraftAll',
 }
 
 //'Cat|Huge|Void|56'

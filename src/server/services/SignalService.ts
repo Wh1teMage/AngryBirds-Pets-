@@ -87,6 +87,16 @@ export class SignalService implements OnStart, OnInit {
             if (operation === PetOperationStatus.RemoveMutation) { playerComp.RemovePetMutation(pet) }
         })
 
+        Events.ManagePets.connect((player: Player, operation: PetOperationStatus, pets?: IDBPetData[] | string) => {
+            let playerComp = ServerPlayerFabric.GetPlayer(player)
+            if (!playerComp) { return }
+
+            if (operation === PetOperationStatus.CraftAll) { playerComp.CraftAll() }
+            if (operation === PetOperationStatus.EquipBest) { playerComp.EquipBest() }
+            if (operation === PetOperationStatus.UnequipAll) { playerComp.UnequipAll() }
+            if (operation === PetOperationStatus.MultiDelete) { playerComp.RemovePets(pets as IDBPetData[]) }
+        })
+
         Events.ManageTool.connect((player: Player, operation: ToolOperationStatus, toolname: string) => {
             let playerComp = ServerPlayerFabric.GetPlayer(player)
             if (!playerComp) { return }

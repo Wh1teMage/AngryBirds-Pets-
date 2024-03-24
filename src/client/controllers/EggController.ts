@@ -20,10 +20,9 @@ export class EggController implements OnStart, OnInit {
             let name = egg[0]
             let data = egg[1]
             
-            /*
             if (!data.model) { continue }
 
-            data.model.Platform.BillboardGui.Main.Price.Text = tostring(data.price)
+            data.model.Floor.EggPrice.BillboardGui.Frame.Price.Text = tostring(data.price)
 
 
             let fullchance = 0
@@ -36,8 +35,11 @@ export class EggController implements OnStart, OnInit {
                 if (!petchance.name) { continue }
                 
                 let pet = PetsData.get(petchance.name) 
+                if (!pet) { continue }
 
-                let port = new Instance('ViewportFrame')
+                let petUI = data.model.Floor.Examples.PetExample.Clone()
+
+                let port = petUI.ViewportFrame
                 let model = pet!.model.Clone() 
                 
                 model.PivotTo(model.GetPivot().mul(pet!.stats.rotationOffset))
@@ -48,28 +50,24 @@ export class EggController implements OnStart, OnInit {
                 model.Parent = port
                 modelCam.Parent = port
                 port.CurrentCamera = modelCam
-                port.Name = tostring(petchance.weight)
 
-                port.Parent = data.model.Platform.BillboardGui.Main.Pets
+                petUI.PetName.Text = pet.name
+                petUI.Percent.Text = tostring(math.round(fullchance/petchance.weight*100)/100) 
 
-                BillboardFabric.CreateBillboard(data.model.Platform.BillboardGui)
+                petUI.Parent = data.model.Floor.EggUI.BillboardGui.EggFrame.Pets
 
-                print('1/'+math.round(fullchance/petchance.weight)+'%', pet?.name+' chance')
+                BillboardFabric.CreateBillboard(data.model.Floor.EggUI.BillboardGui)
+
+                // print('1/'+math.round(fullchance/petchance.weight)+'%', pet?.name+' chance')
 
                 // can be connected to work
 
-                // let buyButton = ButtonFabric.CreateButton(data.model.Platform.BillboardGui.Main.Buy)
+                let buyButton1 = ButtonFabric.CreateButton(data.model.Floor.EggUI.BillboardGui.EggFrame.Buttons.E)
+                let buyButton2 = ButtonFabric.CreateButton(data.model.Floor.EggUI.BillboardGui.EggFrame.Buttons.R)
 
-                // buyButton.BindToClick(() => { Events.BuyEgg(name, BuyType.Single) })
+                buyButton1.BindToClick(() => { Events.BuyEgg(name, EggBuyType.Single) })
+                buyButton2.BindToClick(() => { Events.BuyEgg(name, EggBuyType.Triple) })
             }
-            */
-            
-            task.wait(4)
-            print('Bought')
-            for (let i = 0; i < 3; i++) {
-                Events.BuyEgg(name, EggBuyType.Single)
-            }
-            
 
         }
 
