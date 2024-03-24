@@ -18,8 +18,8 @@ WorldsData.set(WorldType.Default, {
     reward: 100,
     length: 729,
 
-    gravity: 10*5,
-    density: 10*5,
+    gravity: 10,
+    density: 10,
     shootPosition: new Vector3(-5, 40, 349)
 })
 
@@ -37,8 +37,8 @@ WorldsData.set(WorldType.Cyber, {
     reward: 1000,
     length: 729,
 
-    gravity: 10*15,
-    density: 10*15,
+    gravity: 10,
+    density: 10,
     shootPosition: new Vector3(-5, 40, 349)
 })
 
@@ -56,7 +56,7 @@ WorldsData.set(WorldType.Space, {
     reward: 1000,
     length: 729,
 
-    gravity: 10*15,
-    density: 10*15,
+    gravity: 10,
+    density: 10,
     shootPosition: new Vector3(-5, 40, 349)
 })

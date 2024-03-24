@@ -428,6 +428,17 @@ MarketCallbacks.set('neonpack', (player) => {
     profileData.Products.push('neonpack')
 })
 
+MarketCallbacks.set('starterpack', (player) => {
+    let profileData = player.profile.Data
+
+    profileData.Config.MaxEquippedPets += 1
+    player.AppendPotion(PotionType.WinsPotion, 1)
+    player.SetWins(profileData.Values.WinsVal + 300)
+
+    player.replica.SetValue('Profile.Config.MaxEquippedPets', profileData.Config.MaxEquippedPets)
+    profileData.Products.push('starterpack')
+})
+
 MarketCallbacks.set('buy1spin', (player) => {
     let profileData = player.profile.Data
 

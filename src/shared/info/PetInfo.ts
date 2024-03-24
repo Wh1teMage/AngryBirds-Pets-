@@ -22,7 +22,7 @@ PetsData.set('Cat', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Cat', 40) as Model
+    model: Pets.WaitForChild('Cat', 5) as Model
 })
 
 PetsData.set('Dog', {
@@ -40,7 +40,7 @@ PetsData.set('Dog', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Dog', 40) as Model
+    model: Pets.WaitForChild('Dog', 5) as Model
 })
 
 PetsData.set('White Bunny', {
@@ -58,9 +58,9 @@ PetsData.set('White Bunny', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('White Bunny', 40) as Model
+    model: Pets.WaitForChild('White Bunny', 5) as Model
 })
-
+/*
 PetsData.set('Elephant', {
     name: 'Elephant',
     locked: false,
@@ -76,7 +76,7 @@ PetsData.set('Elephant', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Elephant', 40) as Model
+    model: Pets.WaitForChild('Elephant', 5) as Model
 })
 
 PetsData.set('Butterfly', {
@@ -94,7 +94,7 @@ PetsData.set('Butterfly', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Butterfly', 40) as Model
+    model: Pets.WaitForChild('Butterfly', 5) as Model
 })
 
 // * Ore egg
@@ -114,7 +114,7 @@ PetsData.set('Fox', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Fox', 40) as Model
+    model: Pets.WaitForChild('Fox', 5) as Model
 })
 
 PetsData.set('Monkey', {
@@ -132,7 +132,7 @@ PetsData.set('Monkey', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Monkey', 40) as Model
+    model: Pets.WaitForChild('Monkey', 5) as Model
 })
 
 PetsData.set('Dragon', {
@@ -150,7 +150,7 @@ PetsData.set('Dragon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Dragon', 40) as Model
+    model: Pets.WaitForChild('Dragon', 5) as Model
 })
 
 PetsData.set('Raccoon', {
@@ -168,7 +168,7 @@ PetsData.set('Raccoon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Raccoon', 40) as Model
+    model: Pets.WaitForChild('Raccoon', 5) as Model
 })
 
 PetsData.set('CandyCane Unicorn', {
@@ -186,7 +186,7 @@ PetsData.set('CandyCane Unicorn', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('CandyCane Unicorn', 40) as Model
+    model: Pets.WaitForChild('CandyCane Unicorn', 5) as Model
 })
 
 // * Rail egg
@@ -206,7 +206,7 @@ PetsData.set('Cow', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Cow', 40) as Model
+    model: Pets.WaitForChild('Cow', 5) as Model
 })
 
 PetsData.set('Pig', {
@@ -224,7 +224,7 @@ PetsData.set('Pig', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Pig', 40) as Model
+    model: Pets.WaitForChild('Pig', 5) as Model
 })
 
 PetsData.set('Fish', {
@@ -242,7 +242,7 @@ PetsData.set('Fish', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Fish', 40) as Model
+    model: Pets.WaitForChild('Fish', 5) as Model
 })
 
 PetsData.set('Crab', {
@@ -260,7 +260,7 @@ PetsData.set('Crab', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Crab', 40) as Model
+    model: Pets.WaitForChild('Crab', 5) as Model
 })
 
 PetsData.set('Peacock', {
@@ -278,7 +278,7 @@ PetsData.set('Peacock', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Peacock', 40) as Model
+    model: Pets.WaitForChild('Peacock', 5) as Model
 })
 
 // * Diamond egg (donat)
@@ -298,7 +298,7 @@ PetsData.set('Glacier', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Glacier', 40) as Model
+    model: Pets.WaitForChild('Glacier', 5) as Model
 })
 
 PetsData.set('Mega Amythest Dragon', {
@@ -316,7 +316,7 @@ PetsData.set('Mega Amythest Dragon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Mega Amythest Dragon', 40) as Model
+    model: Pets.WaitForChild('Mega Amythest Dragon', 5) as Model
 })
 
 PetsData.set('Sinister Hydra', {
@@ -334,7 +334,7 @@ PetsData.set('Sinister Hydra', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Sinister Hydra', 40) as Model
+    model: Pets.WaitForChild('Sinister Hydra', 5) as Model
 })
 // !World 1 /\
 
@@ -357,7 +357,7 @@ PetsData.set('Pink Bunny', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Pink Bunny', 40) as Model
+    model: Pets.WaitForChild('Pink Bunny', 5) as Model
 })
 
 PetsData.set('Pink Axolotl', {
@@ -375,7 +375,7 @@ PetsData.set('Pink Axolotl', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Pink Axolotl', 40) as Model
+    model: Pets.WaitForChild('Pink Axolotl', 5) as Model
 })
 
 PetsData.set('Seal', {
@@ -393,7 +393,7 @@ PetsData.set('Seal', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Seal', 40) as Model
+    model: Pets.WaitForChild('Seal', 5) as Model
 })
 
 PetsData.set('Diamond Golem', {
@@ -411,7 +411,7 @@ PetsData.set('Diamond Golem', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Diamond Golem', 40) as Model
+    model: Pets.WaitForChild('Diamond Golem', 5) as Model
 })
 
 PetsData.set('Aqua Dragon', {
@@ -429,7 +429,7 @@ PetsData.set('Aqua Dragon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Aqua Dragon', 40) as Model
+    model: Pets.WaitForChild('Aqua Dragon', 5) as Model
 })
 
 // *
@@ -449,7 +449,7 @@ PetsData.set('Blue Something', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Blue Something', 40) as Model
+    model: Pets.WaitForChild('Blue Something', 5) as Model
 })
 
 PetsData.set('White Bear', {
@@ -467,7 +467,7 @@ PetsData.set('White Bear', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('White Bear', 40) as Model
+    model: Pets.WaitForChild('White Bear', 5) as Model
 })
 
 PetsData.set('Gecon', {
@@ -485,7 +485,7 @@ PetsData.set('Gecon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Gecon', 40) as Model
+    model: Pets.WaitForChild('Gecon', 5) as Model
 })
 
 PetsData.set('Clown Doggy', {
@@ -503,7 +503,7 @@ PetsData.set('Clown Doggy', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Clown Doggy', 40) as Model
+    model: Pets.WaitForChild('Clown Doggy', 5) as Model
 })
 
 PetsData.set('The Clown', {
@@ -521,7 +521,7 @@ PetsData.set('The Clown', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('The Clown', 40) as Model
+    model: Pets.WaitForChild('The Clown', 5) as Model
 })
 
 // *
@@ -541,7 +541,7 @@ PetsData.set('Polar', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Polar', 40) as Model
+    model: Pets.WaitForChild('Polar', 5) as Model
 })
 
 
@@ -560,7 +560,7 @@ PetsData.set('Red Dragon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Red Dragon', 40) as Model
+    model: Pets.WaitForChild('Red Dragon', 5) as Model
 })
 
 PetsData.set('WizMouse', {
@@ -578,7 +578,7 @@ PetsData.set('WizMouse', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('WizMouse', 40) as Model
+    model: Pets.WaitForChild('WizMouse', 5) as Model
 })
 
 PetsData.set('Lily', {
@@ -596,7 +596,7 @@ PetsData.set('Lily', {
        evolution: Evolutions.Normal,
        mutation: Mutations.Default
    },
-    model: Pets.WaitForChild('Lily', 40) as Model
+    model: Pets.WaitForChild('Lily', 5) as Model
 })
 
 PetsData.set('Crystal Lord', {
@@ -614,7 +614,7 @@ PetsData.set('Crystal Lord', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Crystal Lord', 40) as Model
+    model: Pets.WaitForChild('Crystal Lord', 5) as Model
 })
 
 // *
@@ -634,7 +634,7 @@ PetsData.set('Sus Cat', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Sus Cat', 40) as Model
+    model: Pets.WaitForChild('Sus Cat', 5) as Model
 })
 
 PetsData.set('Ice Cream Dog', {
@@ -652,7 +652,7 @@ PetsData.set('Ice Cream Dog', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Ice Cream Dog', 40) as Model
+    model: Pets.WaitForChild('Ice Cream Dog', 5) as Model
 })
 
 PetsData.set('Cake', {
@@ -670,7 +670,7 @@ PetsData.set('Cake', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Cake', 40) as Model
+    model: Pets.WaitForChild('Cake', 5) as Model
 })
 
 // !
@@ -690,7 +690,7 @@ PetsData.set('Garden Wraith', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Garden Wraith', 40) as Model
+    model: Pets.WaitForChild('Garden Wraith', 5) as Model
 })
 
 PetsData.set('Capybara', {
@@ -708,7 +708,7 @@ PetsData.set('Capybara', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Capybara', 40) as Model
+    model: Pets.WaitForChild('Capybara', 5) as Model
 })
 
 PetsData.set('Yellow Something', {
@@ -726,7 +726,7 @@ PetsData.set('Yellow Something', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Yellow Something', 40) as Model
+    model: Pets.WaitForChild('Yellow Something', 5) as Model
 })
 
 PetsData.set('Royal Raven', {
@@ -744,7 +744,7 @@ PetsData.set('Royal Raven', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Royal Raven', 40) as Model
+    model: Pets.WaitForChild('Royal Raven', 5) as Model
 })
 
 PetsData.set('King Ant', {
@@ -762,7 +762,7 @@ PetsData.set('King Ant', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('King Ant', 40) as Model
+    model: Pets.WaitForChild('King Ant', 5) as Model
 })
 
 // *
@@ -782,7 +782,7 @@ PetsData.set('Mystery Cat', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Mystery Cat', 40) as Model
+    model: Pets.WaitForChild('Mystery Cat', 5) as Model
 })
 
 PetsData.set('Cyber Dominus', {
@@ -800,7 +800,7 @@ PetsData.set('Cyber Dominus', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Cyber Dominus', 40) as Model
+    model: Pets.WaitForChild('Cyber Dominus', 5) as Model
 })
 
 PetsData.set('Cyberpunk Dragon', {
@@ -818,7 +818,7 @@ PetsData.set('Cyberpunk Dragon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Cyberpunk Dragon', 40) as Model
+    model: Pets.WaitForChild('Cyberpunk Dragon', 5) as Model
 })
 
 PetsData.set('Crow', {
@@ -836,7 +836,7 @@ PetsData.set('Crow', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Crow', 40) as Model
+    model: Pets.WaitForChild('Crow', 5) as Model
 })
 
 PetsData.set('Moon Bird', {
@@ -854,7 +854,7 @@ PetsData.set('Moon Bird', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Moon Bird', 40) as Model
+    model: Pets.WaitForChild('Moon Bird', 5) as Model
 })
 
 // *
@@ -874,7 +874,7 @@ PetsData.set('Hacked Doggy', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Hacked Doggy', 40) as Model
+    model: Pets.WaitForChild('Hacked Doggy', 5) as Model
 })
 
 PetsData.set('Alien Bird', {
@@ -892,7 +892,7 @@ PetsData.set('Alien Bird', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Alien Bird', 40) as Model
+    model: Pets.WaitForChild('Alien Bird', 5) as Model
 })
 
 PetsData.set('Alien Dragon', {
@@ -910,7 +910,7 @@ PetsData.set('Alien Dragon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Alien Dragon', 40) as Model
+    model: Pets.WaitForChild('Alien Dragon', 5) as Model
 })
 
 PetsData.set('Galaxy Doggy', {
@@ -928,7 +928,7 @@ PetsData.set('Galaxy Doggy', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Galaxy Doggy', 40) as Model
+    model: Pets.WaitForChild('Galaxy Doggy', 5) as Model
 })
 
 PetsData.set('Dark Hydra', {
@@ -946,7 +946,7 @@ PetsData.set('Dark Hydra', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Dark Hydra', 40) as Model
+    model: Pets.WaitForChild('Dark Hydra', 5) as Model
 })
 
 // *
@@ -966,7 +966,7 @@ PetsData.set('Mega Galaxy Doggy', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Mega Galaxy Doggy', 40) as Model
+    model: Pets.WaitForChild('Mega Galaxy Doggy', 5) as Model
 })
 
 PetsData.set('Purple Alien Hydra', {
@@ -984,7 +984,7 @@ PetsData.set('Purple Alien Hydra', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Purple Alien Hydra', 40) as Model
+    model: Pets.WaitForChild('Purple Alien Hydra', 5) as Model
 })
 
 PetsData.set('Ultra Alien', {
@@ -1002,7 +1002,7 @@ PetsData.set('Ultra Alien', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Ultra Alien', 40) as Model
+    model: Pets.WaitForChild('Ultra Alien', 5) as Model
 })
 
 PetsData.set('Nightmare Cat', {
@@ -1020,7 +1020,7 @@ PetsData.set('Nightmare Cat', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Nightmare Cat', 40) as Model
+    model: Pets.WaitForChild('Nightmare Cat', 5) as Model
 })
 
 PetsData.set('Nightmare Bunny', {
@@ -1038,7 +1038,7 @@ PetsData.set('Nightmare Bunny', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Nightmare Bunny', 40) as Model
+    model: Pets.WaitForChild('Nightmare Bunny', 5) as Model
 })
 
 PetsData.set('Nightmare Yeti', {
@@ -1056,7 +1056,7 @@ PetsData.set('Nightmare Yeti', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Nightmare Yeti', 40) as Model
+    model: Pets.WaitForChild('Nightmare Yeti', 5) as Model
 })
 
 PetsData.set('Devil Spider', {
@@ -1074,7 +1074,7 @@ PetsData.set('Devil Spider', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Devil Spider', 40) as Model
+    model: Pets.WaitForChild('Devil Spider', 5) as Model
 })
 
 PetsData.set('Observer', {
@@ -1092,7 +1092,7 @@ PetsData.set('Observer', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Observer', 40) as Model
+    model: Pets.WaitForChild('Observer', 5) as Model
 })
 
 PetsData.set('Confetti Balloon', {
@@ -1110,7 +1110,7 @@ PetsData.set('Confetti Balloon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Confetti Balloon', 40) as Model
+    model: Pets.WaitForChild('Confetti Balloon', 5) as Model
 })
 
 PetsData.set('Party Goblin', {
@@ -1128,7 +1128,7 @@ PetsData.set('Party Goblin', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Party Goblin', 40) as Model
+    model: Pets.WaitForChild('Party Goblin', 5) as Model
 })
 
 PetsData.set('Swaggy Songbird', {
@@ -1146,7 +1146,7 @@ PetsData.set('Swaggy Songbird', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Swaggy Songbird', 40) as Model
+    model: Pets.WaitForChild('Swaggy Songbird', 5) as Model
 })
 
 PetsData.set('DJ Demon', {
@@ -1164,7 +1164,7 @@ PetsData.set('DJ Demon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('DJ Demon', 40) as Model
+    model: Pets.WaitForChild('DJ Demon', 5) as Model
 })
 
 // !
@@ -1184,7 +1184,7 @@ PetsData.set('Shadow Chameleon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Shadow Chameleon', 40) as Model
+    model: Pets.WaitForChild('Shadow Chameleon', 5) as Model
 })
 
 PetsData.set('Shadow Butterfly', {
@@ -1202,7 +1202,7 @@ PetsData.set('Shadow Butterfly', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Shadow Butterfly', 40) as Model
+    model: Pets.WaitForChild('Shadow Butterfly', 5) as Model
 })
 
 PetsData.set('Shadow Ghost', {
@@ -1220,7 +1220,7 @@ PetsData.set('Shadow Ghost', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Shadow Ghost', 40) as Model
+    model: Pets.WaitForChild('Shadow Ghost', 5) as Model
 })
 
 PetsData.set('Shadow Star', {
@@ -1238,7 +1238,7 @@ PetsData.set('Shadow Star', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Shadow Star', 40) as Model
+    model: Pets.WaitForChild('Shadow Star', 5) as Model
 })
 
 // *Gifts & Daily & Chest Rewards
@@ -1258,7 +1258,7 @@ PetsData.set('The Ultra Banana Split', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('The Ultra Banana Split', 40) as Model
+    model: Pets.WaitForChild('The Ultra Banana Split', 5) as Model
 })
 
 PetsData.set('Star Spike', {
@@ -1276,7 +1276,7 @@ PetsData.set('Star Spike', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Star Spike', 40) as Model
+    model: Pets.WaitForChild('Star Spike', 5) as Model
 })
 
 PetsData.set('Nightmare Spirit', {
@@ -1294,7 +1294,7 @@ PetsData.set('Nightmare Spirit', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Nightmare Spirit', 40) as Model
+    model: Pets.WaitForChild('Nightmare Spirit', 5) as Model
 })
 
 PetsData.set('Flame Pixie', {
@@ -1312,7 +1312,7 @@ PetsData.set('Flame Pixie', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Flame Pixie', 40) as Model
+    model: Pets.WaitForChild('Flame Pixie', 5) as Model
 })
 
 PetsData.set('Shadow Demon', {
@@ -1330,7 +1330,7 @@ PetsData.set('Shadow Demon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Shadow Demon', 40) as Model
+    model: Pets.WaitForChild('Shadow Demon', 5) as Model
 })
 
 PetsData.set('Pixie', {
@@ -1348,7 +1348,7 @@ PetsData.set('Pixie', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Pixie', 40) as Model
+    model: Pets.WaitForChild('Pixie', 5) as Model
 })
 
 PetsData.set('Midnight', {
@@ -1366,7 +1366,7 @@ PetsData.set('Midnight', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Midnight', 40) as Model
+    model: Pets.WaitForChild('Midnight', 5) as Model
 })
 
 PetsData.set('Leek Cat', {
@@ -1384,7 +1384,7 @@ PetsData.set('Leek Cat', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Leek Cat', 40) as Model
+    model: Pets.WaitForChild('Leek Cat', 5) as Model
 })
 
 // *Spin
@@ -1404,7 +1404,7 @@ PetsData.set('Red Devil', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Red Devil', 40) as Model
+    model: Pets.WaitForChild('Red Devil', 5) as Model
 })
 
 // *Bundles
@@ -1424,7 +1424,7 @@ PetsData.set('Magma Doggy', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Magma Doggy', 40) as Model
+    model: Pets.WaitForChild('Magma Doggy', 5) as Model
 })
 
 PetsData.set('Soul Golem', {
@@ -1442,7 +1442,7 @@ PetsData.set('Soul Golem', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Soul Golem', 40) as Model
+    model: Pets.WaitForChild('Soul Golem', 5) as Model
 })
 
 // *Limeted
@@ -1462,7 +1462,7 @@ PetsData.set('Ultra Capybara', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Ultra Capybara', 40) as Model
+    model: Pets.WaitForChild('Ultra Capybara', 5) as Model
 })
 
 PetsData.set('Psycho', {
@@ -1480,7 +1480,7 @@ PetsData.set('Psycho', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Psycho', 40) as Model
+    model: Pets.WaitForChild('Psycho', 5) as Model
 })
 
 PetsData.set('Devils Soul', {
@@ -1498,7 +1498,7 @@ PetsData.set('Devils Soul', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('Devils Soul', 40) as Model
+    model: Pets.WaitForChild('Devils Soul', 5) as Model
 })
 
 // !!GigaRacoon!!
@@ -1517,6 +1517,8 @@ PetsData.set('GigaRacoon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('GigaRacoon', 40) as Model
+    model: Pets.WaitForChild('GigaRacoon', 5) as Model
 })
 // !!GigaRacoon!!
+
+*/

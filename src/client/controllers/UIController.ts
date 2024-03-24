@@ -1517,7 +1517,7 @@ export class UIController implements OnStart, OnInit {
         let profileData = this._playerController.replica.Data.Profile;
         let dailyChestPart = Workspace.WaitForChild('DailyChest')
 
-        let dailyBillboard = dailyChestPart.WaitForChild('Attachment').WaitForChild('BilboardGui') as BillboardGui
+        let dailyBillboard = dailyChestPart.WaitForChild('Attachment').WaitForChild('BillboardGui') as BillboardGui
         let timer = dailyBillboard.WaitForChild('Frame').WaitForChild('Timer') as TextLabel
 
         let timeLeft = profileData.StatValues.LastDailyChestTime+10-os.time();
@@ -2396,6 +2396,7 @@ export class UIController implements OnStart, OnInit {
                 Events.ManageWorld.fire(WorldOperationStatus.BuyAll)
                 if (this.autoRebirth) { Events.ClaimReward.fire(RewardType.Rebirth) }
                 this.updateWheelSpin()
+                this.updateDailyChestBillboard()
 
                 let voidTime = (this.stopVoidTime - this.startVoidTime)*this._playerController.replica.Data.Profile.Multipliers.VoidMachineMul
                 let currentVoidTime = this.startVoidTime+voidTime-os.time();
