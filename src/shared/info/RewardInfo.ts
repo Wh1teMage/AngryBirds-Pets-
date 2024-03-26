@@ -515,14 +515,34 @@ RebirthsRewardsData.push({
 
 export const SpinRewardData: IRewardData = {
     Chances: [
-        {weight: 10, name: 'Wins1', reward: {
+        {weight: 1, name: 'Pet', reward: {
+            // Pets:{
+            //     pet: 'Red Devil'
+            // }
+        }},
+        {weight: 150, name: 'Potinon', reward: {
             Values: {
                 Wins: 10,
             }
         }},
-        {weight: 10, name: 'Wins2', reward: {
+        {weight: 349, name: 'Wins', reward: {
             Values: {
                 Wins: 10,
+            }
+        }},
+        {weight: 50, name: 'gem', reward: {
+            Values: {
+                Wins: 1,
+            }
+        }},
+        {weight: 250, name: 'Wins', reward: {
+            Values: {
+                Wins: 50,
+            }
+        }},
+        {weight: 200, name: 'Strенч', reward: {
+            Values: {
+                Wins: 1000,
             }
         }},
         
@@ -531,33 +551,62 @@ export const SpinRewardData: IRewardData = {
 
 export const DailyChestRewardData: IRewardData = {
     Chances: [
-        {weight: 10, name: 'Wins1', reward: {
+        {weight: 30, name: 'Wins1', reward: {
             Values: {
                 Wins: 100000,
             }
         }},
-        {weight: 10, name: 'Wins2', reward: {
+        {weight: 25, name: 'PotinonGiren', reward: {
             Values: {
-                Wins: 100000,
+                // Wins: 100000,
+            }
+        }},
+        {weight: 20, name: 'PotinonRad', reward: {
+            Values: {
+                // Wins: 100000,
+            }
+        }},
+        {weight: 15, name: 'PotinonYalov', reward: {
+            Values: {
+                // Wins: 100000,
+            }
+        }},
+        {weight: 9, name: 'PotinonPyprel', reward: {
+            Values: {
+                // Wins: 100000,
+            }
+        }},
+        {weight: 1, name: 'Pet', reward: {
+            Values: {
+                // Wins: 100000,
             }
         }},
         
     ]
-} 
+}
 
 export const GroupChestRewardData: IRewardData = {
     Chances: [
-        {weight: 10, name: 'Wins1', reward: {
+        {weight: 50, name: 'Wins1', reward: {
             Values: {
                 Wins: 100000,
             }
         }},
-        {weight: 10, name: 'Wins2', reward: {
+        {weight: 46, name: 'PotinonGiren', reward: {
             Values: {
-                Wins: 100000,
+                // Wins: 100000,
             }
         }},
-        
+        {weight: 3, name: 'Egg', reward: {
+            Values: {
+                // Wins: 100000,
+            }
+        }},
+        {weight: 1, name: 'хз что это', reward: {
+            Values: {
+                // Wins: 100000,
+            }
+        }}
     ]
 } 
 

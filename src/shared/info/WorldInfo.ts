@@ -6,7 +6,7 @@ export const WorldsData = new Map<WorldType, IWorldData>()
 
 WorldsData.set(WorldType.Default, {
     hitbox: game.Workspace.WaitForChild('Part1') as Part,
-    teleportPart: game.Workspace.WaitForChild('Part') as Part,
+    teleportPart: game.Workspace.WaitForChild('Part4') as Part,
     slingshotPart: game.Workspace.WaitForChild('Slingshot').WaitForChild('Part') as Part,
     shop: ['Slingshot1W1', 'Slingshot2W1', 'Slingshot3W1', 'Slingshot4W1', 'Slingshot5W1', 'SlingshotD1W1'],
     shopName: 'World1',
@@ -31,7 +31,7 @@ WorldsData.set(WorldType.Default, {
 
 WorldsData.set(WorldType.Cyber, {
     hitbox: game.Workspace.WaitForChild('Part2') as Part,
-    teleportPart: game.Workspace.WaitForChild('Part2') as Part,
+    teleportPart: game.Workspace.WaitForChild('CyberPart') as Part,
     slingshotPart: game.Workspace.WaitForChild('Slingshot').WaitForChild('Part') as Part,
     shop: ['Slingshot1W2', 'Slingshot2W2', 'Slingshot3W2', 'Slingshot4W2', 'Slingshot5W2', 'Slingshot6W2', 'SlingshotD1W2'], //['я четырнадцати летняя проститутка из Никгура'],
     shopName: 'World2',
@@ -56,7 +56,7 @@ WorldsData.set(WorldType.Cyber, {
 
 WorldsData.set(WorldType.Space, {
     hitbox: game.Workspace.WaitForChild('Part3') as Part,
-    teleportPart: game.Workspace.WaitForChild('Part3') as Part,
+    teleportPart: game.Workspace.WaitForChild('ZVpart') as Part,
     slingshotPart: game.Workspace.WaitForChild('Slingshot').WaitForChild('Part') as Part,
     shop: ['Slingshot1W3', 'Slingshot2W3', 'Slingshot3W3', 'Slingshot4W3', 'Slingshot5W3', 'Slingshot6W3', 'SlingshotD1W3'],
     shopName: 'World3',
