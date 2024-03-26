@@ -37,7 +37,7 @@ ToolsData.set('Slingshot3W1', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default3',
+    name: 'Rare',
     addition: 5,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -52,7 +52,7 @@ ToolsData.set('Slingshot4W1', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default4',
+    name: 'Epic',
     addition: 8,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -67,7 +67,7 @@ ToolsData.set('Slingshot5W1', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default5',
+    name: 'Legendary',
     addition: 12,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -97,7 +97,7 @@ ToolsData.set('Slingshot1W2', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default1',
+    name: 'Common',
     addition: 18,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -111,7 +111,7 @@ ToolsData.set('Slingshot2W2', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default2',
+    name: 'Uncommon',
     addition: 27,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -125,7 +125,7 @@ ToolsData.set('Slingshot3W2', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default3',
+    name: 'Rare',
     addition: 40,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -140,7 +140,7 @@ ToolsData.set('Slingshot4W2', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default4',
+    name: 'Epic',
     addition: 60,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -155,7 +155,7 @@ ToolsData.set('Slingshot5W2', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default5',
+    name: 'Legendary',
     addition: 90,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -169,7 +169,8 @@ ToolsData.set('Slingshot6W2', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'я четырнадцати летняя проститутка из Никгура',
+    name: 'Mtyhical',
+    // name: 'я четырнадцати летняя проститутка из Никгура',
     addition: 140,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -183,7 +184,7 @@ ToolsData.set('SlingshotD1W2', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default6',
+    name: 'Strong Shield',
     addition: 550,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -200,7 +201,7 @@ ToolsData.set('Slingshot1W3', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default1',
+    name: 'Common',
     addition: 200,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -214,7 +215,7 @@ ToolsData.set('Slingshot2W3', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default2',
+    name: 'Uncommon',
     addition: 300,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -228,7 +229,7 @@ ToolsData.set('Slingshot3W3', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default3',
+    name: 'Rare',
     addition: 450,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -243,7 +244,7 @@ ToolsData.set('Slingshot4W3', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default4',
+    name: 'Epic',
     addition: 650,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -258,7 +259,7 @@ ToolsData.set('Slingshot5W3', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default5',
+    name: 'Legendary',
     addition: 950,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -272,7 +273,7 @@ ToolsData.set('Slingshot6W3', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'я четырнадцати летняя проститутка из Никгура',
+    name: 'Mythical',
     addition: 1400,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -286,7 +287,7 @@ ToolsData.set('SlingshotD1W3', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Default6',
+    name: 'Lightsaber',
     addition: 5500,
     firerate: 1/1,
     effectname: 'Shoot',
