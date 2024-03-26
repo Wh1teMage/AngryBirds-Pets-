@@ -1,5 +1,5 @@
 import { Service, OnStart, OnInit } from "@flamework/core";
-import { Players, TeleportService } from "@rbxts/services";
+import { Players, TeleportService, StarterGui } from "@rbxts/services";
 
 @Service({})
 export class UpdateService implements OnStart, OnInit {
@@ -7,6 +7,7 @@ export class UpdateService implements OnStart, OnInit {
         
         game.BindToClose(() => {
 
+            /*
             let reservedServer = TeleportService.ReserveServer(game.PlaceId)
             TeleportService.TeleportToPrivateServer(game.PlaceId, reservedServer[0], Players.GetPlayers())
 
@@ -15,7 +16,9 @@ export class UpdateService implements OnStart, OnInit {
             })
 
             task.wait(10) // to make sure that all players will teleport
+            */
 
+            (StarterGui.WaitForChild('MainUI').WaitForChild('SoftShutdown') as CanvasGroup).Visible = true
         })
 
     }

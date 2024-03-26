@@ -16,11 +16,16 @@ WorldsData.set(WorldType.Default, {
 
     maxClicks: 100,
     reward: 100,
-    length: 729,
 
     gravity: 10,
-    density: 10,
-    shootPosition: new Vector3(-5, 40, 349)
+    density: 10**3,
+
+    startingPosition: new Vector3(-5, 40, 349),
+    endingPosition: new Vector3(0, 53, -3733),
+
+    minY: 28,
+    angle: 30,
+    energyLoss: 50
 })
 
 WorldsData.set(WorldType.Cyber, {
@@ -35,11 +40,16 @@ WorldsData.set(WorldType.Cyber, {
 
     maxClicks: 100,
     reward: 1000,
-    length: 729,
 
     gravity: 10,
-    density: 10,
-    shootPosition: new Vector3(-5, 40, 349)
+    density: 10**3,
+
+    startingPosition: new Vector3(-5, 40, 349),
+    endingPosition: new Vector3(0, 53, -3733),
+
+    minY: 28,
+    angle: 30,
+    energyLoss: 50
 })
 
 WorldsData.set(WorldType.Space, {
@@ -54,9 +64,14 @@ WorldsData.set(WorldType.Space, {
 
     maxClicks: 100,
     reward: 1000,
-    length: 729,
 
     gravity: 10,
-    density: 10,
-    shootPosition: new Vector3(-5, 40, 349)
+    density: 10**3,
+    
+    startingPosition: new Vector3(-5, 40, 349),
+    endingPosition: new Vector3(0, 53, -3733),
+
+    minY: 28,
+    angle: 30,
+    energyLoss: 50
 })

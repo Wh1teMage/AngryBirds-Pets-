@@ -1,3 +1,4 @@
+import { GlobalDataService } from "server/classes/GlobalDataStoreService";
 import { ServerPlayerComponent } from "server/components/PlayerComponent";
 import { PotionType } from "shared/enums/PotionEnum";
 import { WorldsData } from "shared/info/WorldInfo";
@@ -458,4 +459,60 @@ MarketCallbacks.set('buy100spin', (player) => {
 
     profileData.StatValues.SpinCount += 100
     player.replica.SetValue('Profile.StatValues.SpinCount', profileData.StatValues.SpinCount)
+})
+
+MarketCallbacks.set('limited1', (player) => {
+    let profileData = player.profile.Data
+
+    player.AppendPet({
+        name: 'Soul Golem',
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    })
+
+    GlobalDataService.setValue('Limited1', GlobalDataService.values.get('Limited1')!-1)
+})
+
+MarketCallbacks.set('limited2', (player) => {
+    let profileData = player.profile.Data
+
+    player.AppendPet({
+        name: 'Soul Golem',
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    })
+
+    GlobalDataService.setValue('Limited2', GlobalDataService.values.get('Limited2')!-1)
+})
+
+MarketCallbacks.set('limited3', (player) => {
+    let profileData = player.profile.Data
+
+    player.AppendPet({
+        name: 'Soul Golem',
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    })
+
+    GlobalDataService.setValue('Limited3', GlobalDataService.values.get('Limited3')!-1)
+})
+
+MarketCallbacks.set('unlocksessiongifts', (player) => {
+    player.session.sessionTime = 10**6
+    player.replica.SetValue('Session.sessionTime', player.session.sessionTime)
 })

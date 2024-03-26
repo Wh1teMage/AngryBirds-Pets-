@@ -1,10 +1,12 @@
 import { Controller, OnStart, OnInit } from "@flamework/core";
+import { GUIUtilities } from "client/classes/GUIUtilities";
 import { BillboardFabric } from "client/components/UIComponents/BillboardComponent";
 import { ButtonFabric } from "client/components/UIComponents/ButtonComponent";
 import { Events } from "client/network";
 import { EggsData } from "shared/info/EggInfo";
 import { PetsData } from "shared/info/PetInfo";
 import { EggBuyType } from "shared/interfaces/EggData";
+import { PlayerController } from "./PlayerController";
 
 //basically initializer
 
@@ -13,8 +15,18 @@ export class EggController implements OnStart, OnInit {
 
     // can easily connect player service here to check players gamepasses and etc
 
+    private _playerController: PlayerController
+
+    constructor(playerController: PlayerController) {
+        this._playerController = playerController
+    }
+
     onInit() {
         
+        if (!this._playerController.fullyLoaded) { this._playerController.loadSignal.Wait() }
+
+        let profileData = this._playerController.replica.Data.Profile
+
         for (let egg of EggsData) {
 
             let name = egg[0]
@@ -22,8 +34,14 @@ export class EggController implements OnStart, OnInit {
             
             if (!data.model) { continue }
 
-            data.model.Floor.EggPrice.BillboardGui.Frame.Price.Text = tostring(data.price)
+            data.model.Floor.EggPrice.BillboardGui.Frame.Price.Text = GUIUtilities.getSIPrefixSymbol(data.price)
+            data.model.Floor.EggUI.BillboardGui.EggFrame.Wins.Value.Text = GUIUtilities.getSIPrefixSymbol(data.price)
 
+            let eggFrame = data.model.Floor.EggUI.BillboardGui.EggFrame
+
+            eggFrame.Passes.Luck.Lock.Visible = profileData.Products.includes('luck1')
+            eggFrame.Passes.Luck2.Lock.Visible = profileData.Products.includes('luck2')
+            eggFrame.Passes.Luck3.Lock.Visible = profileData.Products.includes('luck3')
 
             let fullchance = 0
 
@@ -56,8 +74,6 @@ export class EggController implements OnStart, OnInit {
 
                 petUI.Parent = data.model.Floor.EggUI.BillboardGui.EggFrame.Pets
 
-                BillboardFabric.CreateBillboard(data.model.Floor.EggUI.BillboardGui)
-
                 // print('1/'+math.round(fullchance/petchance.weight)+'%', pet?.name+' chance')
 
                 // can be connected to work
@@ -67,6 +83,13 @@ export class EggController implements OnStart, OnInit {
 
                 buyButton1.BindToClick(() => { Events.BuyEgg(name, EggBuyType.Single) })
                 buyButton2.BindToClick(() => { Events.BuyEgg(name, EggBuyType.Triple) })
+
+                data.model.Floor.EggUI.BillboardGui.Adornee = data.model.Floor.EggUI
+                
+                BillboardFabric.CreateBillboard(data.model.Floor.EggUI.BillboardGui)
+
+                data.model.Floor.EggUI.BillboardGui.Name = name
+                data.model.Floor.EggUI.WaitForChild(name)!.Parent = this._playerController.component.instance.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('EggGui')
             }
 
         }

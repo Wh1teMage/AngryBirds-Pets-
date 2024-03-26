@@ -7,7 +7,7 @@ export const ToolsData = new Map<string, IToolData>()
 ToolsData.set('Slingshot1W1', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World1').WaitForChild('Common') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Common',
     addition: 2,
@@ -21,7 +21,7 @@ ToolsData.set('Slingshot1W1', {
 ToolsData.set('Slingshot2W1', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World1').WaitForChild('Uncommon') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Uncommon',
     addition: 3,
@@ -35,7 +35,7 @@ ToolsData.set('Slingshot2W1', {
 ToolsData.set('Slingshot3W1', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World1').WaitForChild('Rare') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default3',
     addition: 5,
@@ -50,7 +50,7 @@ ToolsData.set('Slingshot3W1', {
 ToolsData.set('Slingshot4W1', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World1').WaitForChild('Epic') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default4',
     addition: 8,
@@ -65,7 +65,7 @@ ToolsData.set('Slingshot4W1', {
 ToolsData.set('Slingshot5W1', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World1').WaitForChild('Legendary') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default5',
     addition: 12,
@@ -79,7 +79,7 @@ ToolsData.set('Slingshot5W1', {
 ToolsData.set('SlingshotD1W1', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World1').WaitForChild('Paid') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Luminous Stone',
     addition: 50,
@@ -95,7 +95,7 @@ ToolsData.set('SlingshotD1W1', {
 ToolsData.set('Slingshot1W2', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World2').WaitForChild('Common') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default1',
     addition: 18,
@@ -109,7 +109,7 @@ ToolsData.set('Slingshot1W2', {
 ToolsData.set('Slingshot2W2', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World2').WaitForChild('Uncommon') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default2',
     addition: 27,
@@ -123,7 +123,7 @@ ToolsData.set('Slingshot2W2', {
 ToolsData.set('Slingshot3W2', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World2').WaitForChild('Rare') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default3',
     addition: 40,
@@ -138,7 +138,7 @@ ToolsData.set('Slingshot3W2', {
 ToolsData.set('Slingshot4W2', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World2').WaitForChild('Epic') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default4',
     addition: 60,
@@ -153,7 +153,7 @@ ToolsData.set('Slingshot4W2', {
 ToolsData.set('Slingshot5W2', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World2').WaitForChild('Legendary') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default5',
     addition: 90,
@@ -167,7 +167,7 @@ ToolsData.set('Slingshot5W2', {
 ToolsData.set('Slingshot6W2', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World2').WaitForChild('Mythical') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'я четырнадцати летняя проститутка из Никгура',
     addition: 140,
@@ -181,7 +181,7 @@ ToolsData.set('Slingshot6W2', {
 ToolsData.set('SlingshotD1W2', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World2').WaitForChild('Paid') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default6',
     addition: 550,
@@ -198,7 +198,7 @@ ToolsData.set('SlingshotD1W2', {
 ToolsData.set('Slingshot1W3', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World3').WaitForChild('Common') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default1',
     addition: 200,
@@ -212,7 +212,7 @@ ToolsData.set('Slingshot1W3', {
 ToolsData.set('Slingshot2W3', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World3').WaitForChild('Uncommon') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default2',
     addition: 300,
@@ -226,7 +226,7 @@ ToolsData.set('Slingshot2W3', {
 ToolsData.set('Slingshot3W3', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World3').WaitForChild('Rare') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default3',
     addition: 450,
@@ -241,7 +241,7 @@ ToolsData.set('Slingshot3W3', {
 ToolsData.set('Slingshot4W3', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World3').WaitForChild('Epic') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default4',
     addition: 650,
@@ -256,7 +256,7 @@ ToolsData.set('Slingshot4W3', {
 ToolsData.set('Slingshot5W3', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World3').WaitForChild('Legendary') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default5',
     addition: 950,
@@ -270,7 +270,7 @@ ToolsData.set('Slingshot5W3', {
 ToolsData.set('Slingshot6W3', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World3').WaitForChild('Mythical') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'я четырнадцати летняя проститутка из Никгура',
     addition: 1400,
@@ -284,7 +284,7 @@ ToolsData.set('Slingshot6W3', {
 ToolsData.set('SlingshotD1W3', {
     model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World3').WaitForChild('Paid') as Model,
     sizeOffset: new Vector3(0,0,0),
-    rotationOffset: new CFrame(0,0,0),
+    rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
     name: 'Default6',
     addition: 5500,

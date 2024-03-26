@@ -20,7 +20,7 @@ import { BuyTypeConfig } from "shared/configs/EggConfig";
 import { EggsData } from "shared/info/EggInfo";
 import { ITradingPlayer, TradeUpdateStatus } from "shared/interfaces/TradeData";
 import { Trade } from "server/classes/TradeClass";
-import { Players, HttpService } from "@rbxts/services";
+import { Players, HttpService, BadgeService } from "@rbxts/services";
 import { PetModelManager } from "server/classes/PetModelClass";
 import { PotionType } from "shared/enums/PotionEnum";
 import { PotionsData } from "shared/info/PotionInfo";
@@ -30,13 +30,15 @@ import { ToolsData } from "shared/info/ToolInfo";
 import { IToolData, ToolValueType } from "shared/interfaces/ToolData";
 import { WorldType } from "shared/enums/WorldEnums";
 import { CreationUtilities } from "shared/utility/CreationUtilities";
-import { CodesRewardsData, DailyChestRewardData, DailyRewardsData, GroupChestRewardData, RebirthsRewardsData, SelectDailyReward, SelectSessionReward, SpinRewardData } from "shared/info/RewardInfo";
+import { CodesRewardsData, DailyChestRewardData, DailyRewardsData, FollowCodeRewardData, GroupChestRewardData, RebirthsRewardsData, SelectDailyReward, SelectSessionReward, SpinRewardData } from "shared/info/RewardInfo";
 import { IRewardData } from "shared/interfaces/RewardData";
 import { PassiveValues } from "shared/interfaces/PassiveData";
 import { FlyingObjectClass } from "server/classes/FlyingObjectClass";
 import { PetQuestsData } from "shared/info/QuestInfo";
 import { IncomeSource } from "shared/enums/IncomeEnums";
 import { Passives } from "server/classes/PassiveClass";
+import { BadgeManager } from "server/services/BadgeManager";
+import { BadgeType } from "shared/interfaces/BadgeData";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -52,6 +54,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     private _playerPetController = new PlayerPetController(this)
     private _playerEggController = new PlayerEggController(this)
     private _playerToolController = new PlayerToolController(this)
+    private _playerBadgeController = new PlayerBadgeController(this)
     private _playerValueController = new PlayerValueController(this)
     private _playerTradeController = new PlayerTradeController(this)
     private _playerWorldController = new PlayerWorldController(this)
@@ -115,6 +118,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public ShootObject = (power: number) => this._playerFlyingController.ShootObject(power)
 
     public IsFriends = (id: number) => this._playerHttpsController.CheckIsFriend(id)
+    public GivePremiumReward = () => this._playerHttpsController.GivePremiumReward()
 
     public ApplyReward = (reward: IRewardData) => this._playerRewardController.ApplyReward(reward)
     public ClaimPetQuestReward = () => this._playerRewardController.ClaimPetQuestReward()
@@ -128,6 +132,10 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public ClaimSpinReward = () => this._playerRewardController.ClaimSpinReward()
     public ClaimDailyChest = () => this._playerRewardController.ClaimDailyChest()
     public ClaimGroupChest = () => this._playerRewardController.ClaimGroupChest()
+    public RedeemFollowCode = (code: string) => this._playerRewardController.RedeemFollowCode(code)
+
+    public ClaimBadge = (id: number) => this._playerBadgeController.ClaimBadge(id)
+    public AddBadgeToInventory = (id: number) => this._playerBadgeController.AddBadgeToInventory(id)
 
     onStart() {
 
@@ -175,6 +183,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
         print(this.session.leftToFollow)
 
+        for (let badge of BadgeManager.GetBadgesByType(BadgeType.Start)) { this.ClaimBadge(badge.badgeId) }
+
         this.SetPetMultipliers()
 
         this.session.activePassives.forEach((value) => { value.onStart() })
@@ -190,9 +200,13 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             this.session.friendList.push(player.Name)
 
             component.session.activePassives.forEach((value) => { value.onFriendsChanged() })
+            for (let badge of BadgeManager.GetBadgesByType(BadgeType.Friend)) { this.ClaimBadge(badge.badgeId) }
         })
 
         this.session.activePassives.forEach((value) => { print(value); value.onFriendsChanged() })
+        for (let badge of BadgeManager.GetBadgesByType(BadgeType.Friend)) { this.ClaimBadge(badge.badgeId) }
+
+        this.GivePremiumReward()
 
         task.spawn(() => {
             this.AppendPotion(PotionType.LuckPotion)
@@ -1162,6 +1176,8 @@ class PlayerWorldController {
 
         this.player.SetStars(profileData.Values.StarsVal - worldInfo.price)
         profileData.Config.MaxWorld = world
+
+        for (let badge of BadgeManager.GetBadgesByType(BadgeType.World)) { this.player.ClaimBadge(badge.badgeId) }
         //this.ChangeWorld()
     }
 
@@ -1329,6 +1345,8 @@ class PlayerRewardController {
         if (reward.Additional?.get('MaxPets')) { this.player.profile.Data.Config.MaxPets += reward.Additional?.get('MaxPets')! }
         if (reward.Additional?.get('SpinCount')) { this.player.profile.Data.StatValues.SpinCount += reward.Additional?.get('SpinCount')! }
 
+        if (reward.Additional?.get('StrengthMul')) { this.player.profile.Data.Multipliers.StrengthMul += reward.Additional?.get('StrengthMul')! }
+
         this.player.SetStrength(profile.Values.StrengthVal + (reward.Values?.Strength || 0))
         this.player.SetStars(profile.Values.StarsVal + (reward.Values?.Stars || 0))
         this.player.SetWins(profile.Values.WinsVal + (reward.Values?.Wins || 0))
@@ -1404,6 +1422,17 @@ class PlayerRewardController {
         profileData.RedeemedCodes.push(code)
 
         this.ApplyReward(selectedReward)
+
+    }
+
+    public RedeemFollowCode(code: string) {
+        let profileData = this.player.profile.Data
+
+        if (code.find('@').size() < 1) { return }
+        if (profileData.RedeemedCodes.includes('FollowCode')) { return }
+
+        profileData.RedeemedCodes.push('FollowCode')
+        this.ApplyReward(FollowCodeRewardData)
 
     }
 
@@ -1492,8 +1521,10 @@ class PlayerRewardController {
 
         profileData.StatValues.LastDailyChestTime = os.time()
 
-        let data = this.GetChanceReward(DailyChestRewardData)
-        this.ApplyReward(data.reward)
+        for (let i = 0; i < 2; i ++) {
+            let data = this.GetChanceReward(DailyChestRewardData)
+            this.ApplyReward(data.reward)
+        }
 
         this.player.replica.SetValue('Profile.StatValues.LastDailyChestTime', profileData.StatValues.LastDailyChestTime)
     }
@@ -1549,6 +1580,16 @@ class PlayerHttpsController {
 
         return result
     }
+
+    public GivePremiumReward() {
+        let sessionData = this.player.session
+        let profileData = this.player.profile.Data
+
+        if (this.player.instance.MembershipType !== Enum.MembershipType.Premium) { return }
+
+        profileData.Multipliers.WinsMul += 0.25
+        profileData.Config.Luck += 0.25
+    }
 }
 
 class PlayerFlyingController {
@@ -1582,7 +1623,7 @@ class PlayerFlyingController {
             ignoreFolder.Parent = game.Workspace
         }
 
-        flyingPart.CFrame = new CFrame(currentWorld.shootPosition)
+        flyingPart.CFrame = new CFrame(currentWorld.startingPosition)
         flyingPart.Anchored = true
         flyingPart.Parent = ignoreFolder
 
@@ -1603,17 +1644,13 @@ class PlayerFlyingController {
         print(profileData.Values.StrengthVal, currentWorld.density, power)
         print(profileData.Values.StrengthVal/currentWorld.gravity/3*power, profileData.Values.StrengthVal/currentWorld.density*power)
 
-        let object = new FlyingObjectClass(
-            flyingPart, 
-            new Vector3(0, profileData.Values.StrengthVal/currentWorld.gravity/3*power, -profileData.Values.StrengthVal/currentWorld.density*power), 
-            currentWorld.shootPosition,
-            { gravity: currentWorld.gravity, density: currentWorld.density, length: currentWorld.length },
-        )
+        let object = new FlyingObjectClass(flyingPart, profileData.Values.StrengthVal*power, sessionData.currentWorld)
+        let length = currentWorld.startingPosition.sub(currentWorld.endingPosition).Magnitude
         
         object.BindToStop((obj) => {
             print('ended')
-            print(currentWorld!.reward * math.max((obj.TravelledDistance / currentWorld!.length), .01) * this.player.CalculateMultiplier('wins'))
-            this.player.SetWins( profileData.Values.WinsVal + currentWorld!.reward * math.max((obj.TravelledDistance / currentWorld!.length), .01) * this.player.CalculateMultiplier('wins') )
+            print(currentWorld!.reward * math.max((obj.Distance / length), .01) * this.player.CalculateMultiplier('wins'))
+            this.player.SetWins( profileData.Values.WinsVal + currentWorld!.reward * math.max((obj.Distance / length), .01) * this.player.CalculateMultiplier('wins') )
             sessionData.currentFlyingObject!.part.Destroy()
             sessionData.currentFlyingObject = undefined
             this.player.replica.SetValue('Session.currentFlyingObject', undefined)
@@ -1623,6 +1660,41 @@ class PlayerFlyingController {
         flyingPart.SetNetworkOwner(undefined)
         print('started')
         object.Activate()
+    }
+
+}
+
+class PlayerBadgeController { // add a debug method if playerData has badge but playerInventory doesnt (not sure about request rate)
+
+    private player: ServerPlayerComponent
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+
+    public ClaimBadge(id: number) {
+        let profileData = this.player.profile.Data
+        let badge = BadgeManager.GetBadgeById(id)
+
+        if (!badge) { return }
+        if (profileData.Badges.includes(badge.name)) { return }
+
+        let result = badge.checkCallback(this.player) // this one also gives stuff
+        if (!result) { return }
+
+        profileData.Badges.push(badge.name)
+        this.AddBadgeToInventory(id)
+    }
+
+    public AddBadgeToInventory(id: number) {
+        let profileData = this.player.profile.Data
+        let badge = BadgeManager.GetBadgeById(id)
+
+        if (!badge) { return }
+        if (!profileData.Badges.includes(badge.name)) { return }
+        if (BadgeService.UserHasBadgeAsync(this.player.instance.UserId, id)) { return }
+
+        BadgeService.AwardBadge(this.player.instance.UserId, id)
     }
 
 }

@@ -1,19 +1,32 @@
 import ProfileService from "@rbxts/profileservice";
 import { ProfileMetaData } from "@rbxts/profileservice/globals";
 import { DataStoreService, Players } from "@rbxts/services";
+import { GlobalDataService } from "server/classes/GlobalDataStoreService";
 import { OrderedDataService } from "server/classes/OrderedDataStoreService";
 import { DBName, ORDERED_UPDATE_TIME, defaultValue } from "shared/configs/ProfileConfig";
 import { IOrderedData, IProfileData } from "shared/interfaces/ProfileData";
 import Functions from "shared/utility/LuaUtilFunctions";
 
-task.spawn(() => {
+let IsStarted = false
 
-    while (true) {
-        OrderedDataService.updateValues()
-        task.wait(ORDERED_UPDATE_TIME)
-    }
+let StartUpdating = () => {
+    if (IsStarted) { return }
+    IsStarted = true
+
+    task.spawn(() => {
+        
+        while (true) {
+            print('Replicating')
     
-})
+            OrderedDataService.updateValues()
+            OrderedDataService.replicateLeaderboardValues()
+            GlobalDataService.updateValues()
+            task.wait(ORDERED_UPDATE_TIME)
+        }
+        
+    })
+}
+
 
 
 const ProfileData = ProfileService.GetProfileStore<IProfileData, ProfileMetaData>(DBName, defaultValue)
@@ -32,6 +45,9 @@ export const LoadProfile = (player: Player) => {
 
     print('Formatted', profile.Data)
     print('Current Tool', profile.Data.EquippedTool)
+
+    print('ReplicReplicatingReplicatingReplicatingReplicatingating')
+    StartUpdating()
 
     profile.AddUserId(player.UserId);
     profile.ListenToRelease(()=>{

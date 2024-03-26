@@ -1,6 +1,7 @@
 import { ProductType } from "shared/enums/MarketEnums";
 import { IServerPlayerComponent } from "shared/interfaces/PlayerData";
 import { IProductData } from "shared/interfaces/ProductData";
+import { defaultGlobal } from "./DatastoreInfo";
 
 export const MarketNamings = new Map<number, IProductData>([
     [1701055226, {name: 'test', producttype: ProductType.DevProduct}],
@@ -83,8 +84,22 @@ export const MarketNamings = new Map<number, IProductData>([
     [1779439942, {name: 'neonpack', producttype: ProductType.DevProduct}],
     [1779440646, {name: 'spacepack', producttype: ProductType.DevProduct}],
     [1779438971, {name: 'starterpack', producttype: ProductType.DevProduct}],
+    [1762896804, {name: 'unlocksessiongifts', producttype: ProductType.DevProduct}],
 
     [1762896093, {name: 'buy1spin', producttype: ProductType.DevProduct}],
     [1762896251, {name: 'buy10spin', producttype: ProductType.DevProduct}],
     [1762896353, {name: 'buy100spin', producttype: ProductType.DevProduct}],
+
+    [1779420282, {name: 'limited1', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
+        if (defaultGlobal.get('Limited1')! < 0) { return false }
+        return true
+    },}],
+    [1779420957, {name: 'limited2', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
+        if (defaultGlobal.get('Limited2')! < 0) { return false }
+        return true
+    },}],
+    [1779421279, {name: 'limited3', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
+        if (defaultGlobal.get('Limited3')! < 0) { return false }
+        return true
+    },}],
 ])
