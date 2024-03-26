@@ -9,7 +9,7 @@ ToolsData.set('Slingshot1W1', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: new CFrame(0,0,0),
 
-    name: 'Default1',
+    name: 'Common',
     addition: 2,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -23,7 +23,7 @@ ToolsData.set('Slingshot2W1', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: new CFrame(0,0,0),
 
-    name: 'Default2',
+    name: 'Uncommon',
     addition: 3,
     firerate: 1/1,
     effectname: 'Shoot',
@@ -81,7 +81,7 @@ ToolsData.set('SlingshotD1W1', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: new CFrame(0,0,0),
 
-    name: 'Default6',
+    name: 'Luminous Stone',
     addition: 50,
     firerate: 1/1,
     effectname: 'Shoot',
