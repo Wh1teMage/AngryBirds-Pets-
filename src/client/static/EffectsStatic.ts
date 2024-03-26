@@ -5,10 +5,15 @@ import { EffectsUtilities } from "shared/utility/EffectsUtilities"
 import { TweenService } from "@rbxts/services";
 import { ToolOperationStatus } from "shared/interfaces/ToolData";
 import { Binding } from "client/classes/BindbingValues";
+import { EggBuyType } from "shared/interfaces/EggData";
+import { BillboardFabric } from "client/components/UIComponents/BillboardComponent";
+import { defaultGlobal } from "shared/info/DatastoreInfo";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const player = Players.LocalPlayer
-//const circle = playerGui.WaitForChild('TestingStuff').WaitForChild('Frame') as Frame
+
+const mainUI = playerGui.WaitForChild('MainUI') as ScreenGui
+const circle = mainUI.WaitForChild('Templates').WaitForChild('ClickEffect') as ImageLabel
 
 let canFireUseEvents = true
 
@@ -34,15 +39,20 @@ Effects.set('HoverSound', () => {
 })
 
 Effects.set('ClickEffect', (additional) => {
-    /*
+    
     let clonedCircle = circle.Clone()
     let position = additional!.get('position') as Vector2
-    clonedCircle.Parent = playerGui.WaitForChild('TestingStuff')
-    clonedCircle.Position = UDim2.fromOffset(position.X, position.Y)
-    TweenService.Create(clonedCircle, new TweenInfo(0.25), {'Size': UDim2.fromScale(0.5, 0.5)}).Play()
+
+    clonedCircle.Visible = true
+    clonedCircle.Parent = mainUI
+    clonedCircle.Position = UDim2.fromOffset(position.X, position.Y+100)
+
+    TweenService.Create(clonedCircle, new TweenInfo(0.25), {'Size': UDim2.fromScale(0.15, 0.15)}).Play()
+    TweenService.Create(clonedCircle, new TweenInfo(0.25), {'ImageTransparency': 1}).Play()
+
     task.wait(0.25)
     clonedCircle.Destroy()
-    */
+    
 })
 
 Effects.set('ChangeUseStatus', (additional) => {
@@ -114,5 +124,34 @@ Effects.set('SpinStarted', (additional) => {
         TweenService.Create(spinHolder, new TweenInfo(delta, Enum.EasingStyle.Linear), { 'Rotation': i }).Play()
         task.wait(delta)
     }
+
+})
+
+Effects.set('OpenEgg', (additional) => {
+    let buyType = additional!.get('BuyType') as EggBuyType
+    let billboards = BillboardFabric.GetBillboards()
+
+    billboards.forEach((val) => {
+        if (!val.instance.Enabled) { return }
+        Events.BuyEgg(val.instance.Name, buyType)
+    })
+})
+
+Effects.set('LimitedPets', (additional) => {
+    let info = additional!.get('Info') as Map<string, number>
+    print(info)
+    let scrollingFrame = player.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('Store').WaitForChild('ScrollingFrame') as ScrollingFrame
+    let limitedPets = scrollingFrame.WaitForChild('LimitedPets').WaitForChild('Pets')
+
+    let petList = new Map<string, string>([
+        ['Limited1', 'LimitedPet1'],
+        ['Limited2', 'LimitedPet2'],
+        ['Limited3', 'LimitedPet3'],
+    ])
+
+    info.forEach((val, key) => {
+        let petUI = limitedPets.WaitForChild(petList.get(key)!);
+        (petUI.WaitForChild('Left') as TextLabel).Text = tostring(val)+'/'+tostring(defaultGlobal.get(key))+' Left'
+    })
 
 })

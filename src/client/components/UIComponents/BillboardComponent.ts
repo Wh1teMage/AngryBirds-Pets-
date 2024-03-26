@@ -9,7 +9,7 @@ let updateBillboards = (primaryPart: BasePart) => {
 
         if (!v.instance.Parent) { continue }
 
-        let currentDistance = ((v.instance.Parent as BasePart).Position.sub(primaryPart.Position)).Magnitude
+        let currentDistance = ((v.instance.Adornee!.Parent as BasePart).Position.sub(primaryPart.Position)).Magnitude
 
         if (currentDistance > v.radius && v.instance.Enabled) { v.Leave(); v.instance.Enabled = false; continue }
         if (currentDistance <= v.radius && !v.instance.Enabled) { v.Enter(); v.instance.Enabled = true }
@@ -55,10 +55,14 @@ export class BillboardComponent extends BaseComponent<Attributes, BillboardGui> 
     }
 
     public Enter() {
+        print('Billboard Started')
+
         this._onLeave?.forEach((val) => { val(this.instance) })
     }
 
     public Leave() {
+        print('Billboard Ended')
+
         this._onLeave?.forEach((val) => { val(this.instance) })
     }
 

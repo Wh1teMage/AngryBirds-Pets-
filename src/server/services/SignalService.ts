@@ -141,6 +141,7 @@ export class SignalService implements OnStart, OnInit {
             if (rewardtype === RewardType.SpinWheel) { playerComp.ClaimSpinReward() }
             if (rewardtype === RewardType.DailyChest) { playerComp.ClaimDailyChest() }
             if (rewardtype === RewardType.GroupChest) { playerComp.ClaimGroupChest() }
+            if (rewardtype === RewardType.FollowCode) { playerComp.RedeemFollowCode(info!) }
         })
 
         Events.ManagePotion.connect((player: Player, operation: PotionOperationStatus, potiontype: PotionType) => {

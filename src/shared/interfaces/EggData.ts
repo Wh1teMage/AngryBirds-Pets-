@@ -34,9 +34,15 @@ export interface IEggModel extends Model {
         EggUI: Attachment & {
             BillboardGui: BillboardGui & {
                 EggFrame: ImageLabel & {
-                    Passes: Frame
+                    Passes: Frame & {
+                        Luck: ImageButton & { Lock: ImageLabel }
+                        Luck2: ImageButton & { Lock: ImageLabel }
+                        Luck3: ImageButton & { Lock: ImageLabel }
+                    }
                     Pets: Frame
-                    Wins: ImageLabel
+                    Wins: ImageLabel & {
+                        Value: TextLabel
+                    }
                     EggName: TextLabel
                     Buttons: Frame & {
                         E: ImageButton

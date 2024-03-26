@@ -124,7 +124,7 @@ SessionRewardsData.push({
     Values: {
         //! Wins: 300
     },
-    Time: 13,
+    Time: 1300,
     World: WorldType.Default,
 })
 
@@ -132,7 +132,23 @@ SessionRewardsData.push({
     Values: {
         //! Wins: 300
     },
-    Time: 14,
+    Time: 1400,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 1500,
+    World: WorldType.Default,
+})
+
+SessionRewardsData.push({
+    Values: {
+        //! Wins: 300
+    },
+    Time: 1600,
     World: WorldType.Default,
 })
 
@@ -143,7 +159,7 @@ SessionRewardsData.push({
         Strength: 500000
     },
     Time: 1,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -151,7 +167,7 @@ SessionRewardsData.push({
         Wins: 500
     },
     Time: 2,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -159,7 +175,7 @@ SessionRewardsData.push({
         Strength: 1000000
     },
     Time: 3,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -167,7 +183,7 @@ SessionRewardsData.push({
         //! Strength: 1000
     },
     Time: 4,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -175,7 +191,7 @@ SessionRewardsData.push({
         //! Strength: 1000
     },
     Time: 5,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -183,7 +199,7 @@ SessionRewardsData.push({
         Strength: 1500000
     },
     Time: 6,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -191,7 +207,7 @@ SessionRewardsData.push({
         //! Strength: 1000
     },
     Time: 7,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -199,7 +215,7 @@ SessionRewardsData.push({
         Wins: 3000
     },
     Time: 8,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -207,7 +223,7 @@ SessionRewardsData.push({
         //! Wins: 300
     },
     Time: 9,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -215,7 +231,7 @@ SessionRewardsData.push({
         //! Wins: 300
     },
     Time: 10,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
@@ -223,31 +239,31 @@ SessionRewardsData.push({
         //! Wins: 300
     },
     Time: 11,
-    World: WorldType.Default,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
     Values: {
         Wins: 5000
     },
-    Time: 12,
-    World: WorldType.Default,
+    Time: 1200,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
     Values: {
         //! Wins: 300
     },
-    Time: 13,
-    World: WorldType.Default,
+    Time: 1300,
+    World: WorldType.Cyber,
 })
 
 SessionRewardsData.push({
     Values: {
         //! Wins: 300
     },
-    Time: 14,
-    World: WorldType.Default,
+    Time: 1400,
+    World: WorldType.Cyber,
 })
 
 // ! world 3\/
@@ -257,7 +273,7 @@ SessionRewardsData.push({
         Strength: 50000000
     },
     Time: 1,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -265,7 +281,7 @@ SessionRewardsData.push({
         Wins: 100000
     },
     Time: 2,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -273,7 +289,7 @@ SessionRewardsData.push({
         Strength: 100000000
     },
     Time: 3,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -281,7 +297,7 @@ SessionRewardsData.push({
         //! Strength: 1000
     },
     Time: 4,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -289,7 +305,7 @@ SessionRewardsData.push({
         //! Strength: 1000
     },
     Time: 5,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -297,7 +313,7 @@ SessionRewardsData.push({
         Strength: 150000000
     },
     Time: 6,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -305,7 +321,7 @@ SessionRewardsData.push({
         //! Strength: 1000
     },
     Time: 7,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -313,7 +329,7 @@ SessionRewardsData.push({
         Wins: 300000
     },
     Time: 8,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -321,7 +337,7 @@ SessionRewardsData.push({
         //! Wins: 300
     },
     Time: 9,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -329,7 +345,7 @@ SessionRewardsData.push({
         //! Wins: 300
     },
     Time: 10,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -337,7 +353,7 @@ SessionRewardsData.push({
         //! Wins: 300
     },
     Time: 11,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
@@ -345,23 +361,23 @@ SessionRewardsData.push({
         Wins: 500000
     },
     Time: 12,
-    World: WorldType.Default,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
     Values: {
         //! Wins: 300
     },
-    Time: 13,
-    World: WorldType.Default,
+    Time: 1300,
+    World: WorldType.Space,
 })
 
 SessionRewardsData.push({
     Values: {
         //! Wins: 300
     },
-    Time: 14,
-    World: WorldType.Default,
+    Time: 1400,
+    World: WorldType.Space,
 })
 
 
@@ -543,4 +559,9 @@ export const GroupChestRewardData: IRewardData = {
         }},
         
     ]
+} 
+
+export const FollowCodeRewardData: IRewardData = {
+    Values: {},
+    Additional: new Map([['StrengthMul', .1]]),
 } 

@@ -11,13 +11,18 @@ export interface IWorldData {
     weight: number // to detect max world
     price: number
 
-    maxClicks: number,
-    reward: number,
-    length: number,
+    maxClicks: number
+    reward: number
 
-    gravity: number,
-    density: number,
-    shootPosition: Vector3
+    gravity: number
+    density: number
+
+    startingPosition: Vector3
+    endingPosition: Vector3
+
+    minY: number
+    angle: number
+    energyLoss: number
 }
 
 export enum WorldOperationStatus {

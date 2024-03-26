@@ -50,6 +50,7 @@ export const defaultValue: IProfileData = {
     },
 
     CompletedQuests: [],
+    Badges: [],
     CurrentQuestsProgress: new Map(),
 
     ActiveBuffs: [],

@@ -38,12 +38,12 @@ EggsData.set('Stone', {
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 1, name: 'Cat' },
-        { weight: 10, name: 'Dog' },
-        { weight: 10, name: 'White Bunny' },
-        { weight: 10, name: 'Elephant' },
-        { weight: 10, name: 'Butterfly' },
+        //{ weight: 10, name: 'Dog' },
+        //{ weight: 10, name: 'White Bunny' },
+        //{ weight: 10, name: 'Elephant' },
+        //{ weight: 10, name: 'Butterfly' },
     ],
-    //model: Workspace.WaitForChild('TestEgg') as IEggModel
+    model: Workspace.WaitForChild('World1').WaitForChild('StoneEgg') as IEggModel
 })
 
 EggsData.set('Ore', {

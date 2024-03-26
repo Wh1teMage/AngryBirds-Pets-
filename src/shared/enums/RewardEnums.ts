@@ -8,4 +8,5 @@ export enum RewardType {
     SpinWheel = 'SpinWheel',
     DailyChest = 'DailyChest',
     GroupChest = 'GroupChest',
+    FollowCode  = 'FollowCode',
 }

@@ -48,6 +48,7 @@ export interface IProfileData {
     }
 
     CompletedQuests: Array<string>
+    Badges: Array<string>
     CurrentQuestsProgress: Map<string, Map<string, any>>
 
     ActiveBuffs: Array<{name: string, endTime: number, startTime: number, source: string}>
@@ -66,7 +67,7 @@ export interface IProfileData {
     RedeemedCodes: Array<string>
 
     StoredEggs: Array<{name: string, amount: number}>
-
+    
     CONSTANTS: {
         VERSION: number
         name: string,
@@ -74,7 +75,11 @@ export interface IProfileData {
 }
 
 export interface IOrderedData {
-    coins: number
+    StrengthVal: number
+    WinsVal: number
+    IngameTime: number
+    RobuxSpent: number
+    RebirthsVal: number
 }
 
 export interface IOrderedDataService {
