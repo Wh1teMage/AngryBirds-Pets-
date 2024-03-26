@@ -13,6 +13,7 @@ export interface IWorldData {
 
     maxClicks: number
     reward: number
+    starsReward: number
 
     gravity: number
     density: number

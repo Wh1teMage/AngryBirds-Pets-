@@ -8,6 +8,8 @@ import { Binding } from "client/classes/BindbingValues";
 import { EggBuyType } from "shared/interfaces/EggData";
 import { BillboardFabric } from "client/components/UIComponents/BillboardComponent";
 import { defaultGlobal } from "shared/info/DatastoreInfo";
+import { EggsData } from "shared/info/EggInfo";
+import { PetsData } from "shared/info/PetInfo";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const player = Players.LocalPlayer
@@ -154,4 +156,52 @@ Effects.set('LimitedPets', (additional) => {
         (petUI.WaitForChild('Left') as TextLabel).Text = tostring(val)+'/'+tostring(defaultGlobal.get(key))+' Left'
     })
 
+})
+
+Effects.set('EggHatched', (additional) => {
+    let hatchFrame = mainUI.WaitForChild('HatchingFrame') as ViewportFrame
+
+    if (!hatchFrame.CurrentCamera) {
+        let viewCamera = new Instance('Camera')
+        viewCamera.CFrame = new CFrame(new Vector3(0,0,0), new Vector3(0,0,1))
+        viewCamera.Parent = hatchFrame
+        hatchFrame.CurrentCamera = viewCamera
+    }
+
+    let egg = EggsData.get(additional!.get('EggName'))!
+    let pets = []
+    
+    for (let name of additional!.get('Pets')) {
+        pets.push(PetsData.get(name))
+    }
+
+    for (let pet of pets) {
+
+        let eggModel = egg.model!.Clone()
+        eggModel.PrimaryPart = eggModel.WaitForChild('Egg') as BasePart
+
+        eggModel.PivotTo(new CFrame(new Vector3(0,0,7), new Vector3(0,0,0)).mul(CFrame.Angles(math.rad(90), 0, 0)))
+        eggModel.Parent = hatchFrame
+        
+        task.spawn(() => {
+            let delta = .1
+            let i = 0
+            while (i < 360*10) {
+                i += delta
+                delta += .1
+                eggModel.PivotTo(new CFrame(eggModel.GetPivot().Position).mul(CFrame.Angles(math.rad(90), math.sin(math.rad(i)), 0)))
+                task.wait()
+            }
+
+            let model = pet!.model.Clone()
+            model.PivotTo(new CFrame(eggModel.GetPivot().Position).mul(pet!.stats.rotationOffset))
+            model.Parent = hatchFrame
+
+            eggModel.Destroy()
+            
+            task.delay(5, () => {
+                model.Destroy()
+            })
+        })
+    }
 })

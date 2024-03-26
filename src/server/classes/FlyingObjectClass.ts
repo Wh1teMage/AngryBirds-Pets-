@@ -7,6 +7,7 @@ export class FlyingObjectClass {
     public BodyVelocity: BodyVelocity
     public BodyPosition: BodyPosition
     public Distance: number = 0
+    public Laps: number = 0
 
     private delta = .03
 
@@ -23,7 +24,6 @@ export class FlyingObjectClass {
     private minY: number
     private angle: number
     private energyLoss: number
-
 
     private _onStop: Array<(obj: FlyingObjectClass) => void> = []
     private _onStart: Array<(obj: FlyingObjectClass) => void> = []
@@ -115,6 +115,7 @@ export class FlyingObjectClass {
             if (this.part.Position.Z < this.endingPosition.Z) {
                 this.part.Position = new Vector3(this.startingPosition.X, this.part.Position.Y, this.startingPosition.Z) 
                 this.currentVelocity = this.currentVelocity.mul((100-this.energyLoss)/100)  
+                this.Laps += 1
             }
             
             if ((this.part.Position.Y+this.currentVelocity.Y*this.delta < this.minY) && (this.currentVelocity.Y < 0)) {

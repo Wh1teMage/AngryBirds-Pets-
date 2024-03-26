@@ -528,8 +528,8 @@ export class UIController implements OnStart, OnInit {
             print('Ended')
             this.currentlySearching = search.Text
 
-            if (inventoryButtons.Visible) { this.updatePets() }
-            if (massDeleteButtons.Visible) { this.updateMassDelete() }
+            if (inventoryButtons.Visible) { this.updatePets(); return }
+            if (massDeleteButtons.Visible) { this.updateMassDelete(); return }
         })
     }
 
@@ -2019,11 +2019,46 @@ export class UIController implements OnStart, OnInit {
     }
 
     private renderFlyingObjectPosition() {
-        //a
+        print('FIRE IN THE HOLE!!!')
+        let accuracyLabel = this.UIPath.UpperList.Accuracy.get<ImageComponent>().instance.WaitForChild('Value') as TextLabel
+        let roadFrame = this.UIPath.LowerList.Road.get<ImageComponent>().instance
 
         let sessionData = this._playerController.replica.Data.Session
-        let obj = sessionData
+        let profileData = this._playerController.replica.Data.Profile
 
+        let obj = Workspace.WaitForChild('_ignoreObjects').WaitForChild(sessionData.currentFlyingObject!.partName) as Part
+        let world = WorldsData.get(sessionData.currentWorld)!
+
+        let circles = 0
+        let previousPosition = obj.Position
+
+        let length = world.startingPosition.sub(world.endingPosition).Magnitude
+        let power = profileData.Values.StrengthVal
+
+        let lapsText = roadFrame.WaitForChild('You').WaitForChild('Laps')  as TextLabel
+
+        task.wait(6)
+
+        task.spawn(() => {
+            while (this.isFlying) {
+
+                if (obj.Position.sub(previousPosition).Magnitude > length/2) { circles += 1 }
+                if (circles > 0) { 
+                    lapsText.Visible = true
+                    lapsText.Text = '🔥 LAPS '+tostring(circles)
+                }
+    
+                let perc = (1-obj.Position.sub(world.endingPosition).Magnitude/length)*0.9
+                accuracyLabel.Text = GUIUtilities.getSIPrefixSymbol(power)
+
+                power = math.max(0, power-world.density)
+    
+                TweenService.Create(roadFrame.WaitForChild('You') as ImageLabel, new TweenInfo(.1, Enum.EasingStyle.Linear), {'Position': UDim2.fromScale(perc, -0.586)}).Play()
+    
+                previousPosition = obj.Position
+                task.wait(.1)
+            }
+        })
 
     }
 
@@ -2739,6 +2774,8 @@ export class UIController implements OnStart, OnInit {
         this._playerController.replica.ListenToChange('Profile.Pets', (newValue, oldValue) => {
             this.Pets = newValue
 
+            print('PetsChanged')
+
             if (this.UIPath.PetInventory.Buttons.get<FrameComponent>().instance.Visible) {
                 let newEquippedPets = this.getEquippedPets(this.Pets)
 
@@ -2880,22 +2917,37 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Session.currentFlyingObject', (newValue) => {
-            print(newValue)
+            print(newValue, 'Firing')
             if (newValue) {
                 camera.CameraType = Enum.CameraType.Custom
                 camera.CameraSubject = Workspace.WaitForChild('_ignoreObjects').WaitForChild(newValue.partName) as BasePart
 
+                this.isFlying = true
                 this.renderFlyingObjectPosition()
+
                 PlayEffect('ChangeUseStatus', new Map([['bool', false]]))
+
+                this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible = false
+                this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible = true
+
+                print('this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible', this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible)
+                print('this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible', this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible)
+
                 return 
             }
-
-            //a
 
             camera.CameraType = Enum.CameraType.Custom
             camera.CameraSubject = this._playerController.component.instance.Character?.WaitForChild('Humanoid') as Humanoid
 
             PlayEffect('ChangeUseStatus', new Map([['bool', true]]))
+
+            this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible = true
+            this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible = false
+
+            print('this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible', this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible)
+            print('this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible', this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible)
+
+            accuracyLabel.Text = GUIUtilities.getSIPrefixSymbol(this._playerController.replica.Data.Profile.Values.StrengthVal)
 
             this.isFlying = false
         })

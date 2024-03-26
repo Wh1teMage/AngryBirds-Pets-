@@ -31,7 +31,7 @@ export class OrderedDataService { //write get method
             value.name = key
             let store = DataStoreService.GetOrderedDataStore(value.name)
             if (!store) { warn(value.name+' datastore doesnt exist!'); return }
-            let pages = store.GetSortedAsync(true, 100)
+            let pages = store.GetSortedAsync(false, 100)
             
             value.datastore = store
             value.values = []

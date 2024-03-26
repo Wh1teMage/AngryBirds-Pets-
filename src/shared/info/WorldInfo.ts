@@ -16,6 +16,7 @@ WorldsData.set(WorldType.Default, {
 
     maxClicks: 100,
     reward: 100,
+    starsReward: 10,
 
     gravity: 10,
     density: 10**3,
@@ -24,7 +25,7 @@ WorldsData.set(WorldType.Default, {
     endingPosition: new Vector3(0, 53, -3733),
 
     minY: 28,
-    angle: 30,
+    angle: 10,
     energyLoss: 50
 })
 
@@ -40,6 +41,7 @@ WorldsData.set(WorldType.Cyber, {
 
     maxClicks: 100,
     reward: 1000,
+    starsReward: 10,
 
     gravity: 10,
     density: 10**3,
@@ -48,7 +50,7 @@ WorldsData.set(WorldType.Cyber, {
     endingPosition: new Vector3(0, 53, -3733),
 
     minY: 28,
-    angle: 30,
+    angle: 10,
     energyLoss: 50
 })
 
@@ -64,6 +66,7 @@ WorldsData.set(WorldType.Space, {
 
     maxClicks: 100,
     reward: 1000,
+    starsReward: 10,
 
     gravity: 10,
     density: 10**3,
@@ -72,6 +75,6 @@ WorldsData.set(WorldType.Space, {
     endingPosition: new Vector3(0, 53, -3733),
 
     minY: 28,
-    angle: 30,
+    angle: 10,
     energyLoss: 50
 })

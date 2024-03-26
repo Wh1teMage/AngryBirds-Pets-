@@ -747,6 +747,8 @@ class PlayerEggController {
 
         if (!eggInfo) {return}
 
+        let pets: string[] = []
+
         for (let i = 0; i < amount; i++) {
             let petName = PetUtilities.RandomWeight(eggInfo.petchances, profileData.Config.Luck)
             let pet = PetUtilities.NameToDBPetWithEgg(petName, eggInfo.name)
@@ -757,8 +759,14 @@ class PlayerEggController {
             if (goldenChance <= 10) { pet!.additional.evolution = Evolutions.Gold }
             if (voidChance <= 5) { pet!.additional.evolution = Evolutions.Void }
 
+            pets.push(pet!.name)
+
             this.player.AppendPet(pet)
         }
+        
+        Events.ReplicateEffect.fire(this.player.instance, 'EggHatched', new Map<string, any>([
+            ['EggName', name], ['Pets', pets]
+        ]))
     }
 
     public BuyEgg(name: string, buytype: EggBuyType) {
@@ -882,7 +890,7 @@ class PlayerPetController {
         return count
     }
 
-    public EquipPet(pet: IDBPetData) {
+    public EquipPet(pet: IDBPetData, ignore?: boolean) {
         let profileData = this.player.profile.Data
         let petIndex = -1
 
@@ -896,10 +904,11 @@ class PlayerPetController {
         PetModelManager.AddPet(this.player.instance, profileData.Pets[petIndex])
         this.player.SetPetMultipliers()
 
+        if (ignore) { return }
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
 
-    public UnequipPet(pet: IDBPetData) {
+    public UnequipPet(pet: IDBPetData, ignore?: boolean) {
         let profileData = this.player.profile.Data
         let petIndex = -1
 
@@ -912,6 +921,7 @@ class PlayerPetController {
         PetModelManager.RemovePet(this.player.instance, profileData.Pets[petIndex])
         this.player.SetPetMultipliers()
         
+        if (ignore) { return }
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
 
@@ -936,21 +946,24 @@ class PlayerPetController {
         this.player.session.activePassives.forEach((passive) => { passive.onPetAdded(pet) })
     }
 
-    public RemovePet(pet: IDBPetData) {
+    public RemovePet(pet: IDBPetData, ignore?: boolean) {
         let profileData = this.player.profile.Data
         let petIndex = -1
 
         profileData.Pets.forEach((value, index) => { if (Functions.compareObjects(pet, value) && !value.locked) { petIndex = index } })
         if (petIndex < 0) { return }
 
-        if ( profileData.Pets[petIndex].equipped ) { this.UnequipPet(pet) }
+        if ( profileData.Pets[petIndex].equipped ) { this.UnequipPet(pet, ignore) }
 
         profileData.Pets.remove(petIndex)
+
+        if (ignore) { return }
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
 
     public RemovePets(pets: IDBPetData[]) {
-        pets.forEach((val) => { this.RemovePet(val) })
+        pets.forEach((val) => { this.RemovePet(val, true) })
+        this.player.replica.SetValue('Profile.Pets', this.player.profile.Data.Pets)
     }
 
     public CraftAll() {
@@ -1650,7 +1663,10 @@ class PlayerFlyingController {
         object.BindToStop((obj) => {
             print('ended')
             print(currentWorld!.reward * math.max((obj.Distance / length), .01) * this.player.CalculateMultiplier('wins'))
+
             this.player.SetWins( profileData.Values.WinsVal + currentWorld!.reward * math.max((obj.Distance / length), .01) * this.player.CalculateMultiplier('wins') )
+            this.player.SetStars( obj.Laps * currentWorld!.starsReward )
+
             sessionData.currentFlyingObject!.part.Destroy()
             sessionData.currentFlyingObject = undefined
             this.player.replica.SetValue('Session.currentFlyingObject', undefined)
