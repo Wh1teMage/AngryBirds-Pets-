@@ -1,5 +1,5 @@
 export enum WorldType {
-    Default = 'Default',
-    Cyber = 'Cyber',
+    Cave = 'Cave',
+    NeonCity = 'Neon City',
     Space = 'Space',
 }

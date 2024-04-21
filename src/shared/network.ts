@@ -10,6 +10,7 @@ import { RewardType } from "./enums/RewardEnums";
 import { FlyingObjectStatus } from "./enums/FlyingObjectEnums";
 import { PotionOperationStatus } from "./interfaces/PotionData";
 import { PotionType } from "./enums/PotionEnum";
+import { ReplicationOperationStatus } from "./enums/ReplicationEnums";
 
 interface ClientToServerEvents {
     PurchasePrompt: (productid: number, giftid?: number) => void
@@ -20,7 +21,7 @@ interface ClientToServerEvents {
     ManageTrade: (operation: TradeOperationStatus, status?: TradeUpdateStatus, pet?: IDBPetData) => void
     ManagePet: (operation: PetOperationStatus, pet: IDBPetData, count?: number) => void
 
-    ManagePets: (operation: PetOperationStatus, pets?: IDBPetData[] | string) => void
+    ManagePets: (operation: PetOperationStatus, pets?: IDBPetData[] | string | string[]) => void
 
     ManageTool: (operation: ToolOperationStatus, toolname: string) => void
     ManageWorld: (operation: WorldOperationStatus, world?: WorldType) => void
@@ -29,6 +30,7 @@ interface ClientToServerEvents {
     ClaimReward: (rewardtype: RewardType, info?: any) => void
 
     ShootObject: (operation: FlyingObjectStatus, power?: number) => void
+    ReplicateValues: (operation: ReplicationOperationStatus, additional?: any) => void
 }
 
 interface ServerToClientEvents {

@@ -29,7 +29,7 @@ badgeCallbacks.set('world2', {
     valueType: BadgeType.World,
     badgeId: 2214193672948978,
     checkCallback: (player: IServerPlayerComponent) => {
-        if (WorldsData.get(player.profile.Data.Config.MaxWorld)!.weight < WorldsData.get(WorldType.Cyber)!.weight) { return }
+        if (WorldsData.get(player.profile.Data.Config.MaxWorld)!.weight < WorldsData.get(WorldType.NeonCity)!.weight) { return }
         return true
     }
 })

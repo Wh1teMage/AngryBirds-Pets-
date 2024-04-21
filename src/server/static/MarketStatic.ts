@@ -20,7 +20,7 @@ MarketCallbacks.set('tinypackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi+profileData.Values.GemsVal)
+    player.SetGems(profileData.Values.GemsVal + 7)
 })
 
 MarketCallbacks.set('smallpackgems', (player) => {
@@ -30,7 +30,7 @@ MarketCallbacks.set('smallpackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi+profileData.Values.GemsVal)
+    player.SetGems(profileData.Values.GemsVal + 15)
 })
 
 MarketCallbacks.set('mediumpackgems', (player) => {
@@ -40,7 +40,7 @@ MarketCallbacks.set('mediumpackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi+profileData.Values.GemsVal)
+    player.SetGems(profileData.Values.GemsVal + 45)
 })
 
 MarketCallbacks.set('largepackgems', (player) => {
@@ -50,7 +50,7 @@ MarketCallbacks.set('largepackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi+profileData.Values.GemsVal)
+    player.SetGems(profileData.Values.GemsVal + 80)
 })
 
 MarketCallbacks.set('hugepackgems', (player) => {
@@ -60,7 +60,7 @@ MarketCallbacks.set('hugepackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi+profileData.Values.GemsVal)
+    player.SetGems(profileData.Values.GemsVal + 150)
 })
 
 MarketCallbacks.set('megapackgems', (player) => {
@@ -70,7 +70,7 @@ MarketCallbacks.set('megapackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi+profileData.Values.GemsVal)
+    player.SetGems(profileData.Values.GemsVal + 250)
 })
 
 MarketCallbacks.set('megahugepackgems', (player) => {
@@ -80,7 +80,7 @@ MarketCallbacks.set('megahugepackgems', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetGems(100*multi+profileData.Values.GemsVal)
+    player.SetGems(350)
 })
 
 MarketCallbacks.set('tinypackaccuracy', (player) => {
@@ -90,7 +90,7 @@ MarketCallbacks.set('tinypackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi+profileData.Values.StrengthVal)
+    player.SetStrength(profileData.Values.StrengthVal + math.max(1000, profileData.MaxValues.StrengthMaxVal*0.025))
 })
 
 MarketCallbacks.set('smallpackaccuracy', (player) => {
@@ -100,7 +100,7 @@ MarketCallbacks.set('smallpackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi+profileData.Values.StrengthVal)
+    player.SetStrength(profileData.Values.StrengthVal + math.max(2000, profileData.MaxValues.StrengthMaxVal*0.065))
 })
 
 MarketCallbacks.set('mediumpackaccuracy', (player) => {
@@ -110,7 +110,7 @@ MarketCallbacks.set('mediumpackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi+profileData.Values.StrengthVal)
+    player.SetStrength(profileData.Values.StrengthVal + math.max(4000, profileData.MaxValues.StrengthMaxVal*0.225))
 })
 
 MarketCallbacks.set('largepackaccuracy', (player) => {
@@ -120,7 +120,7 @@ MarketCallbacks.set('largepackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi+profileData.Values.StrengthVal)
+    player.SetStrength(profileData.Values.StrengthVal + math.max(7500, profileData.MaxValues.StrengthMaxVal*0.445))
 })
 
 MarketCallbacks.set('hugepackaccuracy', (player) => {
@@ -130,7 +130,7 @@ MarketCallbacks.set('hugepackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi+profileData.Values.StrengthVal)
+    player.SetStrength(profileData.Values.StrengthVal + math.max(15000, profileData.MaxValues.StrengthMaxVal*0.90))
 })
 
 MarketCallbacks.set('megapackaccuracy', (player) => {
@@ -140,7 +140,7 @@ MarketCallbacks.set('megapackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi+profileData.Values.StrengthVal)
+    player.SetStrength(profileData.Values.StrengthVal + math.max(27000, profileData.MaxValues.StrengthMaxVal*1.20))
 })
 
 MarketCallbacks.set('megahugepackaccuracy', (player) => {
@@ -150,7 +150,7 @@ MarketCallbacks.set('megahugepackaccuracy', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetStrength(100*multi+profileData.Values.StrengthVal)
+    player.SetStrength(profileData.Values.StrengthVal + math.max(40000, profileData.MaxValues.StrengthMaxVal*1.50))
 })
 
 MarketCallbacks.set('tinypackwins', (player) => {
@@ -160,7 +160,7 @@ MarketCallbacks.set('tinypackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi+profileData.Values.WinsVal)
+    player.SetWins(profileData.Values.WinsVal + math.max(50, profileData.MaxValues.WinsMaxVal*0.05))
 })
 
 MarketCallbacks.set('smallpackwins', (player) => {
@@ -170,7 +170,7 @@ MarketCallbacks.set('smallpackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi+profileData.Values.WinsVal)
+    player.SetWins(profileData.Values.WinsVal + math.max(130, profileData.MaxValues.WinsMaxVal*0.13))
 })
 
 MarketCallbacks.set('mediumpackwins', (player) => {
@@ -180,7 +180,7 @@ MarketCallbacks.set('mediumpackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi+profileData.Values.WinsVal)
+    player.SetWins(profileData.Values.WinsVal + math.max(450, profileData.MaxValues.WinsMaxVal*0.45))
 })
 
 MarketCallbacks.set('largepackwins', (player) => {
@@ -190,7 +190,7 @@ MarketCallbacks.set('largepackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi+profileData.Values.WinsVal)
+    player.SetWins(profileData.Values.WinsVal + math.max(750, profileData.MaxValues.WinsMaxVal*0.89))
 })
 
 MarketCallbacks.set('hugepackwins', (player) => {
@@ -200,7 +200,7 @@ MarketCallbacks.set('hugepackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi+profileData.Values.WinsVal)
+    player.SetWins(profileData.Values.WinsVal + math.max(1450, profileData.MaxValues.WinsMaxVal*1.80))
 })
 
 MarketCallbacks.set('megapackwins', (player) => {
@@ -210,7 +210,7 @@ MarketCallbacks.set('megapackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi+profileData.Values.WinsVal)
+    player.SetWins(profileData.Values.WinsVal + math.max(2000, profileData.MaxValues.WinsMaxVal*2.40))
 })
 
 MarketCallbacks.set('megahugepackwins', (player) => {
@@ -220,7 +220,7 @@ MarketCallbacks.set('megahugepackwins', (player) => {
     if (!worldData) { return }
 
     let multi = worldData.multipliers.get('product') || 1
-    player.SetWins(100*multi+profileData.Values.WinsVal)
+    player.SetWins(profileData.Values.WinsVal + math.max(3000, profileData.MaxValues.WinsMaxVal*3.00))
 })
 
 MarketCallbacks.set('100storage', (player) => {
@@ -254,19 +254,20 @@ MarketCallbacks.set('doublestars', (player) => {
 })
 
 MarketCallbacks.set('instantpower', (player) => {
-    //! алямантера
+    let profileData = player.profile.Data
 })
 
 MarketCallbacks.set('fasthatch', (player) => {
-    //! кокрочес
+    let profileData = player.profile.Data
+    profileData.Multipliers.HatchSpeedMul += .5
 })
 
 MarketCallbacks.set('3egghatch', (player) => {
-    //! алямантера
+    let profileData = player.profile.Data
 })
 
 MarketCallbacks.set('autorebirth', (player) => {
-    //! алямантера
+    let profileData = player.profile.Data
 })
 
 MarketCallbacks.set('doublewins', (player) => {
@@ -298,14 +299,14 @@ MarketCallbacks.set('luck1', (player) => {
 MarketCallbacks.set('luck2', (player) => {
     let profileData = player.profile.Data
     profileData.Config.Luck += .5
-    profileData.Products.push('luck2')
+    //profileData.Products.push('luck2')
 })
 
 MarketCallbacks.set('luck3', (player) => {
     let profileData = player.profile.Data
     profileData.Config.Luck += .5
     MarketCallbacks.get('largepackwins')!(player)
-    profileData.Products.push('luck3')
+    //profileData.Products.push('luck3')
 })
 
 MarketCallbacks.set('rebirthskip1', (player) => {
@@ -515,4 +516,67 @@ MarketCallbacks.set('limited3', (player) => {
 MarketCallbacks.set('unlocksessiongifts', (player) => {
     player.session.sessionTime = 10**6
     player.replica.SetValue('Session.sessionTime', player.session.sessionTime)
+})
+
+
+MarketCallbacks.set('nightmare1', (player) => {
+    player.OpenEggBypass('Nightmare', EggBuyType.Single)
+})
+
+MarketCallbacks.set('nightmare3', (player) => {
+    player.OpenEggBypass('Nightmare', EggBuyType.Triple)
+})
+
+MarketCallbacks.set('nightmare10', (player) => {
+    player.OpenEggBypass('Nightmare', EggBuyType.Ten)
+})
+
+
+MarketCallbacks.set('shadow1', (player) => {
+    player.OpenEggBypass('ShadowDonate', EggBuyType.Single)
+})
+
+MarketCallbacks.set('shadow3', (player) => {
+    player.OpenEggBypass('ShadowDonate', EggBuyType.Triple)
+})
+
+MarketCallbacks.set('shadow10', (player) => {
+    player.OpenEggBypass('ShadowDonate', EggBuyType.Ten)
+})
+
+
+MarketCallbacks.set('party1', (player) => {
+    player.OpenEggBypass('Party', EggBuyType.Single)
+})
+
+MarketCallbacks.set('party3', (player) => {
+    player.OpenEggBypass('Party', EggBuyType.Triple)
+})
+
+MarketCallbacks.set('party10', (player) => {
+    player.OpenEggBypass('Party', EggBuyType.Ten)
+})
+
+MarketCallbacks.set('diamond1', (player) => {
+    player.OpenEggBypass('Diamond', EggBuyType.Single)
+})
+
+MarketCallbacks.set('diamond3', (player) => {
+    player.OpenEggBypass('Diamond', EggBuyType.Triple)
+})
+
+MarketCallbacks.set('luminousstone', (player) => {
+    player.AppendTool('SlingshotD1W1')
+})
+
+MarketCallbacks.set('strongshield', (player) => {
+    player.AppendTool('SlingshotD1W2')
+})
+
+MarketCallbacks.set('lightsaber', (player) => {
+    player.AppendTool('SlingshotD1W3')
+})
+
+MarketCallbacks.set('voidskip', (player) => {
+    player.ClaimVoidPet(player.session.selectedVoid!, true)
 })

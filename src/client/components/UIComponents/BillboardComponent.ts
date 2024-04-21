@@ -2,7 +2,7 @@ import { Dependency, OnStart } from "@flamework/core";
 import { Component, BaseComponent, Components } from "@flamework/components";
 import { Players } from "@rbxts/services";
 
-const BILLBOARD_RADIUS = 100
+const BILLBOARD_RADIUS = 10
 
 let updateBillboards = (primaryPart: BasePart) => {
     for (let v of BillboardFabric.GetBillboards()) {
@@ -11,8 +11,8 @@ let updateBillboards = (primaryPart: BasePart) => {
 
         let currentDistance = ((v.instance.Adornee!.Parent as BasePart).Position.sub(primaryPart.Position)).Magnitude
 
-        if (currentDistance > v.radius && v.instance.Enabled) { v.Leave(); v.instance.Enabled = false; continue }
-        if (currentDistance <= v.radius && !v.instance.Enabled) { v.Enter(); v.instance.Enabled = true }
+        if (currentDistance > v.radius && v.instance.Enabled) { v.Leave(); v.instance.Enabled = false; continue } //
+        if (currentDistance <= v.radius && !v.instance.Enabled) { v.Enter(); v.instance.Enabled = true; } //
 
     }
 }
@@ -23,7 +23,7 @@ let activateRender = () => {
 
     task.spawn(() => {
     
-        while (task.wait(3)) {
+        while (task.wait(.1)) {
             let character = Players.LocalPlayer.Character
             if (!character || !character.FindFirstChild('HumanoidRootPart')) { continue }
     
@@ -44,8 +44,11 @@ export class BillboardComponent extends BaseComponent<Attributes, BillboardGui> 
     private _onEnter?: Array<(arg: BillboardGui) => void> = []
     private _onLeave?: Array<(arg: BillboardGui) => void> = []
 
-    private _defaultEnter(arg: BillboardGui) {}
-    private _defaultLeave(arg: BillboardGui) {}
+    private _defaultEnter(arg: BillboardGui) { }
+    private _defaultLeave(arg: BillboardGui) { }
+
+    private _locked = false
+    public IsOpened = false
 
     onStart() {
         activateRender()
@@ -55,15 +58,26 @@ export class BillboardComponent extends BaseComponent<Attributes, BillboardGui> 
     }
 
     public Enter() {
-        print('Billboard Started')
+        if (this._locked || this.IsOpened) {return}
 
-        this._onLeave?.forEach((val) => { val(this.instance) })
+        this._locked = true
+        this.CloseOthers()
+        this._onEnter?.forEach((val) => { val(this.instance) })
+        this._locked = false
+        this.IsOpened = true
+
     }
 
     public Leave() {
-        print('Billboard Ended')
+        if (this._locked || !this.IsOpened) {return}
 
+        this._locked = true
+        print('Leave Started')
         this._onLeave?.forEach((val) => { val(this.instance) })
+        print('Leave Ended')
+        this._locked = false
+        this.IsOpened = false
+
     }
 
     public BindToEnter(entercallback: (arg: BillboardGui) => void) {
@@ -72,6 +86,16 @@ export class BillboardComponent extends BaseComponent<Attributes, BillboardGui> 
 
     public BindToLeave(leavecallback: (arg: BillboardGui) => void) {
         this._onLeave?.push(leavecallback)
+    }
+
+    
+    public CloseOthers() {
+        let components = Dependency<Components>().getAllComponents<BillboardComponent>()
+
+        for (let component of components) {
+            if (component === this) continue
+            component.Leave()
+        }
     }
 
 }

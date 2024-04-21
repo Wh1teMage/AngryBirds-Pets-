@@ -37,6 +37,7 @@ export class MarketService implements OnStart, OnInit {
 
     private _onSuccesfulPurchase(userId: number) {
         Events.ReplicateEffect.fire(Players.GetPlayerByUserId(userId)!, 'DonationEnded')
+        Events.ReplicateEffect.fire(Players.GetPlayerByUserId(userId)!, 'PlaySound', new Map([['Sound', 'rbxassetid://2609873966']]))
     }
 
     private _completePurchase(userId: number, productId: number, isPurchased: boolean) {
@@ -64,10 +65,20 @@ export class MarketService implements OnStart, OnInit {
         
         MarketplaceService.PromptProductPurchaseFinished.Connect((userId, productId, isPurchased) => { 
             //product dont have any DB saves (unless Bundles). Futher DB saves will be written in callbacks (profiles).
+            let giftId = giftingQueue.get(userId)
             let playerComponent = this._completePurchase(userId, productId, isPurchased)
 
             if (!playerComponent) { return }
 
+            let gamepassRefference = false
+            MarketNamings.forEach((value, key) => {
+                if (giftId && (value.correspondingGiftId === giftId)) { gamepassRefference = true }
+            })
+
+            if (giftId && gamepassRefference) { 
+                Events.ReplicateEffect(playerComponent.instance, 'Notify', new Map([['Message', 'Recieved Gift!'], ['Image', 'NewGift']]))
+                playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) 
+            }
             playerComponent.replica.SetValue('Profile.Products', playerComponent.profile.Data.Products)
         })
 
@@ -102,7 +113,7 @@ export class MarketService implements OnStart, OnInit {
         let playerComponent = ServerPlayerFabric.GetPlayer(player)
 
         if (giftId) {
-            let giftPlayerComponent = ServerPlayerFabric.GetPlayer(player)
+            let giftPlayerComponent = ServerPlayerFabric.GetPlayer(Players.GetPlayerByUserId(giftId)!)
 
             if (product.checkCallback && !product.checkCallback(giftPlayerComponent)) { return }
             if (!giftPlayerComponent || !giftPlayerComponent.profile) { warn('Something Went Wrong With Data!'); return }

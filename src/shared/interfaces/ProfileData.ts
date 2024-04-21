@@ -11,6 +11,14 @@ export interface IProfileData {
         GemsVal: number
     }
 
+    MaxValues: {
+        StrengthMaxVal: number
+        WinsMaxVal: number
+        StarsMaxVal: number
+        RebirthsMaxVal: number
+        GemsMaxVal: number
+    }
+
     StatValues: {
         FirstJoin: number
         LastJoined: number
@@ -26,7 +34,13 @@ export interface IProfileData {
         SpinCount: number
         RebirthSkips: number
         FriendsCount: number
+        //EquippedPetsCount: number
         
+        WasShooting: boolean
+        WasTraining: boolean
+        WasRebirthing: boolean
+
+        Favorited: boolean
     }
 
     Multipliers: {
@@ -35,6 +49,7 @@ export interface IProfileData {
         WinsMul: number
         StarsMul: number
         RebirthsMul: number
+        HatchSpeedMul: number
         VoidMachineMul: number
     }
 

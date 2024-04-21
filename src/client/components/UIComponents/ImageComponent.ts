@@ -9,13 +9,9 @@ let IsOpenLocked = false // to prevent 2 windows openning at the exact time
 @Component({})
 export class ImageComponent extends BaseComponent<Attributes, ImageLabel> implements OnStart {
 
-    onStart() {
-        
-        this.BindToOpen(() => { UIAnimations.BlurSwitch(16); UIAnimations.Zoom(80); this.instance.Visible = true; if (this.CanCloseOthers) { this.CloseOthers() } })
-        this.BindToClose(() => { UIAnimations.BlurSwitch(0); UIAnimations.Zoom(0); task.delay(.3, () =>  this.instance.Visible = false) })
+    onStart() {}
 
-    }
-
+    public IgnoreDefault = false
     public IsOpened = false
     public CanBeClosedByOthers = true
     public CanCloseOthers = true
@@ -66,12 +62,23 @@ export class ImageComponent extends BaseComponent<Attributes, ImageLabel> implem
         }
     }
 
+    public Setup() {
+        if (this.IgnoreDefault) { return } 
+
+        this.BindToOpen(() => { UIAnimations.BlurSwitch(16); UIAnimations.Zoom(80); this.instance.Visible = true; if (this.CanCloseOthers) { this.CloseOthers() } })
+        this.BindToClose(() => { UIAnimations.BlurSwitch(0); UIAnimations.Zoom(0); task.delay(.3, () =>  this.instance.Visible = false) })
+    }
+
 }
 
 export class ImageFabric {
 
-    static CreateImage(image: ImageLabel) {
-        return Dependency<Components>().addComponent<ImageComponent>(image)
+    static CreateImage(image: ImageLabel, ignore?: boolean) {
+        let component = Dependency<Components>().addComponent<ImageComponent>(image)
+        if (ignore) { component.IgnoreDefault = ignore }
+        component.Setup()
+
+        return component
     }
 
 }

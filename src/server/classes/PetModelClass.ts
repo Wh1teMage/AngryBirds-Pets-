@@ -1,5 +1,6 @@
 import { Workspace } from "@rbxts/services";
 import { IDBPetData, IPetData } from "shared/interfaces/PetData";
+import { CreationUtilities } from "shared/utility/CreationUtilities";
 import Functions from "shared/utility/LuaUtilFunctions";
 import { PetUtilities } from "shared/utility/PetUtilities";
 
@@ -39,6 +40,22 @@ export class PetModelManager {
         newPet.model.Parent = Workspace.FindFirstChild('Pets')!.WaitForChild(player.UserId)
         newPet.model.PivotTo(new CFrame(0,0,0))
         newPet.model.PrimaryPart!.Anchored = true
+        
+        /*
+        for (let modelPart of newPet.model.GetDescendants()) {
+            if (modelPart.IsA('WeldConstraint')) { modelPart.Destroy() }
+            if (!modelPart.IsA('BasePart')) { continue }
+
+            modelPart.Anchored = false
+            modelPart.CanCollide = false
+
+            if (modelPart === newPet.model.PrimaryPart!) { continue }
+            let weld = CreationUtilities.WeldConstraint(modelPart, newPet.model.PrimaryPart!)
+            weld.Parent = weld.Part0
+        }
+
+        newPet.model.PrimaryPart!.Anchored = true
+        */
 
         PetModelManager.GetPlayer(player)!.push({Pet: newPet, DB: pet})
     }

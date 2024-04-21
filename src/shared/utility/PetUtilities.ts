@@ -21,8 +21,8 @@ export class PetUtilities {
         let originalPet = PetsData.get(info.name)!
         let pet: IPetData = {
             name: originalPet.name,
-            locked: originalPet.locked,
-            equipped: originalPet.equipped,
+            locked: info.locked,
+            equipped: info.equipped,
             stats: table.clone( originalPet.stats ),
             additional: table.clone( info.additional ),
             multipliers: table.clone( originalPet.multipliers ),

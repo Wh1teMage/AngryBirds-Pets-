@@ -3,6 +3,8 @@ import { Component, BaseComponent, Components } from "@flamework/components";
 import { PlayEffect } from "client/static/EffectsStatic";
 import { EffectName } from "shared/enums/EffectEnums";
 import { TweenService } from "@rbxts/services";
+import Maid from "@rbxts/maid";
+import { ImageComponent } from "./ImageComponent";
 
 interface Attributes {}
 
@@ -16,6 +18,7 @@ export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implem
 
     private _defaultScaleValue = 1
     private _scale?: UIScale
+    private maid: Maid = new Maid()
 
     private _defaultClick(arg: GuiButton) {
         PlayEffect('ClickSound')
@@ -48,16 +51,27 @@ export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implem
 
     onStart() {
         
-        this.instance.MouseButton1Click.Connect(() => {
-            this._onClick?.forEach((val) => { val(this.instance) })
-        })
+        this.maid.GiveTask(
+            this.instance.MouseButton1Click.Connect(() => {
+                this._onClick?.forEach((val) => { val(this.instance) })
+            })    
+        )
 
-        this.instance.MouseEnter.Connect(() => {
-            this._onEnter?.forEach((val) => { val(this.instance) })
-        })
+        this.maid.GiveTask(
+            this.instance.MouseEnter.Connect(() => {
+                this._onEnter?.forEach((val) => { val(this.instance) })
+            })
+        )
 
-        this.instance.MouseLeave.Connect(() => {
+        this.maid.GiveTask(
+            this.instance.MouseLeave.Connect(() => {
+                this._onLeave?.forEach((val) => { val(this.instance) })
+            })
+        )
+
+        this.instance.Destroying.Connect(() => {  
             this._onLeave?.forEach((val) => { val(this.instance) })
+            this.maid.DoCleaning() 
         })
 
     }
@@ -79,7 +93,6 @@ export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implem
         this._onEnter = []
         this._onLeave = []
     }
-
 
 }
 

@@ -1,12 +1,12 @@
 import { Service, OnStart, OnInit } from "@flamework/core";
-import { Players, RunService, Workspace } from "@rbxts/services";
+import { Players, RunService, Workspace, TweenService } from "@rbxts/services";
 import { ActivePetPlayers, PetModelManager } from "server/classes/PetModelClass";
 import { ServerPlayerFabric } from "server/components/PlayerComponent";
 
 
-const PET_CYCLE_UPDATE = .1
+const PET_CYCLE_UPDATE = 3
 const PETS_PER_LINE = 10
-const SMOOTHNESS = .05
+const SMOOTHNESS = .1
 
 const OFFSET_CONFIG = {
     front: 4,
@@ -34,6 +34,7 @@ export class PetModelService implements OnStart, OnInit {
             let character = playerComp.session.character
             if (!character || !character.PrimaryPart) { return }
 
+            /*
             let humanoid = character!.WaitForChild('Humanoid') as Humanoid
 
             let currentRow = 0
@@ -73,22 +74,21 @@ export class PetModelService implements OnStart, OnInit {
                     return
                 }
 
-                pet.Pet.model.PivotTo( pet.Pet.model.GetPivot().Lerp(modifiedCFrame, SMOOTHNESS))
+                //TweenService.Create(pet.Pet.model.PrimaryPart!, new TweenInfo(PET_CYCLE_UPDATE*1.1, Enum.EasingStyle.Linear), { 'CFrame': modifiedCFrame }).Play()
+                pet.Pet.model.PivotTo(pet.Pet.model.GetPivot().Lerp(modifiedCFrame, SMOOTHNESS))
             })
-    
+            */
     
         })
     
     }
 
     onInit() {
-        
+
         task.spawn(() => {
         
-            while (RunService.Heartbeat.Wait()) { //task.wait(PET_CYCLE_UPDATE) 
-
+            while (task.wait(PET_CYCLE_UPDATE)) { 
                 this._renderPets()
-
             }
         
         })

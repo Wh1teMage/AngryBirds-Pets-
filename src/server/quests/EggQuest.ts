@@ -1,5 +1,6 @@
 import { PassiveClass, PassiveDecorator } from "server/classes/PassiveClass";
 import { ServerPlayerComponent, ServerPlayerFabric } from "server/components/PlayerComponent";
+import { Events } from "server/network";
 import { EggQuestsData } from "shared/info/QuestInfo";
 import { PassiveValues } from "shared/interfaces/PassiveData";
 import { IServerPlayerComponent } from "shared/interfaces/PlayerData";
@@ -38,9 +39,13 @@ export class EggQuest extends PassiveClass {
                 if (foundIndex < 0) { 
                     profileData.StoredEggs.push({ name: key2, amount: 0 })
                     foundIndex = profileData.StoredEggs.size()-1
-                 }
+                }
 
-                 profileData.StoredEggs[foundIndex]!.amount += value2
+                if (key2 === 'Shadow') {
+                    Events.ReplicateEffect(component.instance, 'Notify', new Map([['Message', 'Recieved Shadow Egg!'], ['Image', 'ShadowEgg']]))
+                }
+
+                profileData.StoredEggs[foundIndex]!.amount += value2
 
             })
             component!.ApplyReward(value.reward)

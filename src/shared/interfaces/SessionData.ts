@@ -1,3 +1,4 @@
+import { ReplicatedStorage } from "@rbxts/services";
 import { WorldType } from "shared/enums/WorldEnums"
 import { ITradeObj } from "./TradeData"
 import { IPassiveData } from "./PassiveData"
@@ -29,6 +30,10 @@ export interface ISessionData {
     stats: Map<string, any>
     friendList: Array<string>
     leftToFollow: Array<number>
+    deletePets: Array<string>,
+    selectedVoid?: IDBPetData,
+
+    headStats: BillboardGui
 }
 
 export interface IMultipliers {
@@ -54,7 +59,7 @@ export const DefaultMultipliers: IMultipliers = {
 export const SessionData: ISessionData = {
     character: undefined,
     activeTrade: undefined,
-    currentWorld: WorldType.Default,
+    currentWorld: WorldType.Cave,
     sessionTime: 0,
 
     claimedRewards: [],
@@ -76,4 +81,36 @@ export const SessionData: ISessionData = {
         2680486757,
         3013687191,
     ],
+    deletePets: [],
+
+    headStats: (ReplicatedStorage.WaitForChild('Templates').WaitForChild('HeadStats') as BillboardGui)
+}
+
+export const cloneSessionData = () => {
+
+    let data = table.clone(SessionData)
+
+    data.claimedRewards = []
+    data.activePassives = []
+
+    data.friendList = []
+    data.leftToFollow = [
+        399939444,
+        2680486757,
+        3013687191,
+    ]
+    data.deletePets = []
+
+    data.multipliers = {
+        other: table.clone(DefaultMultipliers),
+        pet: table.clone(DefaultMultipliers),
+        world: table.clone(DefaultMultipliers),
+        potion: table.clone(DefaultMultipliers),
+        friends: table.clone(DefaultMultipliers),
+    }
+
+    data.headStats = data.headStats.Clone()
+
+    return data
+
 }

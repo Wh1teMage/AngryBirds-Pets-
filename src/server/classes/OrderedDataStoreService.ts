@@ -98,6 +98,11 @@ export class OrderedDataService { //write get method
             if (!obj.IsA('Model')) { continue }
 
             let value = orderedConstants.get(obj.Name)!
+            let playersUI = obj.WaitForChild('Main').WaitForChild('SurfaceGui').WaitForChild('LeaderboardFrame').WaitForChild('Players')
+
+            for (let playerUI of playersUI.GetChildren()) {
+                if (playerUI.IsA('GuiObject')) { playerUI.Destroy() }
+            }
 
             value.values.forEach((val, index) => {
 
@@ -123,7 +128,7 @@ export class OrderedDataService { //write get method
                 }
 
                 if (index < 3) { return }
-                objectUI.Parent = obj.WaitForChild('Main').WaitForChild('SurfaceGui').WaitForChild('LeaderboardFrame').WaitForChild('Players')
+                objectUI.Parent = playersUI
 
             })
             

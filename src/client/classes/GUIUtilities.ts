@@ -75,7 +75,7 @@ export class GUIUtilities {
 
     static GuiTimeFormatter(time: number) {
         function getTimeRemaining(){
-            let rt = [`${math.round( (time/(60*60)) % 24 )}`, `${math.round( (time/60) % 60 )}`, `${math.round( (time) % 60 )}`]
+            let rt = [`${math.floor( (time/(60*60)) % 24 )}`, `${math.floor( (time/60) % 60 )}`, `${math.floor( (time) % 60 )}`]
             if(rt[0].size() < 2){ rt[0] = '0' + rt[0]}
             if(rt[1].size() < 2){ rt[1] = '0' + rt[1]}
             if(rt[2].size() < 2){ rt[2] = '0' + rt[2]}

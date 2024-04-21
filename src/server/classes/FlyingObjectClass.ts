@@ -31,6 +31,7 @@ export class FlyingObjectClass {
     constructor(part: BasePart, power: number, worldtype: WorldType) { // x axes only
 
         let world = WorldsData.get(worldtype)!
+        let newPower = math.min(world.maxPower, power)
 
         this.part = part
         this.gravity = world.gravity
@@ -43,13 +44,16 @@ export class FlyingObjectClass {
         this.angle = world.angle
         this.energyLoss = world.energyLoss
 
-        this.currentVelocity = new Vector3(0, power*math.sin(math.rad(this.angle)), -power*math.cos(math.rad(this.angle))).div(this.density).div(this.delta)
+        let yvelocity = math.min(math.max(newPower*math.sin(math.rad(this.angle)), this.density*this.gravity/5*7), this.density*this.gravity*10)
+        let zvelocity = math.max(newPower*math.cos(math.rad(this.angle)), this.density*70)
+
+        this.currentVelocity = new Vector3(0, yvelocity, -zvelocity).div(this.density)//.div(this.delta)
         this.energy = this.currentVelocity.Magnitude**2/2
 
-        print(this.energy, 'CURRENT ENERGY', power, this.currentVelocity.Z)
+        print(this.energy, 'CURRENT ENERGY', newPower, this.currentVelocity.Z, newPower)
 
         this.BodyVelocity = new Instance('BodyVelocity')
-        this.BodyVelocity.MaxForce = new Vector3(9e99, 9e99, 9e99)
+        this.BodyVelocity.MaxForce = new Vector3(0, 0, 0)//new Vector3(0, 9e99, 9e99)
         this.BodyVelocity.Velocity = this.currentVelocity
 
         this.BodyPosition = new Instance('BodyPosition')
@@ -103,15 +107,60 @@ export class FlyingObjectClass {
 
         this.Start()
 
+        this.part.ApplyImpulse(this.currentVelocity.mul(500))
+        print(this.currentVelocity, 'Applied Impulse')
+
+        task.wait(.2)
+
+        while (math.abs(this.part.AssemblyLinearVelocity.Z) > 20) {
+
+            //print(this.part.AssemblyLinearVelocity.Magnitude)
+            //this.part.ApplyImpulse(this.currentVelocity.mul(3))
+            //this.part.SetNetworkOwner(undefined)
+
+            if (this.part.Position.Z < this.endingPosition.Z) {
+                this.part.Position = new Vector3(this.startingPosition.X, this.part.Position.Y, this.startingPosition.Z) 
+                this.Laps += 1
+
+                /*
+                this.part.AssemblyLinearVelocity = new Vector3(
+                    this.part.AssemblyLinearVelocity.X,
+                    math.abs(this.part.AssemblyLinearVelocity.Y),
+                    this.part.AssemblyLinearVelocity.Z
+                ).mul(this.energyLoss/100)
+                */
+            }
+
+            if (this.part.Position.Y < this.minY) {
+                this.part.AssemblyLinearVelocity = new Vector3(
+                    this.part.AssemblyLinearVelocity.X,
+                    math.abs(this.part.AssemblyLinearVelocity.Y),
+                    this.part.AssemblyLinearVelocity.Z
+                ).mul(this.energyLoss/100)
+
+                this.part.Position = new Vector3(this.part.Position.X, this.minY, this.part.Position.Z)
+            }
+
+            task.wait(this.delta)
+        }
+
+        this.part.Position = new Vector3(this.part.Position.X, this.minY, this.part.Position.Z)
+        this.part.AssemblyLinearVelocity = new Vector3(0,0,0)
+        this.part.Anchored = true
+
+        task.wait(.5)
+
+        /*
         while ((this.energy > 1) && (math.abs(this.currentVelocity.Z) > .25)) {
 
             this.BodyVelocity.Velocity = this.currentVelocity
-            this.part.AssemblyAngularVelocity = (this.currentVelocity.add(new Vector3(this.currentVelocity.Z * math.random(),0,0))).div(10)
+            //this.part.AssemblyAngularVelocity = (this.currentVelocity.add(new Vector3(this.currentVelocity.Z * math.random(),0,0))).div(10)
 
             this.Distance += math.abs(this.currentVelocity.Z)*this.delta
             this.currentVelocity = this.currentVelocity.sub(new Vector3(0, this.gravity, 0)) 
-            print(this.minY)
-            
+            //print(this.minY)
+            print(this.part.Position.Z, this.endingPosition.Z)
+
             if (this.part.Position.Z < this.endingPosition.Z) {
                 this.part.Position = new Vector3(this.startingPosition.X, this.part.Position.Y, this.startingPosition.Z) 
                 this.currentVelocity = this.currentVelocity.mul((100-this.energyLoss)/100)  
@@ -128,8 +177,9 @@ export class FlyingObjectClass {
             task.wait(this.delta)
 
         }
+        */
 
-        this.BodyVelocity.Velocity = new Vector3(0,0,0)
+        //this.BodyVelocity.Velocity = new Vector3(0,0,0)
 
         this.Stop()
 

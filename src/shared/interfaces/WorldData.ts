@@ -7,6 +7,8 @@ export interface IWorldData {
 
     shop: Array<string>
     shopName: string
+    worldIcon: string
+    
     multipliers: Map<keyof IMultipliers, number>
     weight: number // to detect max world
     price: number
@@ -24,6 +26,8 @@ export interface IWorldData {
     minY: number
     angle: number
     energyLoss: number
+
+    maxPower: number
 }
 
 export enum WorldOperationStatus {

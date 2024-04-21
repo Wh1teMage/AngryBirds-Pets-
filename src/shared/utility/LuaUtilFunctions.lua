@@ -1,3 +1,5 @@
+local AvatarEditorService = game:GetService('AvatarEditorService')
+
 local Functions = {}
 
 local compareIgnoreList = {
@@ -74,6 +76,23 @@ end
 
 Functions.compareObjects = function(obj1, obj2, useIgnore)
     return CompareTables(obj1, obj2, useIgnore)
+end
+
+Functions.checkFavorite = function()
+
+    local finalResult = nil
+
+    pcall(function()
+        AvatarEditorService:PromptSetFavorite(game.PlaceId, Enum.AvatarItemType.Asset, 1)
+    end)
+    
+    AvatarEditorService.PromptSetFavoriteCompleted:Once(function(result)
+        finalResult = result
+    end)
+
+    while (finalResult == nil) do task.wait() end
+
+    return finalResult
 end
 
 return Functions

@@ -19,7 +19,7 @@ export class EffectsUtilities {
         let sound = (soundobj as Sound).Clone()
 
         sound.PlayOnRemove = true
-        sound.Parent = Players.LocalPlayer.Character?.WaitForChild('Head')
+        sound.Parent = game.Workspace //Players.LocalPlayer.Character?.WaitForChild('Head')
         sound.Destroy()
 
     } 

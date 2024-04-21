@@ -16,6 +16,7 @@ import { FlyingObjectStatus } from "shared/enums/FlyingObjectEnums";
 import { WorldsData } from "shared/info/WorldInfo";
 import { PotionOperationStatus } from "shared/interfaces/PotionData";
 import { PotionType } from "shared/enums/PotionEnum";
+import { ReplicationOperationStatus } from "shared/enums/ReplicationEnums";
 
 @Service({})
 export class SignalService implements OnStart, OnInit {
@@ -85,9 +86,10 @@ export class SignalService implements OnStart, OnInit {
             if (operation === PetOperationStatus.ClaimVoid) { playerComp.ClaimVoidPet(pet) }
             if (operation === PetOperationStatus.Mutate) { playerComp.UpgradePetMutation(pet, count!) }
             if (operation === PetOperationStatus.RemoveMutation) { playerComp.RemovePetMutation(pet) }
+            if (operation === PetOperationStatus.SkipVoid) { playerComp.session.selectedVoid = pet; MarketService.MakePurchase(player.UserId, 1802315798) }
         })
 
-        Events.ManagePets.connect((player: Player, operation: PetOperationStatus, pets?: IDBPetData[] | string) => {
+        Events.ManagePets.connect((player: Player, operation: PetOperationStatus, pets?: IDBPetData[] | string | string[]) => {
             let playerComp = ServerPlayerFabric.GetPlayer(player)
             if (!playerComp) { return }
 
@@ -95,6 +97,9 @@ export class SignalService implements OnStart, OnInit {
             if (operation === PetOperationStatus.EquipBest) { playerComp.EquipBest() }
             if (operation === PetOperationStatus.UnequipAll) { playerComp.UnequipAll() }
             if (operation === PetOperationStatus.MultiDelete) { playerComp.RemovePets(pets as IDBPetData[]) }
+            if (operation === PetOperationStatus.MultiLock) { playerComp.MultiLock(pets as IDBPetData[]) }
+            if (operation === PetOperationStatus.MultiUnlock) { playerComp.MultiUnlock(pets as IDBPetData[]) }
+            if (operation === PetOperationStatus.SessionAutoDelete) { playerComp.UpdateAutoDelete(pets as string[]) }
         })
 
         Events.ManageTool.connect((player: Player, operation: ToolOperationStatus, toolname: string) => {
@@ -121,8 +126,9 @@ export class SignalService implements OnStart, OnInit {
             
             if (operation === FlyingObjectStatus.IniticalizeObject) { playerComp.InitializeObject() }
             if (operation === FlyingObjectStatus.ShootObject) { 
-                let redactedPower = math.clamp(power!, .1, 1)*0.3+1
+                let redactedPower = math.clamp(power!, .1, 1)*0.35+1
                 print(redactedPower)
+                if (playerComp.profile.Data.Products.includes('instantpower')) { redactedPower = 1.35 }
                 playerComp.ShootObject(redactedPower)
              }
             
@@ -149,6 +155,16 @@ export class SignalService implements OnStart, OnInit {
             if (!playerComp) { return }
 
             if (operation === PotionOperationStatus.Use) { playerComp.UsePotion(potiontype) }
+        })
+
+        Events.ReplicateValues.connect((player: Player, operation: ReplicationOperationStatus, additional?: any) => {
+            let playerComp = ServerPlayerFabric.GetPlayer(player)
+            if (!playerComp) { return }
+
+            if (operation === ReplicationOperationStatus.AutoShoot) { playerComp.profile.Data.StatValues.WasShooting = additional as boolean }
+            if (operation === ReplicationOperationStatus.AutoTrain) { playerComp.profile.Data.StatValues.WasTraining = additional as boolean }
+            if (operation === ReplicationOperationStatus.Favorite) { playerComp.profile.Data.StatValues.Favorited = additional as boolean }
+            if (operation === ReplicationOperationStatus.AutoRebirth) { playerComp.profile.Data.StatValues.WasRebirthing = additional as boolean }
         })
 
     }

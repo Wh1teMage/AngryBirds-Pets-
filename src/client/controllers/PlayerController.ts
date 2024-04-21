@@ -17,8 +17,11 @@ export class PlayerController implements OnStart, OnInit, ILocalPlayer {
     public replica!: PlayerDataReplica
     public loadSignal = new Signal<() => void>()
     public fullyLoaded = false
+    public autoDeletePets = new Binding<string[]>([])
 
+    static autoEgg = false
     static currentClicks = new Binding<number>(0)
+    static lastClick = os.time()
 
     onInit() {
         

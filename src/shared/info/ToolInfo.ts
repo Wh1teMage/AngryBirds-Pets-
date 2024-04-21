@@ -86,9 +86,9 @@ ToolsData.set('SlingshotD1W1', {
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: 100,
+    price: 99,
     valuetype: ToolValueType.VBugs,
-    productid: 123
+    productid: 1779476876
 })
 
 // ! World 2
@@ -189,9 +189,9 @@ ToolsData.set('SlingshotD1W2', {
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: 100,
+    price: 249,
     valuetype: ToolValueType.VBugs,
-    productid: 123
+    productid: 1779477226
 })
 
 
@@ -292,7 +292,7 @@ ToolsData.set('SlingshotD1W3', {
     firerate: 1/1,
     effectname: 'Shoot',
 
-    price: 100,
+    price: 449,
     valuetype: ToolValueType.VBugs,
-    productid: 123
+    productid: 1779477513
 })

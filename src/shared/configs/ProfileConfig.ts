@@ -14,6 +14,14 @@ export const defaultValue: IProfileData = {
         GemsVal: 0,
     },
 
+    MaxValues: {
+        StrengthMaxVal: 0,
+        WinsMaxVal: 0,
+        StarsMaxVal: 0,
+        RebirthsMaxVal: 0,
+        GemsMaxVal: 0,
+    },
+
     StatValues: {
         FirstJoin: os.time(),
         LastJoined: os.time(),
@@ -29,6 +37,13 @@ export const defaultValue: IProfileData = {
         SpinCount: 0,
         RebirthSkips: 0,
         FriendsCount: 0,
+        //EquippedPetsCount: 0,
+
+        WasShooting: false,
+        WasTraining: false,
+        WasRebirthing: false,
+
+        Favorited: false,
     },
 
     Multipliers: {
@@ -37,15 +52,16 @@ export const defaultValue: IProfileData = {
         WinsMul: 1,
         StarsMul: 1,
         RebirthsMul: 1,
+        HatchSpeedMul: 1,
         VoidMachineMul: 1,
     },
 
     Config: {
         Luck: 1,
-        MaxPets: 100,
-        MaxEquippedPets: 3,
+        MaxPets: 200, //100
+        MaxEquippedPets: 200, //3
         MaxPetsInVoidMachine: 5,
-        MaxWorld: WorldType.Default,
+        MaxWorld: WorldType.Cave,
         RebirthTitle: 'Default',
     },
 

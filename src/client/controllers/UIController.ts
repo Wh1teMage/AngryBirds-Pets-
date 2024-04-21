@@ -1,7 +1,7 @@
 
 import { Controller, OnStart, OnInit, Dependency } from "@flamework/core";
 import { PlayerController } from "./PlayerController";
-import { Players, Workspace, RunService, SocialService, TweenService, MarketplaceService } from "@rbxts/services";
+import { Players, Workspace, RunService, SocialService, TweenService, MarketplaceService, ReplicatedStorage, UserInputService, TeleportService } from "@rbxts/services";
 import { FrameComponent, FrameFabric } from "../components/UIComponents/FrameComponent";
 import { ButtonComponent, ButtonFabric } from "../components/UIComponents/ButtonComponent";
 import { Binding } from "client/classes/BindbingValues";
@@ -10,7 +10,7 @@ import { UIAnimations } from "shared/utility/UIAnimations";
 import { ComponentsInitializer } from "client/classes/ComponentsInitializer";
 import { CreationUtilities } from "shared/utility/CreationUtilities";
 import { SurfaceComponent, SurfaceFabric } from "client/components/UIComponents/SurfaceComponent";
-import { Evolutions, IDBPetData, IPetData, Mutations, PetOperationStatus, Sizes } from "shared/interfaces/PetData";
+import { Evolutions, IDBPetData, IPetData, Mutations, PetOperationStatus, Rarities, Sizes } from "shared/interfaces/PetData";
 import { Components } from "@flamework/components";
 import { PetsData } from "shared/info/PetInfo";
 import { Events } from "client/network";
@@ -38,6 +38,8 @@ import { FlyingObjectStatus } from "shared/enums/FlyingObjectEnums";
 import { PotionType } from "shared/enums/PotionEnum";
 import { PotionOperationStatus } from "shared/interfaces/PotionData";
 import { EggBuyType } from "shared/interfaces/EggData";
+import { ReplicationOperationStatus } from "shared/enums/ReplicationEnums";
+import LuaUtilFunctions from "shared/utility/LuaUtilFunctions";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const mainUI   = playerGui.WaitForChild('MainUI') as ScreenGui
@@ -90,7 +92,11 @@ const mainUIInterface =
 
         {name: 'LowerList', objComponent: 'Frame', children: [
             {name: 'Item', objComponent: 'Button'},
-            {name: 'Road', objComponent: 'Image'},
+            {name: 'Road', objComponent: 'Image', children: [
+                {name: 'Final', objComponent: 'Image', children: [
+                    {name: 'InstantPower', objComponent: 'Button'}
+                ]}
+            ]},
         ]},
 
         {name: 'CleanseMachine', objComponent: 'Image', children:[
@@ -202,7 +208,8 @@ const mainUIInterface =
             {name: 'Close', objComponent: 'Button'}
         ]},
         {name: 'StarterPack', objComponent: 'Image', children:[
-            {name: 'Close', objComponent: 'Button'}
+            {name: 'Close', objComponent: 'Button'},
+            {name: 'Buy', objComponent: 'Button'}
         ]},
         {name: 'Store', objComponent: 'Image', children:[
             {name: 'Close', objComponent: 'Button'},
@@ -243,17 +250,14 @@ const mainUIInterface =
         {name: 'SpacePack', objComponent: 'Image'},
 
         {name: 'Potions', objComponent: 'Frame', children: [
-            {name: 'FriendBoost', objComponent: 'Image'},
-            {name: 'PremiumBoost', objComponent: 'Image', children: [
-                {name: 'Buy', objComponent: 'Button'},
-            ]},
-            {name: 'XBoost', objComponent: 'Image', children: [
-                {name: 'Buy', objComponent: 'Button'},
-            ]},
+            {name: 'FriendBoost', objComponent: 'Button'},
+            {name: 'PremiumBoost', objComponent: 'Button'},
+            {name: 'XBoost', objComponent: 'Button'},
         ]},
 
         {name: 'StatsInfo', objComponent: 'Frame'},
         {name: 'PetOverlay', objComponent: 'Image'},
+        {name: 'SpeedLines', objComponent: 'Frame'}
     ]
 
 
@@ -263,17 +267,21 @@ export class UIController implements OnStart, OnInit {
     private _playerController: PlayerController
     private UIPath = ComponentsInitializer.InitializeObject(mainUIInterface, mainUI)
 
-    private Pets: IDBPetData[] = []
+    private Pets: IPetData[] = []
     private EquippedPets: IDBPetData[] = []
     
     private selectedUIObject?: GuiObject
     private selectedPet?: IDBPetData
     private selectedPetStatus: PetOperationStatus = PetOperationStatus.Equip
     private giftingToUserId?: number
+    private giftsReady = 0
+    private minGiftTime = 10**8
 
     private autoTrain: boolean = false
     private autoShoot: boolean = false
     private autoRebirth: boolean = false
+
+    private disablePets: boolean = false
 
     private selectedGoldenPet?: IDBPetData
     private selectedGoldenUIObjects: GuiObject[] = []
@@ -283,7 +291,7 @@ export class UIController implements OnStart, OnInit {
     private selectedVoidUIObject?: GuiObject
     private startVoidTime: number = 0
     private stopVoidTime: number = 0
-    private currentVoidTime = new Binding<number>(0)
+    private currentVoidTime: number = 0
     private isPetInVoidMachine = false
     private isFlying = false
 
@@ -301,10 +309,18 @@ export class UIController implements OnStart, OnInit {
     private selectedDeletePets: IDBPetData[] = []
     private allDeletingPets?: Map<GuiObject, IDBPetData>
 
+    private selectedLockUIObjects: GuiObject[] = []
+    private selectedLockPets: IDBPetData[] = []
+    private selectedUnlockPets: IDBPetData[] = []
+    private allLockingPets?: Map<GuiObject, IDBPetData>
+
     private currentlySearching?: string
 
     private ownedTools: string[] = []
     private equippedTool?: string
+
+    private creationId: number = 0
+    private petInventory = new Map<GuiObject, IDBPetData>()
 
     constructor(playerController: PlayerController) {
         this._playerController = playerController
@@ -327,66 +343,206 @@ export class UIController implements OnStart, OnInit {
         task.spawn(() => {
             while (task.wait()) {
                 if (!petOverlay.Visible) { continue }
-                petOverlay.Position = petOverlay.Position.Lerp(UDim2.fromOffset(mouse.X+50, mouse.Y+100), .1)
+                petOverlay.Position = petOverlay.Position.Lerp(UDim2.fromOffset(mouse.X+50, mouse.Y+100), .5)
             }
         })
     }
 
-    private createPetExamples(parent: Instance, callback: (pet: IDBPetData, obj: GuiButton) => void) {
+    private setupPetBackpackPasses() {
+        let profileData = this._playerController.replica.Data.Profile
+        let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
+        let amountInfo = petInventory.WaitForChild('Backpack').WaitForChild('AmountInfo') as Frame
+
+        ButtonFabric.CreateButton(amountInfo.WaitForChild('Backpack').WaitForChild('Plus') as ImageButton).BindToClick(() => {
+            if (!profileData.Products.includes('100storage')) { Events.PurchasePrompt(722039542) }
+            if (!profileData.Products.includes('250storage')) { Events.PurchasePrompt(722093443) }
+        })
+
+        ButtonFabric.CreateButton(amountInfo.WaitForChild('Equip').WaitForChild('Plus') as ImageButton).BindToClick(() => {
+            if (!profileData.Products.includes('3equipped')) { Events.PurchasePrompt(722111374) }
+            if (!profileData.Products.includes('5equipped')) { Events.PurchasePrompt(721938617) }
+        })
+    }
+
+    private setupPotionInfo() {
+        let potionFrame = this.UIPath.Potions.get<ImageComponent>().instance
+        let potionInfo = potionFrame.WaitForChild('Templates').WaitForChild('PotionInfo') as Frame
+        let mouse = this._playerController.component.instance.GetMouse()
+
+        let boostList = new Map<string, string>([
+            ['FriendBoost', 'Friend Boost'],
+            ['PremiumBoost', 'Premium Boost'],
+            ['XBoost', 'Follow Boost'],
+        ])
+
+        task.spawn(() => {
+            while (task.wait()) {
+                if (!potionInfo.Visible) { continue }
+                let position = UserInputService.GetMouseLocation()
+                potionInfo.Position = potionInfo.Position.Lerp(UDim2.fromOffset(position.X+50, position.Y-potionFrame.AbsolutePosition.Y-potionFrame.AbsoluteSize.Y/3), .5)
+            }
+        })
+
+        for (let obj of potionFrame.GetChildren()) {
+            if (!obj.IsA('GuiButton')) { continue }
+
+            let button = ButtonFabric.CreateButton(obj)
+
+            button.BindToEnter(() => { potionInfo.Visible = true; (potionInfo.WaitForChild('TextLabel') as TextLabel).Text = boostList.get(obj.Name)! })
+            button.BindToLeave(() => { potionInfo.Visible = false })
+        }
+
+    }
+
+    private createPetExample(pet: IDBPetData, callback: (pet: IDBPetData, obj: GuiButton) => void) {
 
         let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
         let petOverlay = this.UIPath.PetOverlay.get<ImageComponent>().instance
+
+        let petModifiers = ReplicatedStorage.WaitForChild('PetModifiers') as Folder;
+        let petRarities = ReplicatedStorage.WaitForChild('PetRarities') as Folder;
+
+        let obj = petInventory.WaitForChild('Template')!.WaitForChild('PetExample')!.Clone() as GuiButton;
+        obj.Visible = true;
+
+        (obj.WaitForChild('PetName') as TextLabel).Text = pet.name;
+        (obj.WaitForChild('Equip') as TextLabel).Visible = pet.equipped;
+        (obj.WaitForChild('Lock') as ImageLabel).Visible = pet.locked;
+
+        let button = ButtonFabric.CreateButton(obj)
+        button.BindToClick(() => { callback(pet, obj) })
+
+        let newPet = PetUtilities.DBToPetTransfer(pet)
+        let stats = petOverlay.WaitForChild('Stats')
+
+        if (!newPet) { return }
+
+        let multiplier = math.round(newPet.multipliers.get('strength')!*10) 
+        obj.LayoutOrder = -multiplier
+        
+        if (pet.equipped) { obj.LayoutOrder = -multiplier-10**10 }
+        
+        let gradient = petRarities.WaitForChild(newPet.stats.rarity)
+        if (gradient) { gradient.Clone().Parent = obj }
+
+        button.BindToEnter(() => { 
+            petOverlay.Visible = true;
+
+            let petData = PetUtilities.DBToPetTransfer(this.petInventory.get(button.instance)!)!; //Check this later
+
+            (petOverlay.WaitForChild('PetName') as TextLabel).Text = petData.name;
+            (stats.WaitForChild('Mutation').WaitForChild('Text') as TextLabel).Text = petData.additional.mutation;
+            (stats.WaitForChild('PetSize').WaitForChild('Text') as TextLabel).Text = petData.additional.size;
+            (stats.WaitForChild('PetCraft').WaitForChild('Text') as TextLabel).Text = petData.additional.evolution;
+            (stats.WaitForChild('Power').WaitForChild('Boost') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(petData.multipliers.get('strength')!)+'x';
+
+            (stats.WaitForChild('Mutation').WaitForChild('UIGradient') as UIGradient).Color = (petModifiers.WaitForChild(petData.additional.mutation) as UIGradient).Color;
+            (stats.WaitForChild('PetSize').WaitForChild('UIGradient') as UIGradient).Color = (petModifiers.WaitForChild(petData.additional.size) as UIGradient).Color;
+            (stats.WaitForChild('PetCraft').WaitForChild('UIGradient') as UIGradient).Color = (petModifiers.WaitForChild(petData.additional.evolution) as UIGradient).Color;
+
+        })
+        button.BindToLeave(() => { petOverlay.Visible = false });
+
+        let model = newPet!.model.Clone() 
+        let port = obj.WaitForChild('ViewportFrame') as ViewportFrame
+            
+        model.PivotTo(model.GetPivot().mul(newPet!.stats.rotationOffset))
+        let modelCam = new Instance('Camera')
+
+        modelCam.CFrame = new CFrame(model.GetPivot().LookVector.mul(4).add(model.GetPivot().Position), model.GetPivot().Position)
+        
+        model.Parent = port
+        modelCam.Parent = port
+        port.CurrentCamera = modelCam
+
+        return button
+    }
+    
+    private createPetExamples(parent: Instance, callback: (pet: IDBPetData, obj: GuiButton) => void) {
+
         let petsUI = new Map<GuiObject, IDBPetData>()
 
         for (let pet of this.Pets) {
 
+            task.wait()
             if (parent.Parent!.Parent!.Name === 'GoldenInfo' && (pet.additional.evolution !== Evolutions.Normal || pet.locked)) { continue }
             if (parent.Parent!.Parent!.Name === 'VoidMachine' && (pet.additional.evolution !== Evolutions.Gold || pet.locked)) { continue }
             if (parent.Parent!.Parent!.Name === 'MutationMachine' && (pet.additional.mutation !== Mutations.Default || pet.locked)) { continue }
             if (parent.Parent!.Parent!.Name === 'CleanseMachine' && (pet.additional.mutation === Mutations.Default || pet.locked)) { continue }
-            if (this.currentlySearching !== undefined && this.currentlySearching.size() > 0 && pet.name.lower().find(this.currentlySearching.lower()).size() < 1) { continue }
-
-            let obj = petInventory.WaitForChild('Template')!.WaitForChild('PetExample')!.Clone() as GuiButton;
-            obj.Parent = parent
-            obj.Visible = true;
-    
-            (obj.WaitForChild('PetName') as TextLabel).Text = pet.name;
-            (obj.WaitForChild('Equip') as TextLabel).Visible = pet.equipped;
-            (obj.WaitForChild('Lock') as ImageLabel).Visible = pet.locked;
-    
-            if (!pet.equipped) { obj.LayoutOrder = 1 }
-
-            let button = ButtonFabric.CreateButton(obj)
-            button.BindToClick(() => { callback(pet, obj) })
-            button.BindToEnter(() => { petOverlay.Visible = true })
-            button.BindToLeave(() => { petOverlay.Visible = false });
-
-            petsUI.set(button.instance, pet)
-
-            let newPet = PetUtilities.DBToPetTransfer(pet)
-            let stats = petOverlay.WaitForChild('Stats')
-            if (!newPet) { continue }
-
-            (petOverlay.WaitForChild('PetName') as TextLabel).Text = pet.name;
-            (stats.WaitForChild('Mutation').WaitForChild('Text') as TextLabel).Text = pet.additional.mutation;
-            (stats.WaitForChild('PetSize').WaitForChild('Text') as TextLabel).Text = pet.additional.size;
-            (stats.WaitForChild('PetCraft').WaitForChild('Text') as TextLabel).Text = pet.additional.evolution;
-            (stats.WaitForChild('Power').WaitForChild('Boost') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(newPet.multipliers.get('strength')!)+'x';
-
-            let model = newPet!.model.Clone() 
-            let port = obj.WaitForChild('ViewportFrame') as ViewportFrame
-                
-            model.PivotTo(model.GetPivot().mul(newPet!.stats.rotationOffset))
-            let modelCam = new Instance('Camera')
-
-            modelCam.CFrame = new CFrame(model.GetPivot().LookVector.mul(4).add(model.GetPivot().Position), model.GetPivot().Position)
             
-            model.Parent = port
-            modelCam.Parent = port
-            port.CurrentCamera = modelCam
+            let button = this.createPetExample(pet, callback)
+            if (!button) { continue }
+
+            button.instance.Parent = parent
+
+            this.petInventory.set(button.instance, pet)
         }
 
         return petsUI
+    }
+
+    private updatePetSearch() {
+        for (let obj of this.petInventory) {
+            let pet = obj[1]
+            let UIObject = obj[0]
+
+            if (this.currentlySearching !== undefined && this.currentlySearching.size() > 0 && pet.name.lower().find(this.currentlySearching.lower()).size() < 1) { UIObject.Visible = false }
+            else { UIObject.Visible = true }
+        }
+    }
+
+    public appendPetInventory(pets: IDBPetData[]) {
+        let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
+        let scrollingFrame = petInventory.WaitForChild('PetsFrame').WaitForChild('ScrollingFrame')!
+
+        for (let pet of pets) {
+            let button = this.createPetExample(pet, (pet, object) => { this.displayPet(pet, object) })
+            if (!button) { continue }
+
+            button.instance.Parent = scrollingFrame
+            this.petInventory.set(button.instance, pet)
+        }
+
+        pets.clear()
+    }
+
+    public removePetInventory(pets: IDBPetData[]) {
+        for (let pet of pets) {
+
+            for (let obj of this.petInventory) {
+                let value = obj[1]
+                let UIObject = obj[0]
+                if (LuaUtilFunctions.compareObjects(value, pet)) { UIObject.Destroy(); this.petInventory.delete(UIObject); break }
+            }
+
+        }
+
+        pets.clear()
+    }
+
+    public updatePetInventory(oldpet: IDBPetData, newpet: IDBPetData) {
+
+        for (let obj of this.petInventory) {
+            let value = obj[1]
+            let UIObject = obj[0]
+
+            if (!LuaUtilFunctions.compareObjects(value, oldpet)) { continue }
+
+            (UIObject.WaitForChild('Equip') as TextLabel).Visible = newpet.equipped;
+            (UIObject.WaitForChild('Lock') as ImageLabel).Visible = newpet.locked;
+
+            let redactedPet = PetUtilities.DBToPetTransfer(newpet)!
+
+            let multiplier = math.round(redactedPet.multipliers.get('strength')!*10) 
+            UIObject.LayoutOrder = -multiplier
+            
+            if (newpet.equipped) { UIObject.LayoutOrder = -multiplier-10**10 }
+
+            this.petInventory.set(UIObject, newpet)
+
+            break
+        }
+
     }
 
     private updatePets() {
@@ -446,6 +602,11 @@ export class UIController implements OnStart, OnInit {
         (mainStats.WaitForChild('PetCraft').WaitForChild('Text') as TextLabel).Text = formattedPet.additional.evolution;
         (mainStats.WaitForChild('PetSize').WaitForChild('Text') as TextLabel).Text = formattedPet.additional.size;
 
+        let petModifiers = ReplicatedStorage.WaitForChild('PetModifiers') as Folder;
+        (mainStats.WaitForChild('Mutation').WaitForChild('UIGradient') as UIGradient).Color = (petModifiers.WaitForChild(formattedPet.additional.mutation) as UIGradient).Color;
+        (mainStats.WaitForChild('PetCraft').WaitForChild('UIGradient') as UIGradient).Color = (petModifiers.WaitForChild(formattedPet.additional.evolution) as UIGradient).Color;
+        (mainStats.WaitForChild('PetSize').WaitForChild('UIGradient') as UIGradient).Color = (petModifiers.WaitForChild(formattedPet.additional.size) as UIGradient).Color;
+
         this.selectedPetStatus = PetOperationStatus.Equip
 
         if (this.selectedPet.equipped) {
@@ -468,6 +629,21 @@ export class UIController implements OnStart, OnInit {
 
         sizeEvolutionLabel.Text = tostring(sizeCount)+'/'+tostring(nextSizeReq)
         if (!petUpgradeConfig.SizeUpgrades[pet.additional.size].nextSize) { sizeEvolutionLabel.Text = 'MAX' }
+
+        let port = petInfo.WaitForChild('PetIcon') as ViewportFrame
+        let model = formattedPet.model.Clone() 
+        
+        for (let portobj of port.GetChildren()) { if (portobj.IsA('Model')) { portobj.Destroy() } }
+
+        model.PivotTo(model.GetPivot().mul(formattedPet.stats.rotationOffset))
+        let modelCam = new Instance('Camera')
+        if (port.CurrentCamera) { modelCam = port.CurrentCamera }
+
+        modelCam.CFrame = new CFrame(model.GetPivot().LookVector.mul(4).add(model.GetPivot().Position), model.GetPivot().Position)
+        
+        model.Parent = port
+        if (!port.CurrentCamera) { modelCam.Parent = port }
+        port.CurrentCamera = modelCam
     }
 
     private setupAutoTrain() {
@@ -524,12 +700,120 @@ export class UIController implements OnStart, OnInit {
             Events.ManagePets.fire(PetOperationStatus.UnequipAll, 'nil')
         })
 
-        search.InputChanged.Connect(() => {
+        search.GetPropertyChangedSignal('Text').Connect(() => {
             print('Ended')
             this.currentlySearching = search.Text
 
+            if (inventoryButtons.Visible && ((inventoryButtons.WaitForChild('Search') as Frame).Visible)) { this.updateMassLock(); return }
             if (inventoryButtons.Visible) { this.updatePets(); return }
             if (massDeleteButtons.Visible) { this.updateMassDelete(); return }
+        })
+    }
+
+    private setupMassLock() {
+        let inventoryButtons = this.UIPath.PetInventory.Buttons.get<FrameComponent>().instance
+        let lockButton = inventoryButtons.WaitForChild('Lock') as GuiButton
+        let search = inventoryButtons.WaitForChild('Search') as Frame
+
+        ButtonFabric.CreateButton(lockButton).BindToClick(() => {
+            if (search.Visible) {
+                for (let obj of inventoryButtons.GetChildren()) {
+                    if (!obj.IsA('GuiObject') || obj === lockButton) { continue }
+                    obj.Visible = false
+                }
+
+                this.selectedLockPets = []
+                this.selectedUnlockPets = []
+                this.selectedLockUIObjects = []
+
+                this.setupMassLockFrame()
+            }
+            else {
+                for (let obj of inventoryButtons.GetChildren()) {
+                    if (!obj.IsA('GuiObject') || obj === lockButton) { continue }
+                    obj.Visible = true
+                }
+
+                Events.ManagePets.fire(PetOperationStatus.MultiLock, this.selectedLockPets)
+                Events.ManagePets.fire(PetOperationStatus.MultiUnlock, this.selectedUnlockPets)
+                
+                this.selectedLockPets = []
+                this.selectedUnlockPets = []
+                this.selectedLockUIObjects = []
+
+                this.updatePets()
+            }
+        })
+
+    }
+
+    private setupMassLockFrame() {
+        let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
+
+        this.UIPath.PetInventory.PetsFrame.get<FrameComponent>().Close()
+        this.UIPath.PetInventory.PetInfo.get<FrameComponent>().Close()
+
+        let equipAmount = petInventory.WaitForChild('Backpack').WaitForChild('AmountInfo').WaitForChild('Equip').WaitForChild('Amount')! as TextLabel
+        let backpackAmount = equipAmount.Parent!.Parent!.WaitForChild('Backpack').WaitForChild('Amount')! as TextLabel
+
+        equipAmount.Text = tostring(this.EquippedPets.size())+'/'+tostring(this._playerController.replica.Data.Profile.Config.MaxEquippedPets)
+        backpackAmount.Text = tostring(this.Pets.size())+'/'+tostring(this._playerController.replica.Data.Profile.Config.MaxPets)
+
+        let frame = petInventory.WaitForChild('PetsFrame').WaitForChild('ScrollingFrame')!
+
+        this.clearPets(frame)
+        this.allLockingPets = this.createPetExamples(frame, (pet, object) => { this.displayLockPet(pet, object) })
+
+        for (let obj of frame.GetChildren()) {
+            if (!obj.IsA('GuiButton')) { continue }
+            let lock = obj.FindFirstChild('Lock') as ImageLabel
+
+            if (!lock || !lock.Visible) { continue }
+            this.selectedLockUIObjects.push(obj)
+        }
+
+    }
+
+    private displayLockPet(pet: IDBPetData, object: GuiObject) {
+
+        if (object && this.selectedLockUIObjects.includes(object)) {
+            this.selectedLockUIObjects.remove(this.selectedLockUIObjects.indexOf(object)!)
+
+            let selectedIndex = -1
+            this.selectedLockPets.forEach((val, index) => { if (Functions.compareObjects(val, pet)) {selectedIndex = index} });
+
+            (object.WaitForChild('Lock') as ImageLabel).Visible = false
+            this.selectedUnlockPets.push(pet)
+
+            if (selectedIndex < 0) { return }
+            this.selectedLockPets.remove(selectedIndex)
+        }
+        else {
+            this.selectedLockUIObjects.push(object)
+
+            let selectedIndex = -1
+            this.selectedUnlockPets.forEach((val, index) => { if (Functions.compareObjects(val, pet)) {selectedIndex = index} });
+
+            (object.WaitForChild('Lock') as ImageLabel).Visible = true
+            this.selectedLockPets.push(pet)
+
+            if (selectedIndex < 0) { return }
+            this.selectedUnlockPets.remove(selectedIndex)
+        }
+
+    }
+
+    private updateMassLock() {
+        if (!this.allLockingPets) { return }
+        if (!this.currentlySearching || this.currentlySearching.size() < 1) { return }
+
+        this.allLockingPets.forEach((pet, guiobject) => {
+            if (pet.name.lower().find(this.currentlySearching!.lower()).size() < 1) { 
+                guiobject.Visible = false
+                return 
+            }
+
+            guiobject.Visible = true
         })
     }
 
@@ -612,6 +896,7 @@ export class UIController implements OnStart, OnInit {
             guiobject.Visible = true
         })
     }
+
 
     private displayDeletePet(pet: IDBPetData, object: GuiObject) {
         if (!pet)
@@ -717,17 +1002,19 @@ export class UIController implements OnStart, OnInit {
             if (!tool) { continue };
 
             (slingshotFrame.WaitForChild('Name') as TextLabel).Text = tool.name;
-            (slingshotFrame.WaitForChild('Value') as TextLabel).Text = '+'+tostring(tool.addition);
-            (slingshotFrame.WaitForChild('UnlockButton').WaitForChild('Value') as TextLabel).Text = tostring(tool.price);
+            (slingshotFrame.WaitForChild('Value') as TextLabel).Text = '+'+GUIUtilities.getSIPrefixSymbol(tool.addition);
+            (slingshotFrame.WaitForChild('UnlockButton').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(tool.price);
 
             if (this.ownedTools.includes(toolName)) { (slingshotFrame.WaitForChild('UnlockButton').WaitForChild('Equip') as Frame).Visible = true }
 
             let buttonComponent = ButtonFabric.CreateButton(slingshotFrame.WaitForChild('UnlockButton') as GuiButton)
             if (this.equippedTool === toolName) { (slingshotFrame.WaitForChild('UnlockButton').WaitForChild('Equip').WaitForChild('Equip') as TextLabel).Text = 'Equipped' }
+            if (tool.valuetype === ToolValueType.VBugs) { (slingshotFrame.WaitForChild('UnlockButton').WaitForChild('Value') as TextLabel).Text = ''+GUIUtilities.getSIPrefixSymbol(tool.price) }
 
             buttonComponent.BindToClick(() => {
                 if (this.equippedTool === toolName) { return }
                 if (this.ownedTools.includes(toolName)) { Events.ManageTool.fire(ToolOperationStatus.Equip, toolName); return }
+                if (tool!.valuetype === ToolValueType.VBugs) { Events.PurchasePrompt(tool!.productid!) }
                 Events.ManageTool.fire(ToolOperationStatus.Buy, toolName)
             })
 
@@ -754,7 +1041,7 @@ export class UIController implements OnStart, OnInit {
             object.Visible = true;
     
             (object.WaitForChild('PetName') as TextLabel).Text = pet.pet.name;
-            (object.WaitForChild('Equip') as TextLabel).Visible = pet.pet.equipped;
+            (object.WaitForChild('Equip') as TextLabel).Visible = false;
             (object.WaitForChild('Lock') as ImageLabel).Visible = pet.pet.locked;
             (object.WaitForChild('Clock') as ImageLabel).Visible = true
     
@@ -775,7 +1062,20 @@ export class UIController implements OnStart, OnInit {
         let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
         let parent = index.WaitForChild('PetsFrame').WaitForChild('ScrollingFrame')
 
-        for (let petname of this._playerController.replica.Data.Profile.PetIndex) {
+        let layoutRarity = new Map([
+            [Rarities.Common, 1],
+            [Rarities.Uncommon, 2],
+            [Rarities.Rare, 3],
+            [Rarities.Epic, 4],
+            [Rarities.Legendary, 5],
+            [Rarities.Mythic, 6],
+            [Rarities.Secret, 7],
+            [Rarities.Exclusive, 8],
+            [Rarities.Limited, 9],
+        ])
+
+        PetsData.forEach((value, petname) => {
+
             let obj = petInventory.WaitForChild('Template')!.WaitForChild('PetExample')!.Clone() as GuiButton;
             obj.Parent = parent
             obj.Visible = true;
@@ -784,8 +1084,34 @@ export class UIController implements OnStart, OnInit {
             (obj.WaitForChild('Equip') as TextLabel).Visible = false;
             (obj.WaitForChild('Lock') as ImageLabel).Visible = false;
 
+            let newPet = PetUtilities.DBToPetTransfer(PetUtilities.NameToDBPet(petname)!)
+            if (!newPet) { return }
+            
+            let gradient = ReplicatedStorage.WaitForChild('PetRarities').WaitForChild(newPet.stats.rarity)
+            if (gradient) { gradient.Clone().Parent = obj }
+
+            let model = newPet!.model.Clone() 
+            let port = obj.WaitForChild('ViewportFrame') as ViewportFrame
+                
+            model.PivotTo(model.GetPivot().mul(newPet!.stats.rotationOffset))
+            let modelCam = new Instance('Camera')
+
+            obj.LayoutOrder = layoutRarity.get(value.stats.rarity) || 10
+
+            if (!this._playerController.replica.Data.Profile.PetIndex.includes(petname)) {
+                port.ImageColor3 = Color3.fromRGB(0,0,0);
+                (obj.WaitForChild('PetName') as TextLabel).Visible = false
+                obj.LayoutOrder += 10
+            }
+            modelCam.CFrame = new CFrame(model.GetPivot().LookVector.mul(4).add(model.GetPivot().Position), model.GetPivot().Position)
+            
+            model.Parent = port
+            modelCam.Parent = port
+            port.CurrentCamera = modelCam
+
             ButtonFabric.CreateButton(obj)
-        }
+
+        })
 
         let current = PetIndexQuestsData.get('PetIndexQuest1')!
         let petIndex = this._playerController.replica.Data.Profile.PetIndex
@@ -797,9 +1123,10 @@ export class UIController implements OnStart, OnInit {
             if ((value.requirements.get('pets') as number > petIndex.size()) && (delta1 < delta2)) { current = value }
         });
 
+        let maxPercentage = tostring(petIndex.size())+'/'+tostring(PetsData.size());
         let percentage = tostring(petIndex.size())+'/'+tostring(current.requirements.get('pets'));
 
-        (index.WaitForChild('Title1') as TextLabel).Text = percentage+' Pets Found!';
+        (index.WaitForChild('Title1') as TextLabel).Text = maxPercentage+' Pets Found!';
         (index.WaitForChild('Rewards').WaitForChild('Bar').WaitForChild('Value') as TextLabel).Text = percentage+' Pets!';
         (index.WaitForChild('Rewards').WaitForChild('Tier') as TextLabel).Text = current.requirements.get('tier');
 
@@ -814,6 +1141,8 @@ export class UIController implements OnStart, OnInit {
     private setupGifts() {
         
         let gifts = this.UIPath.Gifts.get<ImageComponent>().instance
+
+        this.giftsReady = 0
 
         for (let gift of gifts.WaitForChild('Rewards').GetDescendants()) {
             if (!gift.IsA('ImageButton')) { continue }
@@ -848,17 +1177,17 @@ export class UIController implements OnStart, OnInit {
 
                 let index = (reward as Frame).LayoutOrder-(val%DailyRewardsData.size()+1) //((reward as Frame).LayoutOrder-val-1)%DailyRewardsData.size()
 
-                timer.Text = tostring(index)
+                timer.Text = tostring(index) + ' Days Left'
 
                 //let delta = os.time() - this._playerController.replica.Data.Profile.StatValues.LastDayTime
 
                 if ((reward as Frame).LayoutOrder === (val%DailyRewardsData.size()+1)) { //&& (delta >= 10) //
-                    timer.Text = 'Claim'
+                    timer.Text = 'CLAIM!'
                     return
                 }
 
                 if ((reward as Frame).LayoutOrder < (val%DailyRewardsData.size()+1)) {  //24*60*60
-                    timer.Text = 'Claimed'
+                    timer.Text = 'CLAIMED!'
                     return
                 }
 
@@ -909,13 +1238,15 @@ export class UIController implements OnStart, OnInit {
         bar.Visible = true
         this.isFlying = true
 
-        PlayerController.currentClicks.set(0)
         meter.Position = UDim2.fromScale(meter.Position.X.Scale, 0.824)
 
         let perc = 0
 
         PlayerController.currentClicks.AddCallback((val) => {
             perc = math.min(100, math.round(val/value.maxClicks*100))
+            if (this._playerController.replica.Data.Profile.Products.includes('instantpower')) {
+                perc = 100
+            }
 
             TweenService.Create(clickicon.WaitForChild('UIScale') as UIScale, new TweenInfo(1/20), {'Scale': .85}).Play()
             TweenService.Create(meter, new TweenInfo(1/10, Enum.EasingStyle.Linear), 
@@ -926,6 +1257,8 @@ export class UIController implements OnStart, OnInit {
             task.wait(1/20)
             TweenService.Create(clickicon.WaitForChild('UIScale') as UIScale, new TweenInfo(1/20), {'Scale': 1}).Play()
         })
+
+        PlayerController.currentClicks.set(0)
 
         Events.ShootObject.fire(FlyingObjectStatus.IniticalizeObject)
 
@@ -1038,6 +1371,8 @@ export class UIController implements OnStart, OnInit {
 
     public setupStoreUpperButtons() {
         let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame') as ScrollingFrame
+        let cleanseGemsImage = this.UIPath.CleanseMachine.get<ImageComponent>().instance.WaitForChild('Gems') as ImageLabel
+        let mutationGemsImage = this.UIPath.MutationMachine.get<ImageComponent>().instance.WaitForChild('Gems') as ImageLabel
         let upperFrame = this.UIPath.UpperList.get<FrameComponent>().instance
 
         let scrollList = new Map<string, number>([
@@ -1078,6 +1413,16 @@ export class UIController implements OnStart, OnInit {
                 TweenService.Create(storeFrame, new TweenInfo(.3), { CanvasPosition: new Vector2(scrollList.get(otherList.get(obj.Name)!)!*offset, 0) }).Play()
             })
         }
+
+        ButtonFabric.CreateButton(mutationGemsImage.WaitForChild('Plus') as GuiButton).BindToClick(() => {
+            this.UIPath.Store.get<FrameComponent>().Open()
+            TweenService.Create(storeFrame, new TweenInfo(.3), { CanvasPosition: new Vector2(scrollList.get('5')!*offset, 0) }).Play()
+        })
+
+        ButtonFabric.CreateButton(cleanseGemsImage.WaitForChild('Plus') as GuiButton).BindToClick(() => {
+            this.UIPath.Store.get<FrameComponent>().Open()
+            TweenService.Create(storeFrame, new TweenInfo(.3), { CanvasPosition: new Vector2(scrollList.get('5')!*offset, 0) }).Play()
+        })
 
     }
 
@@ -1200,8 +1545,8 @@ export class UIController implements OnStart, OnInit {
         let packFrame = this.UIPath.Limited.get<FrameComponent>().instance.WaitForChild('ScrollingFrame') as ScrollingFrame
 
         let packList = new Map<string, {id: number, world: WorldType, product: string}>([
-            ['CavePack', { id: 1779439494, world: WorldType.Default, product: 'cavepack' }],
-            ['NeonPack', { id: 1779439942, world: WorldType.Cyber, product: 'neonpack' } ],
+            ['CavePack', { id: 1779439494, world: WorldType.Cave, product: 'cavepack' }],
+            ['NeonPack', { id: 1779439942, world: WorldType.NeonCity, product: 'neonpack' } ],
             ['SpacePack', { id: 1779440646, world: WorldType.Space, product: 'spacepack' } ],
         ])
 
@@ -1239,6 +1584,9 @@ export class UIController implements OnStart, OnInit {
             //if (ButtonFabric.GetButton(obj.WaitForChild('View') as GuiButton)) { continue }
             ButtonFabric.CreateButton(obj.WaitForChild('View') as GuiButton).BindToClick(() => {
                 //print('Prompted')
+                if ((obj.WaitForChild('Owned') as Frame).Visible) { return }
+                if ((obj.WaitForChild('View').WaitForChild('Locked') as Frame).Visible) { return }
+
                 this.UIPath[obj.Name].get<FrameComponent>().Open()
             })
         }
@@ -1269,8 +1617,12 @@ export class UIController implements OnStart, OnInit {
     private makeGift(gift: ImageButton, world: WorldType) {
         let index = gift.LayoutOrder-1
 
+        let claimedRewards = this._playerController.replica.Data.Session.claimedRewards
         let giftData = SelectSessionReward(index, world) //SessionRewardsData[gift.LayoutOrder-1]
         let timer = gift.WaitForChild('TimerFrame').WaitForChild('Timer') as TextLabel
+
+        let giftAmount = this.UIPath.RightList.get<FrameComponent>().instance.WaitForChild('Gifts').WaitForChild('GiftAmount') as Frame
+        let giftText = this.UIPath.RightList.get<FrameComponent>().instance.WaitForChild('Gifts').WaitForChild('Value') as TextLabel
 
         if (!giftData) { return }
 
@@ -1279,17 +1631,39 @@ export class UIController implements OnStart, OnInit {
         })
 
         this.currentGiftTime.AddCallback((val) => {
-            timer.Text =  tostring(giftData.Time! - val)
+            if (!(gift.Parent!.Parent! as Frame).Visible) { return }
+
+            timer.Text = GUIUtilities.GuiTimeFormatter(giftData.Time! - val)
+            let oldGiftAmount = this.giftsReady
 
             if ((giftData.Time! - val) < 0) {
                 (gift.WaitForChild('ClaimFrame') as Frame).Visible = true
+                this.giftsReady += 1
             }
-
-            //print(this._playerController.replica.Data.Session.claimedRewards.includes(index))
     
-            if (this._playerController.replica.Data.Session.claimedRewards.includes(index)) {
+            if (claimedRewards.includes(index)) {
                 (gift.WaitForChild('ClaimFrame') as Frame).Visible = true;
                 (gift.WaitForChild('ClaimFrame').WaitForChild('Timer') as TextLabel).Text = 'Claimed!'
+                this.giftsReady -= 1
+            }
+
+            if ((giftData.Time! - val) > 0) {
+                this.minGiftTime = math.min(giftData.Time! - val, this.minGiftTime)
+            }
+
+            giftAmount.Visible = false
+
+            if ((giftData.Time! - val) < 0 && (giftData.Time! - val) > -2) {
+                PlayEffect('Notify', new Map([['Message', 'Gift Is Ready!'], ['Image', 'NewGift']]))
+            }
+
+            if (this.giftsReady > 0) {
+                giftAmount.Visible = true;
+                (giftAmount.WaitForChild('Value') as TextLabel).Text = tostring(this.giftsReady)
+                giftText.Text = 'CLAIM GIFT'
+            } 
+            else {
+                giftText.Text = 'REWARD IN: '+GUIUtilities.GuiTimeFormatter(this.minGiftTime)
             }
 
         })
@@ -1321,10 +1695,29 @@ export class UIController implements OnStart, OnInit {
         let voidTime = (this.stopVoidTime - this.startVoidTime)*this._playerController.replica.Data.Profile.Multipliers.VoidMachineMul
         let currentVoidTime = this.startVoidTime+voidTime-os.time();
 
+        this.currentVoidTime = currentVoidTime;
+
         (machine.WaitForChild('CraftInfo').WaitForChild('GoldenPet') as TextLabel).Text = 'Golden '+pet.additional.size+' '+pet.name;
         (machine.WaitForChild('CraftInfo').WaitForChild('VoidPet') as TextLabel).Text = 'Void '+pet.additional.size+' '+pet.name;
-        (machine.WaitForChild('CraftInfo').WaitForChild('TimeNumber') as TextLabel).Text = tostring(currentVoidTime);
+        (machine.WaitForChild('CraftInfo').WaitForChild('TimeNumber') as TextLabel).Text = GUIUtilities.GuiTimeFormatter(currentVoidTime);
         
+        let newPet = PetUtilities.DBToPetTransfer(pet)!
+
+        let port = machine.WaitForChild('CraftInfo').WaitForChild('PetIcon') as ViewportFrame
+        let model = newPet.model.Clone() 
+        
+        for (let portobj of port.GetChildren()) { if (portobj.IsA('Model')) { portobj.Destroy() } }
+
+        model.PivotTo(model.GetPivot().mul(newPet.stats.rotationOffset))
+        let modelCam = new Instance('Camera')
+        if (port.CurrentCamera) { modelCam = port.CurrentCamera }
+
+        modelCam.CFrame = new CFrame(model.GetPivot().LookVector.mul(4).add(model.GetPivot().Position), model.GetPivot().Position)
+        
+        model.Parent = port
+        if (!port.CurrentCamera) { modelCam.Parent = port }
+        port.CurrentCamera = modelCam
+
         this.isPetInVoidMachine = false
         if ((this.startVoidTime !== this.stopVoidTime)) { this.isPetInVoidMachine = true };
 
@@ -1334,7 +1727,7 @@ export class UIController implements OnStart, OnInit {
 
         if (!this.isPetInVoidMachine) {
             (machine.WaitForChild('CraftInfo').WaitForChild('Button').WaitForChild('Craft') as TextLabel).Text = 'Craft To Void';
-            (machine.WaitForChild('CraftInfo').WaitForChild('TimeNumber') as TextLabel).Text = tostring(petUpgradeConfig.EvolutionUpgrades.Gold.requirements.time)
+            (machine.WaitForChild('CraftInfo').WaitForChild('TimeNumber') as TextLabel).Text = GUIUtilities.GuiTimeFormatter(petUpgradeConfig.EvolutionUpgrades.Gold.requirements.time)
         }
 
         if (this.isPetInVoidMachine && (currentVoidTime <= 0)) {
@@ -1344,6 +1737,9 @@ export class UIController implements OnStart, OnInit {
     }
 
     private mutationCallback(pet: IDBPetData, obj: GuiObject) {
+        let mutationMachine = this.UIPath.MutationMachine.get<ImageComponent>().instance as Instance
+        let info = mutationMachine.WaitForChild('MutationInfo') as Frame
+
         if (this.selectedMutationUIObject === obj) {
             this.setupMutationGui()
             return
@@ -1353,7 +1749,25 @@ export class UIController implements OnStart, OnInit {
         this.UIPath.MutationMachine.PetsFrame.get<FrameComponent>().Open()
 
         this.selectedMutationUIObject = obj;
-        this.selectedMutationPet = pet
+        this.selectedMutationPet = pet;
+
+        (info.WaitForChild('PetName') as TextLabel).Text = pet.name
+        let newPet = PetUtilities.DBToPetTransfer(pet)!
+
+        let port = info.WaitForChild('PetIcon') as ViewportFrame
+        let model = newPet.model.Clone() 
+        
+        for (let portobj of port.GetChildren()) { if (portobj.IsA('Model')) { portobj.Destroy() } }
+
+        model.PivotTo(model.GetPivot().mul(newPet.stats.rotationOffset))
+        let modelCam = new Instance('Camera')
+        if (port.CurrentCamera) { modelCam = port.CurrentCamera }
+
+        modelCam.CFrame = new CFrame(model.GetPivot().LookVector.mul(4).add(model.GetPivot().Position), model.GetPivot().Position)
+        
+        model.Parent = port
+        if (!port.CurrentCamera) { modelCam.Parent = port }
+        port.CurrentCamera = modelCam
     }
 
     private cleanseCallback(pet: IDBPetData, obj: GuiObject) {
@@ -1371,6 +1785,7 @@ export class UIController implements OnStart, OnInit {
 
     private goldenCallback(pet: IDBPetData, obj: GuiObject) {
     
+        let petOverlay = this.UIPath.PetOverlay.get<ImageComponent>().instance
         let goldMachine = this.UIPath.GoldMachine.get<ImageComponent>().instance
         let petInventory = this.UIPath.PetInventory.get<ImageComponent>().instance
 
@@ -1413,6 +1828,22 @@ export class UIController implements OnStart, OnInit {
             (newobj.WaitForChild('Equip') as TextLabel).Visible = false;
             (newobj.WaitForChild('Lock') as ImageLabel).Visible = false;
 
+            let newPet = PetUtilities.DBToPetTransfer(pet)
+            let stats = petOverlay.WaitForChild('Stats')
+            if (!newPet) { continue }
+
+            let model = newPet!.model.Clone() 
+            let port = newobj.WaitForChild('ViewportFrame') as ViewportFrame
+                
+            model.PivotTo(model.GetPivot().mul(newPet!.stats.rotationOffset))
+            let modelCam = new Instance('Camera')
+
+            modelCam.CFrame = new CFrame(model.GetPivot().LookVector.mul(4).add(model.GetPivot().Position), model.GetPivot().Position)
+            
+            model.Parent = port
+            modelCam.Parent = port
+            port.CurrentCamera = modelCam
+
             if (!debounce) {
                 debounce = true
                 this.selectedGoldenUIObjects.push(newobj);
@@ -1422,6 +1853,18 @@ export class UIController implements OnStart, OnInit {
 
             let button = ButtonFabric.CreateButton(newobj)
             button.BindToClick(() => { this.goldenCallback(newpet, newobj) })
+
+            button.BindToEnter(() => { 
+                petOverlay.Visible = true;
+
+                (petOverlay.WaitForChild('PetName') as TextLabel).Text = pet.name;
+                (stats.WaitForChild('Mutation').WaitForChild('Text') as TextLabel).Text = pet.additional.mutation;
+                (stats.WaitForChild('PetSize').WaitForChild('Text') as TextLabel).Text = pet.additional.size;
+                (stats.WaitForChild('PetCraft').WaitForChild('Text') as TextLabel).Text = pet.additional.evolution;
+                (stats.WaitForChild('Power').WaitForChild('Boost') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(newPet!.multipliers.get('strength')!)+'x';
+    
+            })
+            button.BindToLeave(() => { petOverlay.Visible = false });
         }
         
     }
@@ -1547,18 +1990,24 @@ export class UIController implements OnStart, OnInit {
         let wins = this._playerController.replica.Data.Profile.Values.WinsVal
         let holder = rebirthUI.WaitForChild('StatsHolder');
 
+
+        let newWins = math.max(0, wins-(nextRebirthData.Additional!.get('Wins') || 0))
         print(GUIUtilities.getSIPrefixSymbol(currentAdditional.get('Multiplier')!), );
 
-        (holder.WaitForChild('Stats1').WaitForChild('Boost').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(currentAdditional.get('Multiplier')!);
+        (holder.WaitForChild('Stats1').WaitForChild('Boost').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(currentAdditional.get('Multiplier')!*100)+'%';
         (holder.WaitForChild('Stats1').WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(gems);
         (holder.WaitForChild('Stats1').WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(wins);
 
-        (holder.WaitForChild('Stats2').WaitForChild('Boost').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(additional.get('Multiplier')!);
+        (holder.WaitForChild('Stats2').WaitForChild('Boost').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(additional.get('Multiplier')!*100)+'%';
         (holder.WaitForChild('Stats2').WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(gems+(nextRebirthData.Values!.Gems || 0));
-        (holder.WaitForChild('Stats2').WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(wins+(nextRebirthData.Values!.Wins || 0));
+        (holder.WaitForChild('Stats2').WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(newWins);
 
         (rebirthUI.WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(wins)+'/'+GUIUtilities.getSIPrefixSymbol(additional.get('Wins')!)
         TweenService.Create(rebirthUI.WaitForChild('Wins').WaitForChild('stroke') as ImageLabel, new TweenInfo(.1), { 'Size': UDim2.fromScale(math.min(1, wins/additional.get('Wins')!), 1) }).Play()
+
+        if (wins >= additional.get('Wins')!) [
+            PlayEffect('Notify', new Map([['Message', 'Rebirth Is Ready!'], ['Image', 'RebirthPossible']]))
+        ]
 
     }
 
@@ -1601,11 +2050,13 @@ export class UIController implements OnStart, OnInit {
         ]
 
         let shops = new Map<string, string[]>([
-            ['BowShopPart', world1]
+            ['BowShopPart', world1],
+            ['BowShopPart2', world2],
+            ['BowShopPart3', world3],
         ])
         
         shops.forEach((slingshots, name) => {
-            let shop = game.Workspace.WaitForChild(name)
+            let shop = game.Workspace.WaitForChild('InstaReplica').WaitForChild(name)
             let billboard = shop.WaitForChild('Attachment').WaitForChild('BillboardGui') as BillboardGui
             let description = billboard.WaitForChild('Frame').WaitForChild('Description') as TextLabel
 
@@ -1623,10 +2074,11 @@ export class UIController implements OnStart, OnInit {
                 addition += 1
             })
 
-            if (index < 0) { description.Text = 'Claimed All'; return }
-            if ((index+addition+1) >= slingshots.size() ) { description.Text = 'Claimed All'; return }
-
+            //if (index < 0) { description.Text = 'Claimed All'; return }
+            if (!ToolsData.get(slingshots[index+addition])) { description.Text = 'Claimed All'; return }
             let info = ToolsData.get(slingshots[index+addition])!
+
+            if (profileData.Values.StrengthVal >= info.price) { description.Text = 'Claimed All'; return }
             description.Text = GUIUtilities.getSIPrefixSymbol(math.min(info.price, profileData.Values.StrengthVal))+'/'+GUIUtilities.getSIPrefixSymbol(info.price)
         })
         
@@ -1696,6 +2148,7 @@ export class UIController implements OnStart, OnInit {
     }
 
     private updateStorePacks() {
+        let profileData = this._playerController.replica.Data.Profile
         let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
 
         let world = this._playerController.replica.Data.Profile.Config.MaxWorld
@@ -1703,15 +2156,26 @@ export class UIController implements OnStart, OnInit {
 
         if (!worldData) { return }
 
+        let accuracyList = [2.5, 6.5, 22.5, 44.5, 90, 120, 150]
+        let winsList = [5, 13, 45, 89, 180, 240, 300]
+
         for (let obj of storeFrame.GetDescendants()) {
             if (obj.Name !== 'ChangableValue') { continue }
             if (!obj.IsA('IntValue')) { continue }
 
             let label = obj.Parent!.WaitForChild('Amount') as TextLabel
             let name = obj.Parent!.Parent!.Parent!.Name
-            if (obj.Parent!.Name === 'Huge Pack') { name = obj.Parent!.Parent!.Name }
+            let index = 0
 
-            label.Text = '+'+GUIUtilities.getSIPrefixSymbol(obj.Value * (worldData!.multipliers.get('product') || 1))+' '+name
+            if (obj.Parent!.Name === 'Huge Pack') { name = obj.Parent!.Parent!.Name; index = 6 }
+            else { index = tonumber(obj.Parent!.Name)!-1 }
+
+            let val = obj.Value
+
+            if (name === 'Wins') { val = math.max(val, profileData.MaxValues.WinsMaxVal * winsList[index]/100) }
+            if (name === 'Accuracy') { val = math.max(val, profileData.MaxValues.StrengthMaxVal * accuracyList[index]/100) }
+
+            label.Text = '+'+GUIUtilities.getSIPrefixSymbol(math.round(val))+' '+name
         }
 
     }
@@ -1743,6 +2207,8 @@ export class UIController implements OnStart, OnInit {
         let profileData = this._playerController.replica.Data.Profile
         let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame') as ScrollingFrame
         let rightFrame = this.UIPath.RightList.get<FrameComponent>().instance.WaitForChild('Passes') as Frame
+        let potionFrame = this.UIPath.Potions.get<FrameComponent>().instance
+
         let luckFrame = storeFrame.WaitForChild('EggLuckPasses').WaitForChild('Passes')
 
         let passList = new Map<string, string>([
@@ -1800,6 +2266,14 @@ export class UIController implements OnStart, OnInit {
             obj.Destroy()
         }
 
+        if (profileData.Products.includes('RobloxPremium')) {
+            (potionFrame.WaitForChild('PremiumBoost').WaitForChild('Timer') as TextLabel).Text = '+10%'
+        }
+
+        if (profileData.RedeemedCodes.includes('FollowCode')) {
+            (potionFrame.WaitForChild('XBoost').WaitForChild('Timer') as TextLabel).Text = '+10%'
+        }
+
     }
 
     private updateGiftRewards() {
@@ -1837,6 +2311,8 @@ export class UIController implements OnStart, OnInit {
     private updatePlayerGiftFrame() {
         let storeFrame = this.UIPath.Store.get<ImageComponent>().instance
         let giftFrame = this.UIPath.GiftPlayerList.get<ImageComponent>().instance.WaitForChild('ScrollingFrame') as ScrollingFrame
+        let giftButton = this.UIPath.Store.Gift.get<ButtonComponent>().instance
+
         let template = giftFrame.Parent!.WaitForChild('Template').WaitForChild('PlayerTemplate') as GuiButton
 
         for (let obj of giftFrame.GetChildren()) {
@@ -1844,8 +2320,10 @@ export class UIController implements OnStart, OnInit {
             obj.Destroy()
         }
 
+
+
         for (let player of Players.GetPlayers()) {
-            if (player.UserId === this._playerController.component.instance.UserId) { continue }
+            //if (player.UserId === this._playerController.component.instance.UserId) { continue }
 
             let frame = template.Clone();
             (frame.WaitForChild('DisplayName') as TextLabel).Text = player.DisplayName;
@@ -1859,15 +2337,17 @@ export class UIController implements OnStart, OnInit {
             frame.Parent = giftFrame
 
             ButtonFabric.CreateButton(frame).BindToClick(() => {
-                if (this.giftingToUserId === player.UserId) { 
-                    this.giftingToUserId = undefined; 
-                    (storeFrame.WaitForChild('GiftingTo') as TextLabel).Visible = false;
-                    return 
-                };
+                this.UIPath.GiftPlayerList.get<ImageComponent>().Close();
+                this.UIPath.Store.get<ImageComponent>().Open();
+
+                (giftButton.WaitForChild('Value') as TextLabel).Text = 'Cancel'
+                this.updateGradient(giftButton, mainUI.WaitForChild('Templates').WaitForChild('Red') as UIGradient)
 
                 this.giftingToUserId = player.UserId;
                 (storeFrame.WaitForChild('GiftingTo') as TextLabel).Text = 'Gifting to: '+player.Name;
                 (storeFrame.WaitForChild('GiftingTo') as TextLabel).Visible = true
+
+
             })
         }
 
@@ -1910,6 +2390,9 @@ export class UIController implements OnStart, OnInit {
 
         //if (timeLeft <= 0) { (wheelButton.WaitForChild('Timer') as TextLabel).Text = 'Claim' }
 
+        let wheelImage = wheelButton.WaitForChild('Image') as ImageButton
+        TweenService.Create(wheelImage, new TweenInfo(1, Enum.EasingStyle.Linear), { 'Rotation': 10 + wheelImage.Rotation }).Play()
+
         if (profileData.StatValues.SpinCount < 1) {
             (wheelButton.WaitForChild('Count') as Frame).Visible = false
             return
@@ -1921,16 +2404,16 @@ export class UIController implements OnStart, OnInit {
 
     public updateDailyChestBillboard() {
         let profileData = this._playerController.replica.Data.Profile;
-        let dailyChestPart = Workspace.WaitForChild('DailyChest')
+        let dailyChestPart = Workspace.WaitForChild('InstaReplica').WaitForChild('DailyChest')
 
         let dailyBillboard = dailyChestPart.WaitForChild('Attachment').WaitForChild('BillboardGui') as BillboardGui
         let timer = dailyBillboard.WaitForChild('Frame').WaitForChild('Timer') as TextLabel
 
-        let timeLeft = profileData.StatValues.LastDailyChestTime+10-os.time();
-
+        let timeLeft = profileData.StatValues.LastDailyChestTime+(24*60*60)-os.time();
+        
         timer.Text = GUIUtilities.GuiTimeFormatter(math.max(0, timeLeft));
 
-        if (timeLeft <= 0) { timer.Text = 'Claim' }
+        if (timeLeft <= 0) { timer.Text = 'CLAIM!' }
     }
 
     private updateStarterPack() {
@@ -1938,13 +2421,13 @@ export class UIController implements OnStart, OnInit {
         let currentTime = os.time() - profileData.StatValues.FirstJoin
         let pack = this.UIPath.RightList.Bundles.StarterPack.get<ButtonComponent>().instance
 
-        if ( currentTime < 5 || currentTime > 15000 || profileData.Products.includes('starterpack')) {
+        if ( currentTime < 60 || currentTime > 3600 || profileData.Products.includes('starterpack')) {
             pack.Visible = false
             return
         }
 
         pack.Visible = true;
-        (pack.WaitForChild('Timer') as TextLabel).Text = GUIUtilities.GuiTimeFormatter(profileData.StatValues.FirstJoin+15000-os.time())
+        (pack.WaitForChild('Timer') as TextLabel).Text = GUIUtilities.GuiTimeFormatter(profileData.StatValues.FirstJoin+3660-os.time())
     }
 
     public updateMutations(val: number) {
@@ -1990,18 +2473,90 @@ export class UIController implements OnStart, OnInit {
 
     }
 
+    private updatePotionBuffs() {
+        let profileData = this._playerController.replica.Data.Profile
+
+        let potionsFrame = this.UIPath.Potions.get<FrameComponent>().instance
+        let potionInfo = potionsFrame.WaitForChild('Templates').WaitForChild('PotionInfo') as Frame
+
+        let template = potionsFrame.WaitForChild('Templates').WaitForChild('Potion') as ImageButton
+
+        let buffList = new Map<string, string>([
+            ['LuckPotionBuff', 'rbxassetid://16775664373'],
+            ['WinPotionBuff', 'rbxassetid://16775681520'],
+            ['GoldPotionBuff', 'rbxassetid://16775706913'],
+            ['VoidPotionBuff', 'rbxassetid://16776373393']
+        ])
+
+        let boostList = new Map<string, string>([
+            ['LuckPotionBuff', 'Luck Boost'],
+            ['WinPotionBuff', 'Wins Boost'],
+            ['GoldPotionBuff', 'Gold Boost'],
+            ['VoidPotionBuff', 'Void Boost'],
+        ])
+
+        for (let obj of potionsFrame.GetChildren()) { 
+            if (!buffList.get(obj.Name)) { continue }
+            obj.Destroy()
+        }
+
+        profileData.ActiveBuffs.forEach((value) => {
+            print(value.endTime - profileData.StatValues.IngameTime)
+            if (!buffList.get(value.name)) { return }
+
+            let UIobject = potionsFrame.FindFirstChild(value.name) as ImageButton
+
+            if (!UIobject) {
+                UIobject = template.Clone()
+                UIobject.Name = value.name
+                UIobject.Image = buffList.get(value.name)!
+                UIobject.Visible = true
+                UIobject.Parent = potionsFrame
+            }
+
+            let delta = (value.endTime - profileData.StatValues.IngameTime);
+
+            (UIobject.WaitForChild('Timer') as TextLabel).Text = GUIUtilities.GuiTimeFormatter(delta-1)
+
+            if (delta <= 1) { UIobject.Destroy(); return };
+            
+            if (ButtonFabric.GetButton(UIobject)) { return }
+
+            let button = ButtonFabric.CreateButton(UIobject)
+
+            button.BindToEnter(() => { potionInfo.Visible = true; (potionInfo.WaitForChild('TextLabel') as TextLabel).Text = boostList.get(UIobject.Name)! })
+            button.BindToLeave(() => { potionInfo.Visible = false })
+
+        })
+
+    }
+
     private replicateValue(name: string, newvalue: number, oldvalue: number) {
         let statsFrame = this.UIPath.StatsInfo.get<FrameComponent>().instance
         let info = statsFrame.WaitForChild('Templates').WaitForChild(name) as Frame
         
+        let accuracyLabel = this.UIPath.UpperList.Accuracy.get<ImageComponent>().instance 
+        let starsLabel = this.UIPath.UpperList.Stars.get<ImageComponent>().instance
+        let winsLabel = this.UIPath.UpperList.Wins.get<ImageComponent>().instance
+        let gemsLabel = this.UIPath.UpperList.Gems.get<ImageComponent>().instance
+
         if (!info) { return }
         if (oldvalue >= newvalue) { return }
 
         let clonnedInfo = info.Clone()
 
-        let tweenInfo = new TweenInfo(1)
-        let delta = newvalue - oldvalue;
-        (clonnedInfo.WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(delta)
+        let positionList = new Map<string, {pos: UDim2, label: ImageLabel}>([
+            ['AccuracyInfo', {pos: UDim2.fromScale(0.39 , -0.3), label: accuracyLabel}],
+            ['GemsInfo', {pos: UDim2.fromScale(0.193, -0.3), label: gemsLabel}],
+            ['StarsInfo', {pos: UDim2.fromScale(0.88, -0.3), label: starsLabel}],
+            ['WinsInfo', {pos: UDim2.fromScale(0.635, -0.3), label: winsLabel}],
+        ])
+
+        let tweenInfo = new TweenInfo(1, Enum.EasingStyle.Quad)
+        let tweenInfo2 = new TweenInfo(.4, Enum.EasingStyle.Quad)
+
+        let delta = math.round(newvalue - oldvalue);
+        (clonnedInfo.WaitForChild('Value') as TextLabel).Text = '+'+GUIUtilities.getSIPrefixSymbol(delta)
 
         clonnedInfo.Visible = true
         clonnedInfo.Position = UDim2.fromScale(math.random(0, 100)/100, math.random(0, 100)/100)
@@ -2009,25 +2564,40 @@ export class UIController implements OnStart, OnInit {
 
         print(clonnedInfo.Parent, delta, clonnedInfo)
 
-        TweenService.Create(clonnedInfo, tweenInfo, { 'Position': clonnedInfo.Position.add(UDim2.fromScale(0, -.5)) }).Play()
-        //TweenService.Create(clonnedInfo.WaitForChild('Value') as TextLabel, tweenInfo, { 'TextTransparency': 1 }).Play()
+        task.wait(.5)
+
+        //TweenService.Create(clonnedInfo, tweenInfo, { 'Size': UDim2.fromScale(0,0) }).Play()
+        TweenService.Create(clonnedInfo, tweenInfo, { 'Position': positionList.get(name)!.pos }).Play()
+
+        TweenService.Create(clonnedInfo.WaitForChild('Value').WaitForChild('UIStroke') as UIStroke, tweenInfo2, { 'Transparency': 1 }).Play()
+        TweenService.Create(clonnedInfo.WaitForChild('Value') as TextLabel, tweenInfo2, { 'TextTransparency': 1 }).Play()
+
         TweenService.Create(clonnedInfo.WaitForChild('Icon') as ImageLabel, tweenInfo, { 'ImageTransparency': 1 }).Play()
 
-        task.wait(tweenInfo.Time)
+        task.wait(.5)
+
+        TweenService.Create(positionList.get(name)!.label.WaitForChild('UIScale') as UIScale, new TweenInfo(.1), { 'Scale': 1.1 }).Play()
+        task.wait(.1)
+        TweenService.Create(positionList.get(name)!.label.WaitForChild('UIScale') as UIScale, new TweenInfo(.1), { 'Scale': 1 }).Play()
 
         clonnedInfo.Destroy()
     }
 
     private renderFlyingObjectPosition() {
         print('FIRE IN THE HOLE!!!')
+        let effects = ReplicatedStorage.WaitForChild('Effects')
+
         let accuracyLabel = this.UIPath.UpperList.Accuracy.get<ImageComponent>().instance.WaitForChild('Value') as TextLabel
         let roadFrame = this.UIPath.LowerList.Road.get<ImageComponent>().instance
 
         let sessionData = this._playerController.replica.Data.Session
         let profileData = this._playerController.replica.Data.Profile
 
-        let obj = Workspace.WaitForChild('_ignoreObjects').WaitForChild(sessionData.currentFlyingObject!.partName) as Part
+        let oldobj = Workspace.WaitForChild('_ignoreObjects').WaitForChild(sessionData.currentFlyingObject!.partName) as Part
         let world = WorldsData.get(sessionData.currentWorld)!
+
+        let obj = oldobj.Clone()
+        obj.Parent = Workspace.WaitForChild('_ignoreObjects')
 
         let circles = 0
         let previousPosition = obj.Position
@@ -2036,28 +2606,325 @@ export class UIController implements OnStart, OnInit {
         let power = profileData.Values.StrengthVal
 
         let lapsText = roadFrame.WaitForChild('You').WaitForChild('Laps')  as TextLabel
+        let icon = Players.GetUserThumbnailAsync(this._playerController.component.instance.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100);
+        (roadFrame.WaitForChild('You') as ImageLabel).Image = icon[0];
+        (roadFrame.WaitForChild('WorldIcon') as ImageLabel).Image = world.worldIcon;
+        (roadFrame.WaitForChild('WorldIcon').WaitForChild('Value') as TextLabel).Text = sessionData.currentWorld
+
+        if (profileData.Products.includes('instantpower')) { (roadFrame.WaitForChild('Final').WaitForChild('InstantPower') as ImageButton).Visible = false }
+
+        let pet = PetUtilities.DBToPetTransfer(profileData.Pets[math.random(0, profileData.Pets.size()-1)]!)!
+        let model = pet.model.Clone()
+
+        let attachment = world.slingshotPart.Parent!.FindFirstChild('MainAttachment', true) as Attachment
+        let tInfo = new TweenInfo(5)
+
+        let oldCFrame = attachment.WorldCFrame
+
+        let flyEffects = new Map<Instance, number>([
+            [effects.WaitForChild('RedFly'), 1000],
+            [effects.WaitForChild('PurpleFly'), 10000],
+            [effects.WaitForChild('BlueFly'), 100000],
+            [effects.WaitForChild('GreenFly'), 1000000]
+        ])
+
+        lapsText.Visible = false;
+        (roadFrame.WaitForChild('You') as ImageLabel).Position = UDim2.fromScale(0, 0.069)
+
+        model.PivotTo(attachment.WorldCFrame.mul(pet.stats.rotationOffset))
+        model.Parent = obj
+
+        for (let modelPart of model.GetDescendants()) {
+            if (modelPart.IsA('WeldConstraint')) { modelPart.Destroy() }
+            if (!modelPart.IsA('BasePart')) { continue }
+
+            modelPart.Anchored = false
+            modelPart.CanCollide = false
+
+            if (modelPart === model.PrimaryPart!) { continue }
+            let weld = CreationUtilities.WeldConstraint(modelPart, model.PrimaryPart!)
+            weld.Parent = weld.Part0
+        }
+
+        model.PrimaryPart!.Anchored = true
+        Workspace.CurrentCamera!.CameraSubject = model.PrimaryPart!
+
+        TweenService.Create(attachment, tInfo, { 'Position': attachment.Position.add(attachment.CFrame.LookVector.mul(-8)) }).Play()
+        TweenService.Create(model.PrimaryPart!, tInfo, { 'CFrame': attachment.WorldCFrame.add(attachment.WorldCFrame.LookVector.mul(-8)) }).Play()
+
+        print(obj.AssemblyLinearVelocity.Magnitude, 'Magnitude')
+
+        task.delay(7, () => { if (obj.Anchored) { obj.Anchored = false } })
 
         task.wait(6)
 
-        task.spawn(() => {
-            while (this.isFlying) {
+        TweenService.Create(attachment, new TweenInfo(.4), { 'WorldCFrame': oldCFrame }).Play()
 
-                if (obj.Position.sub(previousPosition).Magnitude > length/2) { circles += 1 }
+        model.PrimaryPart!.Anchored = false
+        model.PrimaryPart!.CFrame = obj.CFrame.mul(pet.stats.rotationOffset)
+
+        Workspace.CurrentCamera!.CameraSubject = obj
+
+        let rotationWeld = CreationUtilities.Weld(obj, model.PrimaryPart!)
+
+        while (oldobj.AssemblyLinearVelocity.Magnitude < 1 && task.wait()) {
+            obj.Anchored = false
+            obj.CanCollide = false
+            obj.AssemblyLinearVelocity = oldobj.AssemblyLinearVelocity
+        }
+
+        //let maxEnergy = (obj.WaitForChild('BodyVelocity') as BodyVelocity).Velocity.Magnitude**2/2
+        //let currentEnergy = maxEnergy
+
+        //let firstFlyTime = math.abs((obj.WaitForChild('BodyVelocity') as BodyVelocity).Velocity.Y)*2/world.gravity/3
+        //let flyTime = firstFlyTime/(1-(world.energyLoss/100))
+
+        //let decrease = power/flyTime
+
+        let currentEffect = effects.WaitForChild('RedFly').Clone() as Part
+        currentEffect.CFrame = model.PrimaryPart!.CFrame
+        currentEffect.Anchored = false
+        currentEffect.CanCollide = false
+        currentEffect.Parent = obj
+
+        CreationUtilities.Weld(obj, currentEffect)
+
+        let currentEnergy = obj.AssemblyLinearVelocity.Magnitude**2/2
+        if (currentEnergy < flyEffects.get(effects.WaitForChild('RedFly'))!) { currentEffect.Destroy() }
+
+        let speedLines = this.UIPath.SpeedLines.get<FrameComponent>().instance
+        let speedLineTemplate = speedLines.WaitForChild('Speedlines') as ImageLabel
+
+        speedLines.GetChildren().forEach((val) => { if (val.Name !== 'Speedlines') { val.Destroy() } }) //make this one for preloading
+
+        let ids = [
+            16955275605,
+            16955296593,
+            16955301649,
+            16955308513,
+            16955320770,
+            16955328882,
+            16955335976,
+            16955341726,
+        ]
+
+        let objLines: ImageLabel[] = []
+
+        ids.forEach((val, index) => {
+            let objLine = speedLineTemplate.Clone()
+            objLine.Image = 'rbxassetid://'+tostring(val)
+            objLine.Position = UDim2.fromScale(2,2)
+            objLine.Visible = true
+            objLine.Name = tostring(index)
+            objLine.Parent = speedLines
+
+            objLines.push(objLine)
+        })
+        
+        let lineDelta = 1/30
+        let currentFrame = -1
+
+        let connection = oldobj.GetPropertyChangedSignal('Anchored').Connect(() => {
+            model.PrimaryPart!.Anchored = true
+        })
+
+        let sound = new Instance('Sound')
+        sound.SoundId = 'rbxassetid://596046130'
+        sound.Parent = game.Workspace
+        sound.Play()
+
+        let prevoiusVelocity = oldobj.AssemblyLinearVelocity
+
+        task.spawn(() => {
+
+            let deltacframe = CFrame.Angles(1, 0, 0)
+
+            while (this.isFlying && !obj.Anchored && oldobj.Parent) {
+                currentFrame += 1
+                /*
+                if (math.abs(obj.Position.Z - previousPosition.Z) > length/2) { 
+                    circles += 1 
+                    model.PrimaryPart!.CFrame = obj.CFrame
+                }
+                */
+
+                let currentLineObject = objLines[currentFrame%objLines.size()]
+                prevoiusVelocity = oldobj.AssemblyLinearVelocity
+
+                currentLineObject.Position = UDim2.fromScale(0,0)
+                task.wait(lineDelta)
+                currentLineObject.Position = UDim2.fromScale(2,2)
+    
+                let yvelocity = obj.AssemblyLinearVelocity.Y
+                obj.AssemblyLinearVelocity = oldobj.AssemblyLinearVelocity.mul(new Vector3(1, 0, 1)).add(new Vector3(0, yvelocity, 0))
+
+                if (obj.Position.Z < world.endingPosition.Z) {
+                    //obj.CFrame = new CFrame(world.startingPosition.X, obj.Position.Y, world.startingPosition.Z) 
+                    obj.CFrame = oldobj.CFrame
+                    circles += 1
+                }
+
+                if (obj.Position.Y < world.minY) {  
+                    obj.CFrame = new CFrame(obj.Position.X, world.minY, obj.Position.Z)
+                    deltacframe = CFrame.Angles(math.random(0, 100)/100, math.random(0, 100)/100, math.random(0, 100)/100)
+
+                    obj.AssemblyLinearVelocity = new Vector3(
+                        obj.AssemblyLinearVelocity.X,
+                        math.abs(obj.AssemblyLinearVelocity.Y),
+                        obj.AssemblyLinearVelocity.Z
+                    ).mul(world.energyLoss/100)
+                }
+
+                /*
+                if ((prevoiusVelocity.Y < 0 && oldobj.AssemblyLinearVelocity.Y > 0)) {  
+                    obj.CFrame = new CFrame(oldobj.Position.X, world.minY, oldobj.Position.Z)
+                    deltacframe = CFrame.Angles(math.random(0, 100)/100, math.random(0, 100)/100, math.random(0, 100)/100)
+                }
+                */
+
+                /*
+                if (oldobj.AssemblyLinearVelocity.Magnitude < 120) { //(math.abs(oldobj.AssemblyLinearVelocity.Y) < 20) && (math.abs(oldobj.AssemblyLinearVelocity.X) < 20)
+                    obj.Anchored = true
+                    let goal = new CFrame(oldobj.CFrame.X, world.minY, oldobj.CFrame.Z) 
+                    obj.AssemblyLinearVelocity = new Vector3(0,0,0)
+                    TweenService.Create(obj, new TweenInfo(1, Enum.EasingStyle.Linear), { 'CFrame': goal }).Play()
+                }
+                */
+
                 if (circles > 0) { 
                     lapsText.Visible = true
                     lapsText.Text = '🔥 LAPS '+tostring(circles)
                 }
-    
-                let perc = (1-obj.Position.sub(world.endingPosition).Magnitude/length)*0.9
-                accuracyLabel.Text = GUIUtilities.getSIPrefixSymbol(power)
 
-                power = math.max(0, power-world.density)
+                //let velocity = obj.FindFirstChild('BodyVelocity') as BodyVelocity
+                //if (!velocity) { continue }
+                
+                currentEnergy = obj.AssemblyLinearVelocity.Magnitude**2/2
+
+                let perc = math.max(0, (1-obj.Position.sub(world.endingPosition).Magnitude/length))
     
-                TweenService.Create(roadFrame.WaitForChild('You') as ImageLabel, new TweenInfo(.1, Enum.EasingStyle.Linear), {'Position': UDim2.fromScale(perc, -0.586)}).Play()
+                TweenService.Create(roadFrame.WaitForChild('You') as ImageLabel, new TweenInfo(.1, Enum.EasingStyle.Linear), {'Position': UDim2.fromScale(perc, 0.069)}).Play()
     
-                previousPosition = obj.Position
-                task.wait(.1)
+                //let dir = model.PrimaryPart!.CFrame.LookVector.Lerp(model.PrimaryPart!.AssemblyLinearVelocity.Unit.mul(new Vector3(0, 1, 1)), 1)
+                //let finalcframe = obj.CFrame.mul(pet.stats.rotationOffset) //new CFrame( obj.Position, obj.Position.add(dir))
+
+                //previousPosition = obj.Position
+                //TweenService.Create(currentEffect, new TweenInfo(.1, Enum.EasingStyle.Linear), {'CFrame': new CFrame(obj.Position, obj.Position.add(dir))}).Play()
+                //TweenService.Create(model.PrimaryPart!, new TweenInfo(.1, Enum.EasingStyle.Linear), {'CFrame': finalcframe}).Play()
+                //model.PrimaryPart!.CFrame = 
+
+                rotationWeld.C1 = rotationWeld.C1.mul(deltacframe)
+                obj.CFrame = new CFrame(obj.Position.X, obj.Position.Y, obj.Position.Z) 
+
+                if (!currentEffect || !currentEffect.Parent) { continue }
+                
+                let delta = 10**9
+                let selected = effects.WaitForChild('RedFly')
+
+                let effect1 = (currentEffect.WaitForChild('0.1').WaitForChild('ragered1') as ParticleEmitter)
+                let effect2 = (currentEffect.WaitForChild('0.1').WaitForChild('ragered') as ParticleEmitter)
+ 
+                flyEffects.forEach((value, instance) => {
+                    if ((currentEnergy - value) > delta || (currentEnergy - value) < 0) { return }
+                    delta = (currentEnergy - value)
+                    selected = instance
+                })
+
+                if (currentEnergy < flyEffects.get(effects.WaitForChild('RedFly'))!) { currentEffect.Destroy(); continue }
+
+                effect1.Color = (selected.WaitForChild('0.1').WaitForChild('ragered1') as ParticleEmitter).Color;
+                effect2.Color = (selected.WaitForChild('0.1').WaitForChild('ragered') as ParticleEmitter).Color;
+                
+                //currentLineObject.ImageColor3 = (selected.WaitForChild('0.1').WaitForChild('ragered1') as ParticleEmitter).Color.Keypoints[0].Value;
+
             }
+
+            obj.AssemblyLinearVelocity = new Vector3(0,0,0)
+
+            connection.Disconnect()
+            obj.Destroy()
+            sound.Destroy()
+        })
+
+    }
+
+    public setupPetDisable() {
+        task.spawn(() => {
+            let petsFolder = game.Workspace.WaitForChild('Pets', 60) as Folder
+
+            let terrainFolder = new Instance('Folder')
+            terrainFolder.Name = 'DisabledPets'
+            terrainFolder.Parent = ReplicatedStorage
+
+            if (!petsFolder) { return }
+
+            petsFolder.ChildAdded.Connect((child) => {
+                if (!this.disablePets) { return }
+                task.wait(.1)
+                child.Parent = terrainFolder
+            })
+        })
+    }
+
+    public setupStoreBuyablePets() {
+
+        let event = this.UIPath.Event.get<ImageComponent>().instance
+        let store = this.UIPath.Store.get<ImageComponent>().instance
+        let storeFrame = store.WaitForChild('ScrollingFrame') as ScrollingFrame
+        let eggs = storeFrame.WaitForChild('ExclusiveEggs')
+
+        let nightmareList = new Map([
+            ['Buy1', 1762894442],
+            ['Buy3', 1762894847],
+            ['Buy10', 1762894981],
+        ])
+
+        let partyList = new Map([
+            ['Buy1', 1762895173],
+            ['Buy3', 1762895301],
+            ['Buy10', 1762895396],
+        ])
+
+        let shadowList = new Map([
+            ['Buy1', 1763283579],
+            ['Buy3', 1763283812],
+            ['Buy10', 1763283954],
+        ])
+
+        for (let obj of event.WaitForChild('ShadowEgg')!.GetChildren()) {
+            if (!obj.IsA('GuiButton')) { continue }
+            ButtonFabric.CreateButton(obj).BindToClick(() => { Events.PurchasePrompt(shadowList.get(obj.Name)!) })
+        }
+
+        for (let obj of eggs.WaitForChild('NightmareEgg')!.GetChildren()) {
+            if (!obj.IsA('GuiButton')) { continue }
+            ButtonFabric.CreateButton(obj).BindToClick(() => { Events.PurchasePrompt(nightmareList.get(obj.Name)!) })
+        }
+
+        for (let obj of eggs.WaitForChild('PartyEgg')!.GetChildren()) {
+            if (!obj.IsA('GuiButton')) { continue }
+            ButtonFabric.CreateButton(obj).BindToClick(() => { Events.PurchasePrompt(partyList.get(obj.Name)!) })
+        }
+
+    }
+
+    public setupFavorites() {
+
+        let tries = 0
+        let result: Enum.AvatarPromptResult = Enum.AvatarPromptResult.Failed
+        let maxWorld = WorldsData.get(this._playerController.replica.Data.Profile.Config.MaxWorld)!
+
+        if (this._playerController.replica.Data.Profile.StatValues.Favorited) { return }
+        if (maxWorld.weight > 1) { return }
+
+        task.spawn(() => {
+            while ((result !== Enum.AvatarPromptResult.Success) && (tries < 3)) {
+                task.wait(10*60)
+                tries += 1
+                result = LuaUtilFunctions.checkFavorite()
+            }
+
+            Events.ReplicateValues.fire(ReplicationOperationStatus.Favorite, true)
         })
 
     }
@@ -2200,6 +3067,14 @@ export class UIController implements OnStart, OnInit {
             UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         })
 
+        this.UIPath.Index.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.475*3), size: obj.Size })
+        })
+
+        this.UIPath.Index.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.475), size: obj.Size })
+        })
+
         this.UIPath.Quest.get<ImageComponent>().BindToClose((obj) => {
             UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
         })
@@ -2213,7 +3088,7 @@ export class UIController implements OnStart, OnInit {
         })
 
         this.UIPath.Gifts.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         })
 
         this.UIPath.Gifts.get<ImageComponent>().BindToClose((obj) => {
@@ -2299,6 +3174,14 @@ export class UIController implements OnStart, OnInit {
             UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         })
 
+        this.UIPath.StarterPack.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.StarterPack.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
         this.UIPath.PetInventory.PetInfo.get<FrameComponent>().BindToOpen((obj) => {
             obj.Visible = true
             UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: UDim2.fromScale(0.641, 0.132), size: UDim2.fromScale(0.348, 0.672) }).Play()
@@ -2333,11 +3216,11 @@ export class UIController implements OnStart, OnInit {
         })
 
         this.UIPath.PetInventory.PetsFrame.get<FrameComponent>().BindToOpen((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2),{ position: obj.Position, size: UDim2.fromScale(0.595, 0.697) }).Play()
+            UIAnimations.TestAnimation(obj, new TweenInfo(.2),{ position: obj.Position, size: UDim2.fromScale(0.621, 0.675) }).Play()
         })
         
         this.UIPath.PetInventory.PetsFrame.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: obj.Position, size: UDim2.fromScale(0.935, 0.697) }).Play()
+            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: obj.Position, size: UDim2.fromScale(0.935, 0.675) }).Play()
         })
 
         this.UIPath.GoldMachine.GoldenInfo.PetsHolder.get<FrameComponent>().BindToOpen((obj) => { 
@@ -2393,7 +3276,7 @@ export class UIController implements OnStart, OnInit {
             UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: obj.Position, size: UDim2.fromScale(0.947, 0.697) }).Play()
         })
 
-        this.UIPath.Potions.PremiumBoost.Buy.get<ButtonComponent>().BindToClick(() => {
+        this.UIPath.Potions.PremiumBoost.get<ButtonComponent>().BindToClick(() => {
             MarketplaceService.PromptPremiumPurchase(this._playerController.component.instance)
         })
 
@@ -2405,12 +3288,28 @@ export class UIController implements OnStart, OnInit {
             Events.PurchasePrompt.fire(1762896804)
         })
 
+        this.UIPath.LowerList.Road.Final.InstantPower.get<ButtonComponent>().BindToClick(() => {
+            Events.PurchasePrompt.fire(722529168)
+        })
+
         this.UIPath.RightList.Buttons.Codes.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.Codes.get<ImageComponent>().Change()
         })
 
-        this.UIPath.Potions.XBoost.Buy.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Follow.get<ImageComponent>().Open()
+        this.UIPath.Potions.XBoost.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Follow.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.Potions.FriendBoost.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Invite.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.GoldMachine.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.GoldMachine.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.SlingshotStore.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.SlingshotStore.get<ImageComponent>().Close()
         })
 
         this.UIPath.Codes.Close.get<ButtonComponent>().BindToClick(() => {
@@ -2419,6 +3318,10 @@ export class UIController implements OnStart, OnInit {
 
         this.UIPath.Follow.Close.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.Follow.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.Index.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Index.get<ImageComponent>().Close()
         })
 
         this.UIPath.RightList.Buttons.Settings.get<ButtonComponent>().BindToClick(() => {
@@ -2464,6 +3367,15 @@ export class UIController implements OnStart, OnInit {
         // })
         // !! ДО РЕЛИЗА НЕ ТРОГАТЬ !!
         // ! ВЫШЕ БОГА НЕТ
+
+
+        this.UIPath.StarterPack.Buy.get<ButtonComponent>().BindToClick(() => {
+            Events.PurchasePrompt.fire(1779438971)
+        })
+
+        this.UIPath.StarterPack.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.StarterPack.get<ImageComponent>().Close()
+        })
 
         this.UIPath.LeftList.Trade.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.TradePlayerList.get<ImageComponent>().Change()
@@ -2541,53 +3453,112 @@ export class UIController implements OnStart, OnInit {
             this.UIPath.UpdateLog.get<ImageComponent>().Close()
         })
 
+        let enablePetsButton = this.UIPath.Settings.get<ImageComponent>().instance.WaitForChild('ScrollingFrame').WaitForChild('HidePets').WaitForChild('Enable') as GuiButton
+        let disablePetsButton = enablePetsButton.WaitForChild('Disable') as GuiButton
+
+        ButtonFabric.CreateButton(enablePetsButton).BindToClick(() => {
+            disablePetsButton.Visible = true
+            this.disablePets = true
+
+            for (let folder of game.Workspace.WaitForChild('Pets').GetChildren()) {
+                folder.Parent = ReplicatedStorage.WaitForChild('DisabledPets')
+            }
+        })
+
+        ButtonFabric.CreateButton(disablePetsButton).BindToClick(() => {
+            disablePetsButton.Visible = false
+            this.disablePets = false
+
+            for (let folder of ReplicatedStorage.WaitForChild('DisabledPets').GetChildren()) {
+                folder.Parent = game.Workspace.WaitForChild('Pets')
+            }
+        })
+
+        let enableMusicButton = this.UIPath.Settings.get<ImageComponent>().instance.WaitForChild('ScrollingFrame').WaitForChild('Music').WaitForChild('Enable') as GuiButton
+        let disableMusicButton = enableMusicButton.WaitForChild('Disable') as GuiButton
+
+        ButtonFabric.CreateButton(enableMusicButton).BindToClick(() => {
+            disableMusicButton.Visible = true;
+            (game.Workspace.WaitForChild('GameMusic') as Sound).Stop()
+        })
+
+        ButtonFabric.CreateButton(disableMusicButton).BindToClick(() => {
+            disableMusicButton.Visible = false;
+            (game.Workspace.WaitForChild('GameMusic') as Sound).Play()
+        })
+        
         this.currentMutationGems.AddCallback((val) => {
             this.updateMutations(val)
         })
 
-        let goldCircle = GroupPopUpFabric.CreateGroupPopUp(game.Workspace.WaitForChild('Gold Machine Circle') as Part)
+        let instaReplica = game.Workspace.WaitForChild('InstaReplica')
+
+        let goldCircle = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('Gold Machine Circle') as Part)
 
         goldCircle.radius = 10
 
         goldCircle.BindToEnter(() => { this.UIPath.GoldMachine.get<ImageComponent>().Open() })
         goldCircle.BindToLeave(() => { this.UIPath.GoldMachine.get<ImageComponent>().Close() })
 
-        let slingshotStore = GroupPopUpFabric.CreateGroupPopUp(game.Workspace.WaitForChild('BowShopPart') as Part)
+        let slingshotStore = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('BowShopPart') as Part)
 
         slingshotStore.radius = 5
 
         slingshotStore.BindToEnter(() => { this.UIPath.SlingshotStore.get<ImageComponent>().Open() })
         slingshotStore.BindToLeave(() => { this.UIPath.SlingshotStore.get<ImageComponent>().Close() })
 
-        let voidPart = GroupPopUpFabric.CreateGroupPopUp(game.Workspace.WaitForChild('VoidPart') as Part)
+        
+        let slingshotStore2 = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('BowShopPart2') as Part)
+
+        slingshotStore2.radius = 5
+
+        slingshotStore2.BindToEnter(() => { this.UIPath.SlingshotStore.get<ImageComponent>().Open() })
+        slingshotStore2.BindToLeave(() => { this.UIPath.SlingshotStore.get<ImageComponent>().Close() })
+
+                
+        let slingshotStore3 = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('BowShopPart3') as Part)
+
+        slingshotStore3.radius = 5
+
+        slingshotStore3.BindToEnter(() => { this.UIPath.SlingshotStore.get<ImageComponent>().Open() })
+        slingshotStore3.BindToLeave(() => { this.UIPath.SlingshotStore.get<ImageComponent>().Close() })
+
+        let voidPart = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('VoidPart') as Part)
 
         voidPart.radius = 5
 
         voidPart.BindToEnter(() => { this.UIPath.VoidMachine.get<ImageComponent>().Open() }) 
         voidPart.BindToLeave(() => { this.UIPath.VoidMachine.get<ImageComponent>().Close() }) 
 
-        let mutationPart = GroupPopUpFabric.CreateGroupPopUp(game.Workspace.WaitForChild('MutationPart') as Part)
+        let mutationPart = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('MutationPart') as Part)
 
         mutationPart.radius = 5
 
         mutationPart.BindToEnter(() => { this.UIPath.MutationMachine.get<ImageComponent>().Open() }) 
         mutationPart.BindToLeave(() => { this.UIPath.MutationMachine.get<ImageComponent>().Close() }) 
 
-        let cleansePart = GroupPopUpFabric.CreateGroupPopUp(game.Workspace.WaitForChild('CleansePart') as Part)
+        let cleansePart = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('CleansePart') as Part)
 
         cleansePart.radius = 5
 
         cleansePart.BindToEnter(() => { this.UIPath.CleanseMachine.get<ImageComponent>().Open() }) 
         cleansePart.BindToLeave(() => { this.UIPath.CleanseMachine.get<ImageComponent>().Close() }) 
 
-        let petQuestPart = GroupPopUpFabric.CreateGroupPopUp(game.Workspace.WaitForChild('PetQuest') as Part)
+        let petIndex = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('PetIndexPart') as Part)
+
+        petIndex.radius = 5
+
+        petIndex.BindToEnter(() => { this.UIPath.Index.get<ImageComponent>().Open() }) 
+        petIndex.BindToLeave(() => { this.UIPath.Index.get<ImageComponent>().Close() }) 
+
+        let petQuestPart = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('PetQuest') as Part)
 
         petQuestPart.radius = 5
 
         petQuestPart.BindToEnter(() => { this.UIPath.Quest.get<ImageComponent>().Open() }) 
         petQuestPart.BindToLeave(() => { this.UIPath.Quest.get<ImageComponent>().Close() }) 
 
-        let limitedPetsPart = GroupPopUpFabric.CreateGroupPopUp(game.Workspace.WaitForChild('LimitedPets') as Part)
+        let limitedPetsPart = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('LimitedPets') as Part)
 
         limitedPetsPart.radius = 5
 
@@ -2600,13 +3571,19 @@ export class UIController implements OnStart, OnInit {
         }) 
         limitedPetsPart.BindToLeave(() => { this.UIPath.Store.get<ImageComponent>().Close() }) 
 
-        let dailyChest = GroupPopUpFabric.CreateGroupPopUp(game.Workspace.WaitForChild('DailyChest') as Part)
+        let dailyChest = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('DailyChest') as Part)
         dailyChest.radius = 5
         dailyChest.BindToEnter(() => { Events.ClaimReward(RewardType.DailyChest, 'nil') }) 
 
-        let groupChest = GroupPopUpFabric.CreateGroupPopUp(game.Workspace.WaitForChild('GroupChest') as Part)
+        let dailyChestBoard = BillboardFabric.CreateBillboard(dailyChest.instance.WaitForChild('Attachment1').WaitForChild('DailyUI') as BillboardGui)
+        dailyChestBoard.radius = 7
+
+        let groupChest = GroupPopUpFabric.CreateGroupPopUp(instaReplica.WaitForChild('GroupChest') as Part)
         groupChest.radius = 5
         groupChest.BindToEnter(() => { Events.ClaimReward(RewardType.GroupChest, 'nil') }) 
+
+        let groupChestBoard = BillboardFabric.CreateBillboard(groupChest.instance.WaitForChild('Attachment').WaitForChild('GroupUI') as BillboardGui)
+        groupChestBoard.radius = 7
 
         this.selectedGoldenSize.AddCallback((val) => {
             (this.UIPath.GoldMachine.GoldenInfo.GoldenHolder.get<FrameComponent>().instance.WaitForChild('Percent') as TextLabel).Text = tostring(val*20)+'%'
@@ -2639,7 +3616,7 @@ export class UIController implements OnStart, OnInit {
         this.UIPath.WheelSpin.Buy10.get<ButtonComponent>().BindToClick(() => { Events.PurchasePrompt.fire(1762896251) })
         this.UIPath.WheelSpin.Buy100.get<ButtonComponent>().BindToClick(() => { Events.PurchasePrompt.fire(1762896353) })
 
-        this.UIPath.RightList.Bundles.StarterPack.get<ButtonComponent>().BindToClick(() => { Events.PurchasePrompt.fire(1779438971) })
+        this.UIPath.RightList.Bundles.StarterPack.get<ButtonComponent>().BindToClick(() => { this.UIPath.StarterPack.get<ImageComponent>().Open() })
 
         this.UIPath.MutationMachine.MutationInfo.Buttons.Plus.get<ButtonComponent>().BindToClick((obj) => {
             this.currentMutationGems.set(math.clamp(this.currentMutationGems.get()+1, 1, 15))
@@ -2661,6 +3638,10 @@ export class UIController implements OnStart, OnInit {
 
         this.UIPath.VoidMachine.CraftInfo.Button.get<ButtonComponent>().BindToClick((obj) => {
             if (!this.selectedVoidPet) { return }
+            if (this.currentVoidTime > 0) {
+                Events.ManagePet.fire(PetOperationStatus.SkipVoid, this.selectedVoidPet);
+                return
+            }
             if (this.isPetInVoidMachine) {
                 Events.ManagePet.fire(PetOperationStatus.ClaimVoid, this.selectedVoidPet);
                 return
@@ -2695,6 +3676,19 @@ export class UIController implements OnStart, OnInit {
         })
 
         this.UIPath.Store.Gift.get<ButtonComponent>().BindToClick(() => {
+
+            let storeFrame = this.UIPath.Store.get<ImageComponent>().instance
+            let giftFrame = this.UIPath.GiftPlayerList.get<ImageComponent>().instance.WaitForChild('ScrollingFrame') as ScrollingFrame
+            let giftButton = this.UIPath.Store.Gift.get<ButtonComponent>().instance
+
+            if (this.giftingToUserId) { 
+                this.giftingToUserId = undefined; 
+                (storeFrame.WaitForChild('GiftingTo') as TextLabel).Visible = false;
+                (giftButton.WaitForChild('Value') as TextLabel).Text = 'Gift'
+                this.updateGradient(giftButton, mainUI.WaitForChild('Templates').WaitForChild('Blue') as UIGradient)
+                return 
+            };
+
             this.updatePlayerGiftFrame()
             this.UIPath.GiftPlayerList.get<ImageComponent>().Open()
         })
@@ -2716,38 +3710,40 @@ export class UIController implements OnStart, OnInit {
             Events.ClaimReward.fire(RewardType.FollowQuest, 'nil')
         })
 
-        let trainObect = this.UIPath.RightList.AutoTrain.get<ButtonComponent>().instance
-        let shootObect = this.UIPath.RightList.AutoShoot.get<ButtonComponent>().instance
-        let rebirthObect = this.UIPath.Rebirth.AutoRebirth.get<ButtonComponent>().instance
+        let trainObject = this.UIPath.RightList.AutoTrain.get<ButtonComponent>().instance
+        let shootObject = this.UIPath.RightList.AutoShoot.get<ButtonComponent>().instance
+        let rebirthObject = this.UIPath.Rebirth.AutoRebirth.get<ButtonComponent>().instance
 
         this.UIPath.RightList.AutoTrain.get<ButtonComponent>().BindToClick(() => {
             this.autoTrain = !this.autoTrain
             if (this.autoTrain) {
-                this.updateGradient(trainObect, templates.WaitForChild('Green') as UIGradient)
+                this.updateGradient(trainObject, templates.WaitForChild('Green') as UIGradient)
             }
             else {
-                this.updateGradient(trainObect, templates.WaitForChild('Red') as UIGradient)
+                this.updateGradient(trainObject, templates.WaitForChild('Red') as UIGradient)
             }
         })
 
         this.UIPath.RightList.AutoShoot.get<ButtonComponent>().BindToClick(() => {
             this.autoShoot = !this.autoShoot
             if (this.autoShoot) {
-                this.updateGradient(shootObect, templates.WaitForChild('Green') as UIGradient)
+                this.updateGradient(shootObject, templates.WaitForChild('Green') as UIGradient)
             }
             else {
-                this.updateGradient(shootObect, templates.WaitForChild('Red') as UIGradient)
+                this.updateGradient(shootObject, templates.WaitForChild('Red') as UIGradient)
             }
         })
 
-        this.UIPath.Rebirth.AutoRebirth.get<ButtonComponent>().BindToClick(() => {
-            if (!this._playerController.replica.Data.Profile.Products.includes('autorebirth')) { return }
+        this.UIPath.Rebirth.AutoRebirth.get<ButtonComponent>().BindToClick((arg) => {
+            if (!this._playerController.replica.Data.Profile.Products.includes('autorebirth')) { Events.PurchasePrompt.fire(733950750); return }
             this.autoRebirth = !this.autoRebirth
             if (this.autoRebirth) {
-                this.updateGradient(rebirthObect, templates.WaitForChild('Green') as UIGradient)
+                //(arg.WaitForChild('AutoRebirthOff') as ImageButton).Visible = true
+                this.updateGradient(rebirthObject, templates.WaitForChild('Green') as UIGradient)
             }
             else {
-                this.updateGradient(rebirthObect, templates.WaitForChild('Red') as UIGradient)
+                //(arg.WaitForChild('AutoRebirthOff') as ImageButton).Visible = false
+                this.updateGradient(rebirthObject, templates.WaitForChild('Red') as UIGradient)
             }
         })
 
@@ -2772,7 +3768,9 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.Pets', (newValue, oldValue) => {
-            this.Pets = newValue
+            let pets: IPetData[] = []
+            newValue.forEach((val) => { pets.push(PetUtilities.DBToPetTransfer(val)!) })
+            this.Pets = pets
 
             print('PetsChanged')
 
@@ -2782,11 +3780,13 @@ export class UIController implements OnStart, OnInit {
                 if (newEquippedPets.size() > this.EquippedPets.size()) {
                     this.selectedPetStatus = PetOperationStatus.Unequip
                     if (this.selectedPet) { this.selectedPet.equipped = true }
+                    PlayEffect('EquipSound')
                 }
     
                 if (this.EquippedPets.size() > newEquippedPets.size()) {
                     this.selectedPetStatus = PetOperationStatus.Equip
                     if (this.selectedPet) { this.selectedPet.equipped = false }
+                    PlayEffect('EquipSound')
                 }
     
                 this.EquippedPets = newEquippedPets
@@ -2797,12 +3797,15 @@ export class UIController implements OnStart, OnInit {
                 this.setupMassDeleteFrame()
             }
 
+            if (goldCircle.enabled) { 
+                this.setupGoldenGui() 
+                this.setupVoidPets()
+                return
+            }
 
-
-            if (goldCircle.enabled) { this.setupGoldenGui() }
-            if (voidPart.enabled) { this.setupVoidPets() }
-            if (mutationPart.enabled) { this.setupMutationGui() }
-            if (cleansePart.enabled) { this.setupCleanseGui() }
+            this.setupMutationGui()
+            this.setupCleanseGui()
+            this.setupVoidPets()
         })
 
         let accuracyLabel = this.UIPath.UpperList.Accuracy.get<ImageComponent>().instance.WaitForChild('Value') as TextLabel
@@ -2815,9 +3818,10 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.StrengthVal', (newValue, oldValue) => {
-            accuracyLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
+            task.delay(1, () => { accuracyLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue) } ) 
             this.updateStoreBillboards()
             this.replicateValue('AccuracyInfo', newValue, oldValue)
+            PlayEffect('EarnSound')
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.RebirthsVal', (newValue, oldValue) => {
@@ -2825,33 +3829,40 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.StarsVal', (newValue, oldValue) => {
-            starsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
+            task.delay(1, () => { starsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue) } )
             this.replicateValue('StarsInfo', newValue, oldValue)
+            PlayEffect('EarnSound')
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.WinsVal', (newValue, oldValue) => {
-            winsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue)
+            task.delay(1, () => { winsLabel.Text = GUIUtilities.getSIPrefixSymbol(newValue) } )
             this.replicateValue('WinsInfo', newValue, oldValue)
+            PlayEffect('EarnSound')
+            this.updateRebirth()
         })
 
         this._playerController.replica.ListenToChange('Profile.Values.GemsVal', (newValue, oldValue) => {
             let val = GUIUtilities.getSIPrefixSymbol(newValue)
-            gemsLabel.Text = val;
+            task.delay(1, () => { gemsLabel.Text = val } );
             (this.UIPath.MutationMachine.get<ImageComponent>().instance.WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = val;
             (this.UIPath.CleanseMachine.get<ImageComponent>().instance.WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = val;
             this.replicateValue('GemsInfo', newValue, oldValue)
+            PlayEffect('EarnSound')
+            this.updateRebirth()
         })
 
         this._playerController.replica.ListenToChange('Profile.Config.MaxWorld', (newValue, oldValue) => {
             this.updateWorldTeleports()
             this.updateStorePacks()
             this.updateGiftRewards()
+            this.setupPacks()
         })
 
         this._playerController.replica.ListenToChange('Session.currentWorld', (newValue, oldValue) => {
             let world = WorldsData.get(newValue)
             if (!world) { return }
             this.updateSlingshots(world)
+            this.updateStoreBillboards()
         })
 
         this._playerController.replica.ListenToChange('Profile.EquippedTool', (newValue) => {
@@ -2883,6 +3894,8 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Session.sessionTime', (newValue) => {
+            this.giftsReady = 0
+            print(this.giftsReady)
             this.currentGiftTime.set(newValue)
         })
 
@@ -2916,14 +3929,15 @@ export class UIController implements OnStart, OnInit {
             this.updateFollowQuest()
         })
 
+        this._playerController.replica.ListenToChange('Profile.ActiveBuffs', () => {
+            this.updatePotionBuffs()
+        })
+
         this._playerController.replica.ListenToChange('Session.currentFlyingObject', (newValue) => {
             print(newValue, 'Firing')
             if (newValue) {
                 camera.CameraType = Enum.CameraType.Custom
-                camera.CameraSubject = Workspace.WaitForChild('_ignoreObjects').WaitForChild(newValue.partName) as BasePart
-
-                this.isFlying = true
-                this.renderFlyingObjectPosition()
+                //camera.CameraSubject = Workspace.WaitForChild('_ignoreObjects').WaitForChild(newValue.partName) as BasePart
 
                 PlayEffect('ChangeUseStatus', new Map([['bool', false]]))
 
@@ -2933,16 +3947,19 @@ export class UIController implements OnStart, OnInit {
                 print('this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible', this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible)
                 print('this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible', this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible)
 
+                this.isFlying = true
+                this.renderFlyingObjectPosition()
+
                 return 
             }
 
             camera.CameraType = Enum.CameraType.Custom
             camera.CameraSubject = this._playerController.component.instance.Character?.WaitForChild('Humanoid') as Humanoid
 
-            PlayEffect('ChangeUseStatus', new Map([['bool', true]]))
-
             this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible = true
             this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible = false
+
+            PlayEffect('ChangeUseStatus', new Map([['bool', true]]))
 
             print('this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible', this.UIPath.LowerList.Item.get<ButtonComponent>().instance.Visible)
             print('this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible', this.UIPath.LowerList.Road.get<ImageComponent>().instance.Visible)
@@ -2960,7 +3977,10 @@ export class UIController implements OnStart, OnInit {
         (this.UIPath.MutationMachine.get<ImageComponent>().instance.WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = gemsLabel.Text;
         (this.UIPath.CleanseMachine.get<ImageComponent>().instance.WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = gemsLabel.Text;
 
-        this.Pets = replicaData.Profile.Pets
+        let pets: IPetData[] = []
+        replicaData.Profile.Pets.forEach((val) => { pets.push(PetUtilities.DBToPetTransfer(val)!) })
+
+        this.Pets = pets
         this.EquippedPets = this.getEquippedPets(this.Pets)
 
         this.equippedTool = replicaData.Profile.EquippedTool
@@ -2982,6 +4002,12 @@ export class UIController implements OnStart, OnInit {
         this.setupMassDelete()
         this.setupLimitedPets()
         this.setupPetOverlay()
+        this.setupPotionInfo()
+        this.setupPetDisable()
+        this.setupMassLock()
+        this.setupStoreBuyablePets()
+        this.setupFavorites()
+        this.setupPetBackpackPasses()
 
         this.updateGiftRewards()
         this.updateStoreLuck()
@@ -2998,10 +4024,20 @@ export class UIController implements OnStart, OnInit {
         this.updateStoreBillboards()
         this.updateStoreGamepasses()
         this.updateLowerFrame()
+        this.updatePotionBuffs()
 
         let voidMachine: Instance = this.UIPath.VoidMachine.get<ImageComponent>().instance;
+        (game.Workspace.WaitForChild('GameMusic') as Sound).Play()
+
+        this.autoShoot = this._playerController.replica.Data.Profile.StatValues.WasShooting
+        this.autoTrain = this._playerController.replica.Data.Profile.StatValues.WasTraining
+        this.autoRebirth = this._playerController.replica.Data.Profile.StatValues.WasRebirthing
 
         task.spawn(() => {
+
+            let prevAutoShoot = this.autoShoot
+            let prevAutoTrain = this.autoTrain
+            let prevAutoRebirth = this.autoRebirth
 
             while (task.wait(1)) {
 
@@ -3010,17 +4046,60 @@ export class UIController implements OnStart, OnInit {
                 this.updateWheelSpin()
                 this.updateDailyChestBillboard()
                 this.updateStarterPack()
+                this.updatePotionBuffs()
+                this.updateStorePacks()
+
+                if (prevAutoShoot !== this.autoShoot) { Events.ReplicateValues.fire(ReplicationOperationStatus.AutoShoot, this.autoShoot) }
+                if (prevAutoTrain !== this.autoTrain) { Events.ReplicateValues.fire(ReplicationOperationStatus.AutoTrain, this.autoTrain) }
+                if (prevAutoRebirth !== this.autoRebirth) { Events.ReplicateValues.fire(ReplicationOperationStatus.AutoRebirth, this.autoRebirth) }
+
+                prevAutoShoot = this.autoShoot
+                prevAutoTrain = this.autoTrain
+                prevAutoRebirth = this.autoRebirth
+
+                if (PlayerController.autoEgg) {
+                    let billboards = BillboardFabric.GetBillboards()
+                    let buyType = EggBuyType.Single
+
+                    if (this._playerController.replica.Data.Profile.Products.includes('3egghatch')) {
+                        buyType = EggBuyType.Triple
+                    }
+
+                    let pressed = false
+                    billboards.forEach((val) => {
+                        if (!val.instance.Enabled) { return }
+                        pressed = true
+                        Events.BuyEgg(val.instance.Name, buyType)
+                    })
+
+                    if (!pressed) { PlayerController.autoEgg = false }
+                }
+
+                if ((os.time() - PlayerController.lastClick) > 15*60) { TeleportService.Teleport(game.PlaceId, this._playerController.component.instance) }
+
+                //PlayEffect('Notify', new Map([['Message', 'Im gay']]))
+
+                if (os.time()%10 === 0) {
+                    let label = this.UIPath.LeftList.Store.get<ImageComponent>().instance.WaitForChild('ImageLabel') as ImageLabel
+                    let tinfo = new TweenInfo(.3)
+
+                    TweenService.Create(label, tinfo, { 'Rotation': 20 }).Play()
+                    task.delay(tinfo.Time, () => { TweenService.Create(label, tinfo, { 'Rotation': -20 }).Play() })
+                    task.delay(tinfo.Time*2, () => { TweenService.Create(label, tinfo, { 'Rotation': 0 }).Play() })
+                }
 
                 let voidTime = (this.stopVoidTime - this.startVoidTime)*this._playerController.replica.Data.Profile.Multipliers.VoidMachineMul
                 let currentVoidTime = this.startVoidTime+voidTime-os.time();
 
+                this.currentVoidTime = currentVoidTime;
+
                 if (!this.isPetInVoidMachine) {
-                    (voidMachine.WaitForChild('CraftInfo').WaitForChild('TimeNumber') as TextLabel).Text = tostring(petUpgradeConfig.EvolutionUpgrades.Gold.requirements.time);
+                    (voidMachine.WaitForChild('CraftInfo').WaitForChild('TimeNumber') as TextLabel).Text = GUIUtilities.GuiTimeFormatter(petUpgradeConfig.EvolutionUpgrades.Gold.requirements.time);
                     (voidMachine.WaitForChild('CraftInfo').WaitForChild('Button').WaitForChild('Craft') as TextLabel).Text = 'Craft To Void';
                     continue
                 }
                 
-                (voidMachine.WaitForChild('CraftInfo').WaitForChild('TimeNumber') as TextLabel).Text = tostring(currentVoidTime);
+                (voidMachine.WaitForChild('CraftInfo').WaitForChild('TimeNumber') as TextLabel).Text = GUIUtilities.GuiTimeFormatter(currentVoidTime);
 
                 if (currentVoidTime <= 0) {
                     (voidMachine.WaitForChild('CraftInfo').WaitForChild('Button').WaitForChild('Craft') as TextLabel).Text = 'Collect';
@@ -3033,6 +4112,7 @@ export class UIController implements OnStart, OnInit {
             }
 
         })
+
 
     }
 

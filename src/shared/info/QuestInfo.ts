@@ -123,7 +123,23 @@ EggQuestsData.set('Shadow', {
 })
 
 PetIndexQuestsData.set('PetIndexQuest1', {
-    requirements: new Map<string, any>([['pets', 10], ['tier', 'Tier 1']]),
+    requirements: new Map<string, any>([['pets', 25], ['tier', 'Tier 1']]),
+    reward: {
+        Values: {},
+        Additional: new Map([['MaxEquippedPets', 1]]),
+    }
+})
+
+PetIndexQuestsData.set('PetIndexQuest2', {
+    requirements: new Map<string, any>([['pets', 50], ['tier', 'Tier 1']]),
+    reward: {
+        Values: {},
+        Additional: new Map([['MaxEquippedPets', 1]]),
+    }
+})
+
+PetIndexQuestsData.set('PetIndexQuest3', {
+    requirements: new Map<string, any>([['pets', 75], ['tier', 'Tier 1']]),
     reward: {
         Values: {},
         Additional: new Map([['MaxEquippedPets', 1]]),

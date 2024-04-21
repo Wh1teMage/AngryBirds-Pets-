@@ -71,13 +71,17 @@ export enum PetOperationStatus {
     CraftSize = 'CraftSize',
     Evolve = 'Evolve',
     Mutate = 'Mutate',
+    SkipVoid = 'SkipVoid',
     ClaimVoid = 'ClaimVoid',
     RemoveMutation = 'RemoveMutation',
 
     MultiDelete = 'MultiDelete',
+    MultiLock = 'MultiLock',
+    MultiUnlock = 'MultiUnlock',
     EquipBest = 'EquipBest',
     UnequipAll = 'UnequipAll',
     CraftAll = 'CraftAll',
+    SessionAutoDelete = 'SessionAutoDelete',
 }
 
 //'Cat|Huge|Void|56'

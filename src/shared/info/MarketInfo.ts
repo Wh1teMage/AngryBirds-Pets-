@@ -102,4 +102,28 @@ export const MarketNamings = new Map<number, IProductData>([
         if (defaultGlobal.get('Limited3')! < 0) { return false }
         return true
     },}],
+
+    [1762894442, {name: 'nightmare1', producttype: ProductType.DevProduct}],
+    [1762894847, {name: 'nightmare3', producttype: ProductType.DevProduct}],
+    [1762894981, {name: 'nightmare10', producttype: ProductType.DevProduct}],
+
+    [1763283579, {name: 'shadow1', producttype: ProductType.DevProduct}],
+    [1763283812, {name: 'shadow3', producttype: ProductType.DevProduct}],
+    [1763283954, {name: 'shadow10', producttype: ProductType.DevProduct}],
+
+    [1762895173, {name: 'party1', producttype: ProductType.DevProduct}],
+    [1762895301, {name: 'party3', producttype: ProductType.DevProduct}],
+    [1762895396, {name: 'party10', producttype: ProductType.DevProduct}],
+
+    [1762884433, {name: 'diamond1', producttype: ProductType.DevProduct}],
+    [1782683273, {name: 'diamond3', producttype: ProductType.DevProduct}],
+
+    [1779476876, {name: 'luminousstone', producttype: ProductType.DevProduct}],
+    [1779477226, {name: 'strongshield', producttype: ProductType.DevProduct}],
+    [1779477513, {name: 'lightsaber', producttype: ProductType.DevProduct}],
+
+    [1802315798, {name: 'voidskip', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
+        if (!player.session.selectedVoid) { return false }
+        return true
+    },}],
 ])

@@ -35,13 +35,22 @@ export class CreationUtilities {
 
     static Weld(p0: BasePart, p1: BasePart) {
 
+        let weld = new Instance('Weld')
+        weld.Part0 = p0
+        weld.Part1 = p1
+        weld.Parent = p0
+
+        return weld
+    }
+
+    static WeldConstraint(p0: BasePart, p1: BasePart) {
+
         let weld = new Instance('WeldConstraint')
         weld.Part0 = p0
         weld.Part1 = p1
         weld.Parent = p0
 
-        print(weld)
-
+        return weld
     }
 
     static getSIPrefixSymbol(num: number) {

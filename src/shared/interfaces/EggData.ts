@@ -9,6 +9,8 @@ export enum EggValueType {
 export enum EggBuyType {
     Single = 'Single',
     Triple = 'Triple',
+    Ten = 'Ten',
+    Auto = 'Auto',
 }
 
 export interface IEggData {
@@ -18,8 +20,12 @@ export interface IEggData {
     petchances: {weight: number, name?: string}[]//Map<string, number>
 
     productid?: number
+    productidx3?: number
+
     model?: IEggModel
     exceptions?: Map<string, IDBPetData>
+
+    rotationOffset?: CFrame
 }
 
 export interface IEggModel extends Model {
@@ -33,33 +39,38 @@ export interface IEggModel extends Model {
         }
         EggUI: Attachment & {
             BillboardGui: BillboardGui & {
-                EggFrame: ImageLabel & {
+                Frame: ImageLabel & {
                     Passes: Frame & {
                         Luck: ImageButton & { Lock: ImageLabel }
                         Luck2: ImageButton & { Lock: ImageLabel }
                         Luck3: ImageButton & { Lock: ImageLabel }
                     }
-                    Pets: Frame
-                    Wins: ImageLabel & {
-                        Value: TextLabel
-                    }
-                    EggName: TextLabel
-                    Buttons: Frame & {
-                        E: ImageButton
-                        R: ImageButton
-                        T: ImageButton
+
+                    x3Open: ImageButton
+
+                    EggFrame: ImageLabel & {
+                        Pets: Frame
+                        Wins: ImageLabel & {
+                            Value: TextLabel
+                        }
+                        EggName: TextLabel
+                        Buttons: Frame & {
+                            E: ImageButton
+                            R: ImageButton
+                            T: ImageButton
+                        }
                     }
                 }
             }
         }
         SurfaceGui: SurfaceGui
-        Examples: Folder & {
+        /*Examples: Folder & {
             PetExample: ImageButton & {
                 PetName: TextLabel
                 Percent: TextLabel
                 ViewportFrame: ViewportFrame
             }
-        }
+        }*/
     }
     // add gui, etc
 }
