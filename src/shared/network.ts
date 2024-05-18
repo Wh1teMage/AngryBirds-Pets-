@@ -2,7 +2,7 @@ import { Networking } from "@flamework/networking";
 import { EffectName } from "./enums/EffectEnums";
 import { EggBuyType } from "./interfaces/EggData";
 import { RequestOperationStatus, TradeOperationStatus, TradeUpdateStatus } from "./interfaces/TradeData";
-import { IDBPetData, PetOperationStatus } from "./interfaces/PetData";
+import { IDBPetData, PetOperationStatus, PetReplicationStatus } from "./interfaces/PetData";
 import { ToolOperationStatus } from "./interfaces/ToolData";
 import { WorldOperationStatus } from "./interfaces/WorldData";
 import { WorldType } from "./enums/WorldEnums";
@@ -36,6 +36,7 @@ interface ClientToServerEvents {
 interface ServerToClientEvents {
     ReplicateEffect: (name: string, additional?: Map<string, any>) => void
     SendTradeRequest: (requestingplayer: Player) => void
+    SendPetReplication: (operation: PetReplicationStatus, newpets?: IDBPetData[], oldpets?: IDBPetData[]) => void
 }
 
 interface ClientToServerFunctions {}

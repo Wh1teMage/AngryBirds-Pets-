@@ -34,7 +34,7 @@ EggsData.set('Default', {
 */
 EggsData.set('Stone', {
     name: 'Stone',
-    price: 0,
+    price: 5,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 420, name: 'Cat' },
@@ -48,7 +48,7 @@ EggsData.set('Stone', {
 
 EggsData.set('Ore', {
     name: 'Ore',
-    price: 0,
+    price: 50,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 440, name: 'Fox'},
@@ -64,7 +64,7 @@ EggsData.set('Ore', {
 
 EggsData.set('Rail', {
     name: 'Rail',
-    price: 0,
+    price: 250,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 460, name:  'Cow'},
@@ -79,7 +79,7 @@ EggsData.set('Rail', {
 
 EggsData.set('Diamond', {
     name: 'Diamond',
-    price: 0,
+    price: 149,
     valuetype: EggValueType.VBugs,
     petchances: [
         { weight: 60, name:  'Glacier'},
@@ -97,7 +97,7 @@ EggsData.set('Diamond', {
 // !World 2 \/
 EggsData.set('Pink', {
     name: 'Pink',
-    price: 0,
+    price: 2500,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 460, name:  'Pink Bunny'},
@@ -112,10 +112,10 @@ EggsData.set('Pink', {
 
 EggsData.set('Cat', {
     name: 'Cat',
-    price: 0,
+    price: 10000,
     valuetype: EggValueType.Wins,
     petchances: [
-        { weight: 480, name:  'Blue Something'},
+        { weight: 480, name:  'Blue Slime'},
         { weight: 320, name:  'White Bear'},
         { weight: 150, name: 'Gecon' },
         { weight: 50, name: 'Clown Doggy' },
@@ -127,7 +127,7 @@ EggsData.set('Cat', {
 
 EggsData.set('Forcefield', {
     name: 'Forcefield',
-    price: 0,
+    price: 50000,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 500, name:  'Polar'},
@@ -142,7 +142,7 @@ EggsData.set('Forcefield', {
 
 EggsData.set('Rich', {
     name: 'Rich',
-    price: 0,
+    price: 250000,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 69, name:  'Sus Cat'},
@@ -158,12 +158,12 @@ EggsData.set('Rich', {
 
 EggsData.set('Bear', {
     name: 'Bear',
-    price: 0,
+    price: 500000,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 480, name:  'Garden Wraith'},
         { weight: 320, name:  'Capybara'},
-        { weight: 140, name: 'Yellow Something' },
+        { weight: 140, name: 'Yellow Slime' },
         { weight: 60, name: 'Royal Raven' },
         { weight: 5, name: 'King Ant' },
     ],
@@ -172,7 +172,7 @@ EggsData.set('Bear', {
 
 EggsData.set('Flower', {
     name: 'Flower',
-    price: 0,
+    price: 2500000,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 500, name:  'Mystery Cat'},
@@ -186,7 +186,7 @@ EggsData.set('Flower', {
 
 EggsData.set('Sun', {
     name: 'Sun',
-    price: 0,
+    price: 10000000,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 520, name:  'Hacked Doggy'},
@@ -201,7 +201,7 @@ EggsData.set('Sun', {
 
 EggsData.set('Cursed', {
     name: 'Cursed',
-    price: 0,
+    price: 40000000,
     valuetype: EggValueType.Wins,
     petchances: [
         { weight: 750, name:  'Mega Galaxy Doggy'},
@@ -223,7 +223,7 @@ EggsData.set('Nightmare', {
         { weight: 500, name:  'Nightmare Cat'},
         { weight: 250, name:  'Nightmare Bunny'},
         { weight: 150, name: 'Nightmare Yeti' },
-        { weight: 50, name: 'Devil Spider' },
+        { weight: 50, name: 'Nightmare Spirit' },
         { weight: 5, name: 'Observer' },
     ],
     //model: Workspace.WaitForChild('World1').WaitForChild('StoneEgg') as IEggModel

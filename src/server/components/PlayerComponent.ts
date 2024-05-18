@@ -10,7 +10,7 @@ import { DefaultMultipliers, ICharacter, IMultipliers, ISessionData, SessionData
 import { Events } from "server/network";
 import { EffectName } from "shared/enums/EffectEnums";
 import { CharacterFabric } from "./CharacterComponent";
-import { Evolutions, IDBPetData, Mutations, Sizes } from "shared/interfaces/PetData";
+import { Evolutions, IDBPetData, IPetData, Mutations, PetReplicationStatus, Sizes } from "shared/interfaces/PetData";
 import { PetUtilities } from "shared/utility/PetUtilities";
 import { petUpgradeConfig } from "shared/configs/PetConfig";
 import Functions from "shared/utility/LuaUtilFunctions";
@@ -66,7 +66,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     private _playerMultiplersController = new PlayerMultiplersController(this)
     
     public FindPet = (pet: IDBPetData) => this._playerPetController.FindPet(pet)
-    public AppendPet = (pet: IDBPetData | undefined) => this._playerPetController.AppendPet(pet)
+    public AppendPet = (pet: IDBPetData | undefined, ignore?: boolean) => this._playerPetController.AppendPet(pet, ignore)
     public RemovePet = (pet: IDBPetData) => this._playerPetController.RemovePet(pet)
     public LockPet = (pet: IDBPetData) => this._playerPetController.LockPet(pet)
 
@@ -212,22 +212,18 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
         this.GivePremiumReward()
         this.session.headStats.Parent = Workspace.Terrain
+        this.session.leaderStats.Parent = this.instance
 
         task.spawn(() => {
-            this.AppendPotion(PotionType.LuckPotion)
-            this.UsePotion(PotionType.LuckPotion)
-            
+            //this.AppendPotion(PotionType.LuckPotion)
+            //this.UsePotion(PotionType.LuckPotion)
+
+            /*
             if (this.profile.Data.Pets.size() < 10) {
-
-                let i = 0
-                for (let obj of PetsData) {
-                    i ++
-
-                    if (i > 90) { break }
-                    
+                for (let i = 0; i < 200; i++) {
                     this.AppendPet(
                         {
-                            name: obj[1].name,
+                            name: 'Cat',
                             additional: {
                                 size: Sizes.Baby,
                                 evolution: Evolutions.Normal,
@@ -238,10 +234,10 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                             equipped: false
                         }
                     )
-
+                    
                     this.EquipPet(
                         {
-                            name: obj[1].name,
+                            name: 'Cat',
                             additional: {
                                 size: Sizes.Baby,
                                 evolution: Evolutions.Normal,
@@ -252,9 +248,29 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                             equipped: false
                         }
                     )
-
-                    task.wait()
+                    
                 }
+            }
+            */
+            
+
+            
+            
+            if (this.profile.Data.Pets.size() < 1) {
+
+                this.AppendPet(
+                    {
+                        name: 'Cat',
+                        additional: {
+                            size: Sizes.Baby,
+                            evolution: Evolutions.Normal,
+                            mutation: Mutations.Default,
+                        },
+                        locked: false,
+                        equipped: false
+                    }
+                )
+
             }
             
             print(this.profile.Data, 'Profile')
@@ -328,8 +344,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             )
             */
 
-            let test = AbilityFabric.CreateAbility('Fireball', this.instance)
-            test.Start()
+            //let test = AbilityFabric.CreateAbility('Fireball', this.instance)
+            //test.Start()
             /*
             let tchances = [
                 {weight: 10, name: '1'},
@@ -357,6 +373,11 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             let headFrame = this.session.headStats.WaitForChild('Frame');
             (headFrame.WaitForChild('Nickname') as TextLabel).Text = this.instance.Name
 
+            let accuracyStats = this.session.leaderStats.WaitForChild('Accuracy') as IntValue
+            let winsStats = this.session.leaderStats.WaitForChild('Wins') as IntValue
+            let rebirthStats = this.session.leaderStats.WaitForChild('Rebirth') as IntValue
+            let gemsStats = this.session.leaderStats.WaitForChild('Gems') as IntValue
+
             task.spawn(() => {
                 while (task.wait(1)) {
 
@@ -375,6 +396,11 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
                     this.replica.SetValue('Session.sessionTime', this.session.sessionTime)
                     this.replica.SetValue('Profile.StatValues.IngameTime', this.profile.Data.StatValues.IngameTime )
+
+                    accuracyStats.Value = this.profile.Data.Values.StrengthVal
+                    winsStats.Value = this.profile.Data.Values.WinsVal
+                    rebirthStats.Value = this.profile.Data.Values.RebirthsVal
+                    gemsStats.Value = this.profile.Data.Values.GemsVal
 
                     //this.replica.SetValue('Session.testvalue', math.random(0, 100))
                     //Events.ReplicateEffect.fire(this.instance, EffectName.ClickSound)
@@ -536,7 +562,7 @@ class PlayerMultiplersController {
         */
 
         if (multiname === 'strength') { overallMultiplier *= profileData.Multipliers.StrengthMul }
-        if (multiname === 'stars') { overallMultiplier *= profileData.Multipliers.StarsMul }
+        //if (multiname === 'stars') { overallMultiplier *= profileData.Multipliers. }
         if (multiname === 'stars') { overallMultiplier *= profileData.Multipliers.StarsMul }
         if (multiname === 'wins') { overallMultiplier *= profileData.Multipliers.WinsMul }
 
@@ -639,7 +665,9 @@ class PlayerPotionController {
 
         let buffIndex = this.GetCurrentBuffIndex(potionInfo.buffname)
 
-        if (buffIndex) { 
+        print(buffIndex, 'Buffindex')
+
+        if (buffIndex !== undefined) { 
             profileData.ActiveBuffs[buffIndex].endTime += potionInfo!.duration; 
         }
         else { 
@@ -801,9 +829,11 @@ class PlayerEggController {
             pets.push(pet!.name)
 
             if (sessionData.deletePets.includes(pet!.name)) { continue }
-            this.player.AppendPet(pet)
+            this.player.AppendPet(pet, true)
         }
         
+        this.player.replica.SetValue('Profile.Pets', this.player.profile.Data.Pets)
+
         Events.ReplicateEffect.fire(this.player.instance, 'EggHatched', new Map<string, any>([
             ['EggName', name], ['Pets', pets], ['Speed', this.player.profile.Data.Multipliers.HatchSpeedMul]
         ]))
@@ -881,6 +911,8 @@ class PlayerPetController {
 
     private player: ServerPlayerComponent
 
+    private lastCraftAll = os.clock()
+
     constructor(player: ServerPlayerComponent) {
         this.player = player
     }
@@ -898,14 +930,15 @@ class PlayerPetController {
                 if (!PetUtilities.ComparePets(pet, v)) { continue }
 
                 passes += 1; 
-                if (passes >= value[1]) { break }
                 selectedPets.push(v)
+                if (passes >= value[1]) { break }
             }
 
             if (passes < value[1]) { return }
         }
 
-        for (let selectedpet of selectedPets) { this.RemovePet(selectedpet) }
+        for (let selectedpet of selectedPets) { this.RemovePet(selectedpet, true) }
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Remove, selectedPets)
         /*
         for (let value of upgradeConfig) {
             let formatted = pet
@@ -946,13 +979,14 @@ class PlayerPetController {
     }
 
     public EquipPet(pet: IDBPetData, ignore?: boolean, index?: number) {
+        print('TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest2', pet, ignore)
         let profileData = this.player.profile.Data
         let petIndex = -1
 
         if (this.CheckEquipCount()+1 > profileData.Config.MaxEquippedPets) { return }
 
         if (index) { petIndex = index }
-        if (!index) { profileData.Pets.forEach((value, index) => { if (Functions.compareObjects(pet, value) && !value.equipped) { petIndex = index } }) }
+        if (!index) { profileData.Pets.forEach((value, index) => { if ((pet.id === value.id)) { petIndex = index } }) } //Functions.compareObjects(pet, value) && !value.equipped
         //print(petIndex, pet.equipped)
         if (petIndex < 0) { return }
         //print('Equipped')
@@ -960,26 +994,39 @@ class PlayerPetController {
 
         task.spawn(() => { PetModelManager.AddPet(this.player.instance, profileData.Pets[petIndex]) })
         
-        if (!ignore) { this.player.SetPetMultipliers() }
         if (ignore) { return }
+
+        this.player.SetPetMultipliers()
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Update, [profileData.Pets[petIndex]!], [pet])
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
 
     public UnequipPet(pet: IDBPetData, ignore?: boolean, index?: number) {
+        print('TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest1', pet, ignore)
+
         let profileData = this.player.profile.Data
         let petIndex = -1
 
         if (index) { petIndex = index }
-        if (!index) { profileData.Pets.forEach((value, index) => { if (Functions.compareObjects(pet, value) && value.equipped) { petIndex = index } }) }
+        if (!index) { profileData.Pets.forEach((value, index) => { if ((pet.id === value.id)) { petIndex = index } }) } //&& value.equipped
+
+        print(petIndex)
+
         if (petIndex < 0) { return }
         //if (!profileData.Pets[petIndex].equipId || profileData.EquippedPets.indexOf(profileData.Pets[petIndex].equipId!) < 0) { return }
+
+        print(profileData.Pets[petIndex], petIndex)
 
         profileData.Pets[petIndex].equipped = false
 
         task.spawn(() => { PetModelManager.RemovePet(this.player.instance, profileData.Pets[petIndex]) })
 
-        if (!ignore) { this.player.SetPetMultipliers() }
         if (ignore) { return }
+
+        print('Sent!')
+
+        this.player.SetPetMultipliers()
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Update, [profileData.Pets[petIndex]!], [pet])
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
 
@@ -999,26 +1046,32 @@ class PlayerPetController {
 
         if (this.player.profile.Data.PetIndex.indexOf(pet.name) < 0) { this.player.profile.Data.PetIndex.push(pet.name) }
 
-        this.player.profile.Data.Pets.push(pet)
+        let formatted = table.clone(pet)
+        formatted.id = HttpService.GenerateGUID(false)+tostring(math.random(1, 1000))
 
-        if (!ignore) { this.player.replica.SetValue('Profile.Pets', this.player.profile.Data.Pets) }
-        if (!ignore) { this.player.replica.SetValue('Profile.PetIndex', this.player.profile.Data.PetIndex) }
+        this.player.profile.Data.Pets.push(formatted)
+        this.player.session.activePassives.forEach((passive) => { passive.onPetAdded(formatted) })
 
-        this.player.session.activePassives.forEach((passive) => { passive.onPetAdded(pet) })
+        if (ignore) { return }
+
+        this.player.replica.SetValue('Profile.Pets', this.player.profile.Data.Pets)
+        this.player.replica.SetValue('Profile.PetIndex', this.player.profile.Data.PetIndex)
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Append, [pet])
     }
 
     public RemovePet(pet: IDBPetData, ignore?: boolean) {
         let profileData = this.player.profile.Data
         let petIndex = -1
 
-        profileData.Pets.forEach((value, index) => { if (Functions.compareObjects(pet, value) && !value.locked) { petIndex = index } })
+        profileData.Pets.forEach((value, index) => { if ((pet.id === value.id) && !value.locked) { petIndex = index } })
         if (petIndex < 0) { return }
 
-        if ( profileData.Pets[petIndex].equipped ) { this.UnequipPet(pet, ignore) }
+        if ( profileData.Pets[petIndex].equipped ) { this.UnequipPet(pet, true) }
 
         profileData.Pets.remove(petIndex)
 
         if (ignore) { return }
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Remove, [pet])
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
 
@@ -1028,10 +1081,14 @@ class PlayerPetController {
     }
 
     public CraftAll() {
+        if ((os.clock() - this.lastCraftAll) < 1) { return }
+
         let profileData = this.player.profile.Data
-        profileData.Pets.forEach((val) => {
-            this.UpgradePetSize(val, true)
-        })
+        for (let pet of profileData.Pets) {
+            this.UpgradePetSize(pet, true)
+        }
+
+        this.lastCraftAll = os.clock()
 
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
         this.player.replica.SetValue('Profile.PetIndex', profileData.PetIndex)
@@ -1042,24 +1099,29 @@ class PlayerPetController {
         let start = os.clock()
         print(os.clock()-start, 'pass1')
 
-        let proxyPets = []
+        /*
+        let proxyPets: IPetData[] = []
+        let otherProxy = []
+
         for (let val of profileData.Pets) {
             proxyPets.push(PetUtilities.DBToPetTransfer(val)!)
+            otherProxy.push(table.clone(val))
         }
 
         print(os.clock()-start, 'pass1.5')
         proxyPets.sort((a, b) => {
             return a.multipliers!.get('strength')! > b.multipliers!.get('strength')!
         })
+        */
 
-        /*
+        
         profileData.Pets.sort((a, b) => {
             let petData1 = PetUtilities.DBToPetTransfer(a)!
             let petData2 = PetUtilities.DBToPetTransfer(b)!
 
             return petData1.multipliers!.get('strength')! > petData2.multipliers!.get('strength')!
         })
-        */
+        
         print(os.clock()-start, 'pass2')
 
         this.UnequipAll(true)
@@ -1067,26 +1129,30 @@ class PlayerPetController {
 
         let equipList: IDBPetData[] = []
 
-        for (let val of profileData.Pets) {
+        /*
+        for (let val of proxyPets) {
             //task.wait()
-            if ((val.equipped) || (equipList.size() > math.min(profileData.Config.MaxEquippedPets, profileData.Pets.size()))) { continue }
-            equipList.push(table.clone(val))
+            if (equipList.size() > math.min(profileData.Config.MaxEquippedPets, profileData.Pets.size())) { continue }
+            equipList.push(PetUtilities.PetToDBTransfer(val))
         }
+        */
 
         print(os.clock()-start, 'pass4')
+        print(equipList, 'EquipList')
 
-        for (let i = 0; i < equipList.size(); i++) {
-            let val = equipList[i]
+        for (let i = 0; i < math.min(profileData.Config.MaxEquippedPets, profileData.Pets.size()); i++) {
+            let val = profileData.Pets[i]
             //task.wait()
             this.EquipPet(val, true, i)
         }
 
         print(os.clock()-start, 'pass5')
 
-        proxyPets.clear()
-        equipList.clear()
         this.player.SetPetMultipliers()
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Update, profileData.Pets, otherProxy)
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
+
+        equipList.clear()
 
         print(os.clock()-start, 'pass6')
     }
@@ -1094,23 +1160,33 @@ class PlayerPetController {
     public UnequipAll(ignore?: boolean) {
         let profileData = this.player.profile.Data
         let unequipList: IDBPetData[] = []
+        let proxyList: IDBPetData[] = []
 
         profileData.Pets.forEach((val) => {
             if (!val.equipped) { return }
             unequipList.push(table.clone(val))
+            proxyList.push(table.clone(val))
         })
 
         for (let i = 0; i < unequipList.size(); i++) {
             let val = unequipList[i]
             this.UnequipPet(val, true, i)
+            proxyList[i].equipped = false
         }
 
-        unequipList = []
+        if (ignore) { 
+            unequipList.clear()
+            proxyList.clear()
+        }
 
         if (ignore) { return }
 
         this.player.SetPetMultipliers()
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Update, proxyList, unequipList)
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
+
+        unequipList.clear()
+        proxyList.clear()
     }
 
     public LockPet(pet: IDBPetData, ignore?: boolean) {
@@ -1121,21 +1197,32 @@ class PlayerPetController {
         foundPet.locked = !foundPet.locked
 
         if (ignore) { return }
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Update, [foundPet], [pet])
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
 
     public MultiLock(pets: IDBPetData[]) {
         let profileData = this.player.profile.Data
+        let newPets: IDBPetData[] = []
 
-        pets.forEach((val) => { if (!val.locked) { this.LockPet(val, true) } })
+        pets.forEach((val) => { if (!val.locked) { this.LockPet(val, true); newPets.push(val) } })
+
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Update, newPets, pets)
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
+
+        newPets.clear()
     }
 
     public MultiUnlock(pets: IDBPetData[]) {
         let profileData = this.player.profile.Data
+        let newPets: IDBPetData[] = []
 
-        pets.forEach((val) => { if (val.locked) { this.LockPet(val, true) } })
+        pets.forEach((val) => { if (val.locked) { this.LockPet(val, true); newPets.push(val) } })
+
+        //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Update, newPets, pets)
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
+
+        newPets.clear()
     }
 
     public UpgradePetSize(pet: IDBPetData, ignore?: boolean) {
@@ -1181,6 +1268,7 @@ class PlayerPetController {
         formatted.additional.mutation = mutationName as Mutations
 
         this.AppendPet(formatted)
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Successful ${mutationName!.upper()} Mutation!`], ['Image', 'Success']]))
     }
 
     public RemovePetMutation(pet: IDBPetData) {
@@ -1198,6 +1286,7 @@ class PlayerPetController {
         formatted.additional.mutation = Mutations.Default
 
         this.AppendPet(formatted)
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Successfully Cleared Mutation!'], ['Image', 'Success']]))
     }
 
     public UpgradePetEvolution(pet: IDBPetData, count?: number) {
@@ -1225,10 +1314,16 @@ class PlayerPetController {
                     removablePets.push(value)
                 } })
 
+                let proxy: IDBPetData[] = []
+
                 for (let i = 1; i <= count; i++) {
+                    proxy.push(table.clone(removablePets[0]))
                     this.RemovePet(removablePets[0], true)
                     removablePets.remove(0)
                 }
+
+                //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Remove, proxy)
+                proxy.clear()
 
                 let chance = math.random(1,5)
 
@@ -1554,7 +1649,8 @@ class PlayerRewardController {
         sessionData.claimedRewards.push(rewardindex)
         this.player.replica.SetValue('Session.claimedRewards', sessionData.claimedRewards)
 
-        print(sessionData.claimedRewards)
+        print(sessionData.claimedRewards.size(), 'Claimed Rewards', this.player.instance.Name)
+        print(sessionData)
 
         this.ApplyReward(selectedReward)
         Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Gift Claimed!'], ['Image', 'Success']]))
@@ -1613,6 +1709,8 @@ class PlayerRewardController {
 
         profileData.RedeemedCodes.push('FollowCode')
         this.ApplyReward(FollowCodeRewardData)
+
+        this.player.replica.SetValue('Profile.RedeemedCodes', profileData.RedeemedCodes)
         Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Code Redeemed!'], ['Image', 'SuccessfulFollow']]))
     }
 
@@ -1639,6 +1737,7 @@ class PlayerRewardController {
 
         this.ApplyReward(nextRebirthData)
         profileData.Values.RebirthsVal += 1
+        profileData.Values.GemsVal += nextRebirthData.Values!.Gems! * (profileData.Multipliers.GemsMul - 1)
         if (!skip) { profileData.Values.WinsVal -= additional.get('Wins')! }
 
         this.player.replica.SetValue('Profile.Values.WinsVal', profileData.Values.WinsVal)
@@ -1808,13 +1907,17 @@ class PlayerFlyingController {
         flyingPart.Transparency = 1
         flyingPart.Name = this.player.instance.Name+tostring(math.random(10e9, 10e8))
 
-        let ignoreFolder = game.Workspace.FindFirstChild('_ignoreObjects')
+        let ignoreFolder = game.Workspace.WaitForChild('InstaReplica') //game.Workspace.FindFirstChild('_ignoreObjects')
 
+        print(flyingPart, ignoreFolder?.GetChildren())
+
+        /*
         if (!ignoreFolder) { 
-            ignoreFolder = new Instance('Folder', game.Workspace)
+            ignoreFolder = new Instance('Model', game.Workspace)
             ignoreFolder.Name = '_ignoreObjects'
             ignoreFolder.Parent = game.Workspace
         }
+        */
 
         flyingPart.CFrame = new CFrame(currentWorld.startingPosition)
         flyingPart.Anchored = true
@@ -1858,6 +1961,7 @@ class PlayerFlyingController {
         if (sessionData.currentFlyingObject && sessionData.currentFlyingObject.flying) { return }
 
         let currentWorld = WorldsData.get(sessionData.currentWorld)
+        let flyingWorld = sessionData.currentWorld
         if (!currentWorld) { return }
 
         let flyingPart = sessionData.currentFlyingObject!.part
@@ -1872,14 +1976,14 @@ class PlayerFlyingController {
 
         object.BindToStop((obj) => {
             print('ended')
-            print(currentWorld!.reward * math.max((obj.Distance / length), .01) * this.player.CalculateMultiplier('wins'))
+            print(currentWorld!.reward * math.max((obj.Distance / length), .01) * this.player.CalculateMultiplier('wins'), math.max((obj.Distance / length), .01), this.player.CalculateMultiplier('wins'), obj.Distance, length)
             print(obj.Laps, 'Laps')
 
             isFlying = false
 
             this.player.SetWins( profileData.Values.WinsVal + currentWorld!.reward * math.max((obj.Distance / length), .01) * this.player.CalculateMultiplier('wins') )
-            if (profileData.Config.MaxWorld === sessionData.currentWorld) { 
-                this.player.SetStars( profileData.Values.StarsVal + obj.Laps * currentWorld!.starsReward )
+            if (profileData.Config.MaxWorld === sessionData.currentWorld && flyingWorld === sessionData.currentWorld) { 
+                this.player.SetStars( profileData.Values.StarsVal + obj.Laps * currentWorld!.starsReward * this.player.CalculateMultiplier('stars') )
             }
 
             sessionData.currentFlyingObject!.part.Destroy()

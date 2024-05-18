@@ -31,8 +31,9 @@ WorldsData.set(WorldType.Cave, {
     minY: 30,
     angle: 10,
     energyLoss: 70,
+    lapEnergyLoss: 60,
 
-    maxPower: 80000*15,
+    maxPower: 80000*15*10000,
 })
 
 WorldsData.set(WorldType.NeonCity, {
@@ -41,7 +42,7 @@ WorldsData.set(WorldType.NeonCity, {
     slingshotPart: game.Workspace.WaitForChild('World2').WaitForChild('Slingshot').WaitForChild('Part') as Part,
     shop: ['Slingshot1W2', 'Slingshot2W2', 'Slingshot3W2', 'Slingshot4W2', 'Slingshot5W2', 'Slingshot6W2', 'SlingshotD1W2'], //['я четырнадцати летняя проститутка из Никгура'],
     shopName: 'World2',
-    worldIcon: 'rbxassetid://16290423194',
+    worldIcon: 'rbxassetid://16526402587',
 
     multipliers: new Map([['strength', 1]]),
     weight: 2,
@@ -49,7 +50,7 @@ WorldsData.set(WorldType.NeonCity, {
 
     maxClicks: 100,
     reward: 28000,
-    starsReward: 10,
+    starsReward: 100,
 
     gravity: 10,
     density: 190907,
@@ -60,8 +61,9 @@ WorldsData.set(WorldType.NeonCity, {
     minY: -130,
     angle: 10,
     energyLoss: 70,
+    lapEnergyLoss: 60,
 
-    maxPower: 35000000*15,
+    maxPower: 35000000*15*10000,
 })
 
 WorldsData.set(WorldType.Space, {
@@ -70,18 +72,18 @@ WorldsData.set(WorldType.Space, {
     slingshotPart: game.Workspace.WaitForChild('World3').WaitForChild('Slingshot').WaitForChild('Part') as Part,
     shop: ['Slingshot1W3', 'Slingshot2W3', 'Slingshot3W3', 'Slingshot4W3', 'Slingshot5W3', 'Slingshot6W3', 'SlingshotD1W3'],
     shopName: 'World3',
-    worldIcon: 'rbxassetid://16290423194',
+    worldIcon: 'rbxassetid://16526412141',
     
     multipliers: new Map([['strength', 1]]),
     weight: 3,
-    price: 200,
+    price: 10000,
 
     maxClicks: 100,
     reward: 2800000,
-    starsReward: 10,
+    starsReward: 1000,
 
     gravity: 10,
-    density: 100818181,
+    density: 100818181*2,
     
     startingPosition: new Vector3(-1550.3, 633, 7517.118),
     endingPosition: new Vector3(-1549.756, 626, 3400.771),
@@ -89,6 +91,7 @@ WorldsData.set(WorldType.Space, {
     minY: 626,
     angle: 10,
     energyLoss: 70,
+    lapEnergyLoss: 50,
 
-    maxPower: 4*10**9*5,
+    maxPower: 4*10**9*5*10000,
 })

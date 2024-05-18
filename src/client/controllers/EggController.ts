@@ -40,6 +40,14 @@ export class EggController implements OnStart, OnInit {
 
         let eggMainUI = this._playerController.component.instance.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('EggGui')
 
+        let luck2List: ImageLabel[] = []
+        let luck3List: ImageLabel[] = []
+
+        this._playerController.replica.ListenToChange('Profile.Products', (newval) => {
+            luck2List.forEach((val) => { val.Visible = !newval.includes('luck1') })
+            luck3List.forEach((val) => { val.Visible = !newval.includes('luck2') })
+        })
+
         for (let egg of EggsData) {
 
             let name = egg[0]
@@ -67,6 +75,9 @@ export class EggController implements OnStart, OnInit {
             passes.Luck2.Lock.Visible = !profileData.Products.includes('luck1')
             passes.Luck3.Lock.Visible = !profileData.Products.includes('luck2')
 
+            luck2List.push(passes.Luck2.Lock)
+            luck3List.push(passes.Luck3.Lock)
+
             eggFrame.EggName.Text = data.name
 
             ButtonFabric.CreateButton(passes.Luck).BindToClick(() => { Events.PurchasePrompt(722093437) })
@@ -93,12 +104,17 @@ export class EggController implements OnStart, OnInit {
             let eggImageComponent = ImageFabric.CreateImage(data.model.Floor.EggUI.BillboardGui.Frame, true)
             eggImageComponent.CanBeClosedByOthers = false
 
+            
             eggImageComponent.BindToOpen((obj) => {
+                print('Started')
+                print(obj.Visible)
                 UIAnimations.MainFrameAnimationOpen(obj, {position: obj.Position, size: UDim2.fromScale(0.8, 1)})
+                eggBillboard.instance.Enabled = true
             })
 
             eggImageComponent.BindToClose((obj) => {
                 UIAnimations.MainFrameAnimationClose(obj, {position: obj.Position, size: UDim2.fromScale(0, 0)})
+                eggBillboard.instance.Enabled = false
             })
 
             eggImageComponent.Close()
@@ -121,7 +137,7 @@ export class EggController implements OnStart, OnInit {
             })
             eggBillboard.BindToLeave((arg) => { 
                 data.model!.Floor.EggPrice.BillboardGui.Enabled = true; 
-                task.spawn(() => { eggImageComponent.Close() })
+                eggImageComponent.Close()
                 arg.Parent = data.model! //game.Workspace.Terrain
             })
 

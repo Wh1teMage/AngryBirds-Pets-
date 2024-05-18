@@ -180,7 +180,7 @@ SessionRewardsData.push({
     Values: {
         Strength: 500000
     },
-    Time: 60,
+    Time: 10,
     World: WorldType.NeonCity,
 })
 
@@ -332,7 +332,7 @@ SessionRewardsData.push({
     Values: {
         Strength: 50000000
     },
-    Time: 60,
+    Time: 10,
     World: WorldType.Space,
 })
 

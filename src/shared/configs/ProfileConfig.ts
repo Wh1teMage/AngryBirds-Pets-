@@ -58,8 +58,8 @@ export const defaultValue: IProfileData = {
 
     Config: {
         Luck: 1,
-        MaxPets: 200, //100
-        MaxEquippedPets: 200, //3
+        MaxPets: 100,
+        MaxEquippedPets: 3,
         MaxPetsInVoidMachine: 5,
         MaxWorld: WorldType.Cave,
         RebirthTitle: 'Default',

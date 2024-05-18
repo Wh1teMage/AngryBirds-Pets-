@@ -25,8 +25,8 @@ export const multipliersConfig = {
 export const petUpgradeConfig = {
 
     SizeUpgrades: {
-        Baby: { requirements: new Map<Sizes, number>([[Sizes.Baby, 4]]), nextSize: Sizes.Big },
-        Big: { requirements: new Map<Sizes, number>([[Sizes.Big, 4]]), nextSize: Sizes.Huge },
+        Baby: { requirements: new Map<Sizes, number>([[Sizes.Baby, 3]]), nextSize: Sizes.Big },
+        Big: { requirements: new Map<Sizes, number>([[Sizes.Big, 3]]), nextSize: Sizes.Huge },
         Huge: { requirements: new Map<Sizes, number>([[Sizes.Huge, 999]]), nextSize: undefined },
     },
     EvolutionUpgrades: {

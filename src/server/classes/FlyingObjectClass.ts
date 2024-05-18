@@ -24,6 +24,9 @@ export class FlyingObjectClass {
     private minY: number
     private angle: number
     private energyLoss: number
+    private lapEnergyLoss: number
+
+    private length: number
 
     private _onStop: Array<(obj: FlyingObjectClass) => void> = []
     private _onStart: Array<(obj: FlyingObjectClass) => void> = []
@@ -43,6 +46,9 @@ export class FlyingObjectClass {
         this.minY = world.minY
         this.angle = world.angle
         this.energyLoss = world.energyLoss
+        this.lapEnergyLoss = world.lapEnergyLoss
+
+        this.length = world.startingPosition.sub(world.endingPosition).Magnitude
 
         let yvelocity = math.min(math.max(newPower*math.sin(math.rad(this.angle)), this.density*this.gravity/5*7), this.density*this.gravity*10)
         let zvelocity = math.max(newPower*math.cos(math.rad(this.angle)), this.density*70)
@@ -122,13 +128,14 @@ export class FlyingObjectClass {
                 this.part.Position = new Vector3(this.startingPosition.X, this.part.Position.Y, this.startingPosition.Z) 
                 this.Laps += 1
 
-                /*
+                
                 this.part.AssemblyLinearVelocity = new Vector3(
                     this.part.AssemblyLinearVelocity.X,
                     math.abs(this.part.AssemblyLinearVelocity.Y),
                     this.part.AssemblyLinearVelocity.Z
-                ).mul(this.energyLoss/100)
-                */
+                ).mul(math.min(this.lapEnergyLoss+5**(this.Laps/5), 90)/100)
+
+                print(math.min(this.energyLoss+5**(this.Laps/5), 90), this.Laps, 5**(this.Laps/5))
             }
 
             if (this.part.Position.Y < this.minY) {
@@ -147,6 +154,8 @@ export class FlyingObjectClass {
         this.part.Position = new Vector3(this.part.Position.X, this.minY, this.part.Position.Z)
         this.part.AssemblyLinearVelocity = new Vector3(0,0,0)
         this.part.Anchored = true
+
+        this.Distance = math.abs(this.part.Position.Z - this.startingPosition.Z) + this.Laps * this.length
 
         task.wait(.5)
 

@@ -33,7 +33,8 @@ export interface ISessionData {
     deletePets: Array<string>,
     selectedVoid?: IDBPetData,
 
-    headStats: BillboardGui
+    headStats: BillboardGui,
+    leaderStats: Folder
 }
 
 export interface IMultipliers {
@@ -83,7 +84,8 @@ export const SessionData: ISessionData = {
     ],
     deletePets: [],
 
-    headStats: (ReplicatedStorage.WaitForChild('Templates').WaitForChild('HeadStats') as BillboardGui)
+    headStats: (ReplicatedStorage.WaitForChild('Templates').WaitForChild('HeadStats') as BillboardGui),
+    leaderStats: (ReplicatedStorage.WaitForChild('Templates').WaitForChild('leaderstats') as Folder)
 }
 
 export const cloneSessionData = () => {
@@ -100,6 +102,7 @@ export const cloneSessionData = () => {
         3013687191,
     ]
     data.deletePets = []
+    data.sessionTime = 0
 
     data.multipliers = {
         other: table.clone(DefaultMultipliers),
@@ -110,6 +113,7 @@ export const cloneSessionData = () => {
     }
 
     data.headStats = data.headStats.Clone()
+    data.leaderStats = data.leaderStats.Clone()
 
     return data
 

@@ -30,6 +30,7 @@ Contexts.set('ClickEffect', {obj: Enum.UserInputType.MouseButton1, state: Enum.U
     PlayEffect('Click')
 }})
 
+
 Contexts.set('ClickEffectTouch', {obj: Enum.UserInputType.Touch, state: Enum.UserInputState.Begin, callback: () => {
     let mouse = player.GetMouse()
     PlayEffect('ClickSound')

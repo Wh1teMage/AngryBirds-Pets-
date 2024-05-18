@@ -54,8 +54,23 @@ export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implem
         this.maid.GiveTask(
             this.instance.MouseButton1Click.Connect(() => {
                 this._onClick?.forEach((val) => { val(this.instance) })
-            })    
+            })
         )
+
+        /*
+        this.maid.GiveTask(
+            this.instance.TouchTap.Connect(() => {
+                this._onClick?.forEach((val) => { val(this.instance) })
+            })
+        )
+
+        
+        this.maid.GiveTask(
+            this.instance.TouchLongPress.Connect(() => {
+                this._onClick?.forEach((val) => { val(this.instance) })
+            })
+        )
+        */
 
         this.maid.GiveTask(
             this.instance.MouseEnter.Connect(() => {

@@ -20,6 +20,8 @@ export class PlayerController implements OnStart, OnInit, ILocalPlayer {
     public autoDeletePets = new Binding<string[]>([])
 
     static autoEgg = false
+    static enabledNotifications = true
+    
     static currentClicks = new Binding<number>(0)
     static lastClick = os.time()
 

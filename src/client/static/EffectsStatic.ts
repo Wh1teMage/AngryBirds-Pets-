@@ -64,9 +64,8 @@ Effects.set('ClickEffect', (additional) => {
     TweenService.Create(clonedCircle, new TweenInfo(0.25), {'Size': UDim2.fromScale(0.1, 0.1)}).Play()
     TweenService.Create(clonedCircle, new TweenInfo(0.25), {'ImageTransparency': 1}).Play()
 
-    task.wait(0.25)
-    clonedCircle.Destroy()
-    
+    task.delay(0.25, () => { clonedCircle.Destroy() })
+
 })
 
 Effects.set('ChangeUseStatus', (additional) => {
@@ -151,6 +150,8 @@ Effects.set('Notify', (additional) => {
     let message = additional!.get('Message') as string
     let imageName = additional!.get('Image') as string
 
+    if (!PlayerController.enabledNotifications) { return }
+
     let images = new Map<string, string>([
         ['Default', 'rbxassetid://16810405068'],
         ['NewGift', 'rbxassetid://16245539978'],
@@ -194,7 +195,7 @@ Effects.set('Notify', (additional) => {
     EffectsUtilities.PlaySound('rbxassetid://7383525713')
 
     task.delay(5, () => {
-        TweenService.Create(notifyTemplate, new TweenInfo(.4, Enum.EasingStyle.Quad), {'Size': UDim2.fromScale(0, size)}).Play()
+        TweenService.Create(notifyTemplate, new TweenInfo(.4, Enum.EasingStyle.Back), {'Size': UDim2.fromScale(0, size)}).Play()
         task.wait(.3)
         notifyTemplate.Destroy()
     })
@@ -288,9 +289,10 @@ Effects.set('EggHatched', (additional) => {
 
     if (!viewCamera) {
         viewCamera = new Instance('Camera')
-        viewCamera.CFrame = new CFrame(new Vector3(0,0,0), new Vector3(0,0,1))
         viewCamera.Parent = hatchFrame
     }
+
+    viewCamera.CFrame = new CFrame(new Vector3(0,0,0), new Vector3(0,0,1))
 
     for (let obj of hatchFrame.WaitForChild('Hatching')!.GetChildren()) {
         if (!obj.IsA('GuiObject')) { continue }
@@ -323,7 +325,7 @@ Effects.set('EggHatched', (additional) => {
         petFrame.CurrentCamera = viewCamera
 
         let eggModel = egg.model!
-        if (!egg.model) { eggModel = game.Workspace.WaitForChild('World1').WaitForChild('StoneEgg')! as IEggModel }
+        if (!egg.model) { eggModel = game.Workspace.WaitForChild('Invisible Egg')! as IEggModel }
 
         eggModel = eggModel.Clone()! as IEggModel
         eggModel.PrimaryPart = eggModel.WaitForChild('Egg') as BasePart
@@ -357,6 +359,7 @@ Effects.set('EggHatched', (additional) => {
                 i += delta
                 delta += .2*speed**2
                 eggModel.PivotTo(new CFrame(eggModel.GetPivot().Position).mul(eggRotationOffset).mul(CFrame.Angles(math.rad(90), math.sin(math.rad(i)), 0)))
+                //make tween instead of this
                 
                 //TweenService.Create(viewCamera, new TweenInfo(.01), {'CFrame': new CFrame(viewCamera.CFrame.Position).mul(CFrame.Angles( 0, 0, math.sin(math.rad(i)) ))}).Play()
 

@@ -19,6 +19,7 @@ export interface IPetData {
 }
 
 export interface IDBPetData {
+    id?: string,
     name: string,
     locked: boolean,
     equipped: boolean,
@@ -82,6 +83,12 @@ export enum PetOperationStatus {
     UnequipAll = 'UnequipAll',
     CraftAll = 'CraftAll',
     SessionAutoDelete = 'SessionAutoDelete',
+}
+
+export enum PetReplicationStatus {
+    Append = 'Append',
+    Remove = 'Remove',
+    Update = 'Update'
 }
 
 //'Cat|Huge|Void|56'

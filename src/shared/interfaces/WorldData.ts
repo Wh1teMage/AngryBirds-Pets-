@@ -26,6 +26,7 @@ export interface IWorldData {
     minY: number
     angle: number
     energyLoss: number
+    lapEnergyLoss: number
 
     maxPower: number
 }

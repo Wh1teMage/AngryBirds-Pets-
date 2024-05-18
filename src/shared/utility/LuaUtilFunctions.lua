@@ -6,7 +6,8 @@ local compareIgnoreList = {
     'limit',
     'model',
     'equipped',
-    'locked'
+    'locked',
+    'id',
 }
 
 local function TableClone(transfer, template)

@@ -30,6 +30,10 @@ export class Binding<bindtype> {
         this._callbacks.forEach((callback) => { callback(this._value) })
     }
 
+    public RemoveCallbacks() {
+        this._callbacks.clear()
+    }
+
     public Remove() {
         activeBindings.remove(activeBindings.indexOf(this))
     }

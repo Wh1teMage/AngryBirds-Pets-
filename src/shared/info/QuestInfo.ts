@@ -131,7 +131,7 @@ PetIndexQuestsData.set('PetIndexQuest1', {
 })
 
 PetIndexQuestsData.set('PetIndexQuest2', {
-    requirements: new Map<string, any>([['pets', 50], ['tier', 'Tier 1']]),
+    requirements: new Map<string, any>([['pets', 50], ['tier', 'Tier 2']]),
     reward: {
         Values: {},
         Additional: new Map([['MaxEquippedPets', 1]]),
@@ -139,7 +139,31 @@ PetIndexQuestsData.set('PetIndexQuest2', {
 })
 
 PetIndexQuestsData.set('PetIndexQuest3', {
-    requirements: new Map<string, any>([['pets', 75], ['tier', 'Tier 1']]),
+    requirements: new Map<string, any>([['pets', 75], ['tier', 'Tier 3']]),
+    reward: {
+        Values: {},
+        Additional: new Map([['MaxEquippedPets', 1]]),
+    }
+})
+
+PetIndexQuestsData.set('PetIndexQuest4', {
+    requirements: new Map<string, any>([['pets', 100], ['tier', 'Tier 4']]),
+    reward: {
+        Values: {},
+        Additional: new Map([['MaxEquippedPets', 1]]),
+    }
+})
+
+PetIndexQuestsData.set('PetIndexQuest5', {
+    requirements: new Map<string, any>([['pets', 125], ['tier', 'Tier 5']]),
+    reward: {
+        Values: {},
+        Additional: new Map([['MaxEquippedPets', 1]]),
+    }
+})
+
+PetIndexQuestsData.set('PetIndexQuest6', {
+    requirements: new Map<string, any>([['pets', 150], ['tier', 'Tier 6']]),
     reward: {
         Values: {},
         Additional: new Map([['MaxEquippedPets', 1]]),

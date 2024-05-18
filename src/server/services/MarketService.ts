@@ -63,12 +63,19 @@ export class MarketService implements OnStart, OnInit {
 
     onInit() {
         
-        MarketplaceService.PromptProductPurchaseFinished.Connect((userId, productId, isPurchased) => { 
-            //product dont have any DB saves (unless Bundles). Futher DB saves will be written in callbacks (profiles).
-            let giftId = giftingQueue.get(userId)
-            let playerComponent = this._completePurchase(userId, productId, isPurchased)
+        MarketplaceService.ProcessReceipt = (receiptInfo) => {
 
-            if (!playerComponent) { return }
+            print('OPERATION STARTED')
+            print(receiptInfo)
+
+            let userId = receiptInfo.PlayerId
+            let productId = receiptInfo.ProductId
+
+            let giftId = giftingQueue.get(userId)
+            let playerComponent = this._completePurchase(userId, productId, true)
+
+            print(playerComponent)
+            if (!playerComponent) { return Enum.ProductPurchaseDecision.NotProcessedYet }
 
             let gamepassRefference = false
             MarketNamings.forEach((value, key) => {
@@ -79,8 +86,20 @@ export class MarketService implements OnStart, OnInit {
                 Events.ReplicateEffect(playerComponent.instance, 'Notify', new Map([['Message', 'Recieved Gift!'], ['Image', 'NewGift']]))
                 playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) 
             }
+
+            playerComponent.profile.Data.StatValues.RobuxSpent += receiptInfo.CurrencySpent
+
             playerComponent.replica.SetValue('Profile.Products', playerComponent.profile.Data.Products)
+
+            return Enum.ProductPurchaseDecision.PurchaseGranted
+        }
+
+        
+        MarketplaceService.PromptProductPurchaseFinished.Connect((userId, productId, isPurchased) => { 
+            //product dont have any DB saves (unless Bundles). Futher DB saves will be written in callbacks (profiles).
+            this._onFailedPurchase(userId);
         })
+
 
         MarketplaceService.PromptGamePassPurchaseFinished.Connect((player, productId, isPurchased) => {
             let playerComponent = this._completePurchase(player.UserId, productId, isPurchased)

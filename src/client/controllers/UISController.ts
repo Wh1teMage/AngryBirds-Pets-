@@ -26,13 +26,17 @@ export class UISController implements OnStart, OnInit {
             }
         })
 
-        ContextActionService.BindAction('Controls', (actionname: string, state: Enum.UserInputState, inputobj: InputObject) => {
+        ContextActionService.BindAction('SpecialControls', (actionname: string, state: Enum.UserInputState, inputobj: InputObject) => {
             let formattedInput = tostring(inputobj.KeyCode)+tostring(state)
 
             if (inputobj.KeyCode === Enum.KeyCode.Unknown) { formattedInput = tostring(inputobj.UserInputType)+tostring(state) }
 
-            if (!formattedControls.get(formattedInput)) { warn('Client Context Doesnt Exist!'); return }
+            if (!formattedControls.get(formattedInput)) { warn('Client Context Doesnt Exist!'); return Enum.ContextActionResult.Pass }
             Contexts.get(formattedControls.get(formattedInput)!)!.callback()
+
+            print('Test')
+
+            return Enum.ContextActionResult.Pass
         }, false, ...controls)
 
     }

@@ -11,8 +11,10 @@ let updateBillboards = (primaryPart: BasePart) => {
 
         let currentDistance = ((v.instance.Adornee!.Parent as BasePart).Position.sub(primaryPart.Position)).Magnitude
 
-        if (currentDistance > v.radius && v.instance.Enabled) { v.Leave(); v.instance.Enabled = false; continue } //
-        if (currentDistance <= v.radius && !v.instance.Enabled) { v.Enter(); v.instance.Enabled = true; } //
+        if (v._locked) { continue }
+
+        if (currentDistance > v.radius && v.instance.Enabled) { v.Leave(); continue } //
+        if (currentDistance <= v.radius && !v.instance.Enabled) { v.Enter(); } //
 
     }
 }
@@ -47,8 +49,7 @@ export class BillboardComponent extends BaseComponent<Attributes, BillboardGui> 
     private _defaultEnter(arg: BillboardGui) { }
     private _defaultLeave(arg: BillboardGui) { }
 
-    private _locked = false
-    public IsOpened = false
+    public _locked = false //private
 
     onStart() {
         activateRender()
@@ -58,26 +59,28 @@ export class BillboardComponent extends BaseComponent<Attributes, BillboardGui> 
     }
 
     public Enter() {
-        if (this._locked || this.IsOpened) {return}
+        if (this._locked || this.instance.Enabled) {return}
 
+        this.instance.Enabled = true;
         this._locked = true
-        this.CloseOthers()
+        //this.CloseOthers()
         this._onEnter?.forEach((val) => { val(this.instance) })
+        task.wait(.3)
         this._locked = false
-        this.IsOpened = true
-
+        
     }
 
     public Leave() {
-        if (this._locked || !this.IsOpened) {return}
+        if (this._locked || !this.instance.Enabled) {return}
 
         this._locked = true
         print('Leave Started')
         this._onLeave?.forEach((val) => { val(this.instance) })
         print('Leave Ended')
+        task.wait(.3)
         this._locked = false
-        this.IsOpened = false
-
+        this.instance.Enabled = false;
+        
     }
 
     public BindToEnter(entercallback: (arg: BillboardGui) => void) {

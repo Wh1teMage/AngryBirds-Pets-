@@ -1,5 +1,6 @@
 import { PassiveClass, PassiveDecorator } from "server/classes/PassiveClass";
 import { ServerPlayerComponent, ServerPlayerFabric } from "server/components/PlayerComponent";
+import { Events } from "server/network";
 import { PetIndexQuestsData, PetQuestsData } from "shared/info/QuestInfo";
 import { PassiveValues } from "shared/interfaces/PassiveData";
 import { IDBPetData } from "shared/interfaces/PetData";
@@ -30,6 +31,8 @@ export class PetIndexQuest extends PassiveClass {
 
             profileData.CompletedQuests.push(key)
             component!.ApplyReward(value.reward)
+
+            Events.ReplicateEffect(component.instance, 'Notify', new Map([['Message', 'Pet Index Tier Completed!'], ['Image', 'Success']]))
         })
 
         component.replica.SetValue('Profile.CompletedQuests', profileData.CompletedQuests)

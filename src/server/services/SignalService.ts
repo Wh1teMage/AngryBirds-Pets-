@@ -126,9 +126,9 @@ export class SignalService implements OnStart, OnInit {
             
             if (operation === FlyingObjectStatus.IniticalizeObject) { playerComp.InitializeObject() }
             if (operation === FlyingObjectStatus.ShootObject) { 
-                let redactedPower = math.clamp(power!, .1, 1)*0.35+1
+                let redactedPower = math.clamp(power!, .1, 1)*0.2+1
                 print(redactedPower)
-                if (playerComp.profile.Data.Products.includes('instantpower')) { redactedPower = 1.35 }
+                if (playerComp.profile.Data.Products.includes('instantpower')) { redactedPower = 1.2 }
                 playerComp.ShootObject(redactedPower)
              }
             

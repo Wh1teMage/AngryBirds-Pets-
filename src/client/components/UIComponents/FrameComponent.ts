@@ -12,6 +12,13 @@ export class FrameComponent extends BaseComponent<Attributes, Frame> implements 
         this.BindToOpen(() => { })
         this.BindToClose(() => {  })
 
+        this.instance.MouseEnter.Connect(() => {
+            this._onEnter?.forEach((val) => { val(this.instance) })
+        })
+
+        this.instance.MouseLeave.Connect(() => {
+            this._onLeave?.forEach((val) => { val(this.instance) })
+        })
     }
 
     public IsOpened = false
@@ -22,15 +29,26 @@ export class FrameComponent extends BaseComponent<Attributes, Frame> implements 
     private _onOpen: Array<(arg: Frame) => void> = []
     private _onClose: Array<(arg: Frame) => void> = []
 
+    private _onEnter?: Array<(arg: Frame) => void> = []
+    private _onLeave?: Array<(arg: Frame) => void> = []
+
     //private _onOpen?: (arg: Frame) => void = undefined
     //private _onClose?: (arg: Frame) => void = undefined
 
     public BindToOpen(opencallback: (arg: Frame) => void) {
-        this._onOpen?.push(opencallback)
+        this._onOpen.push(opencallback)
     }
 
     public BindToClose(closecallback: (arg: Frame) => void) {
         this._onClose.push(closecallback)
+    }
+
+    public BindToEnter(entercallback: (arg: Frame) => void) {
+        this._onEnter?.push(entercallback)
+    }
+
+    public BindToLeave(leavecallback: (arg: Frame) => void) {
+        this._onLeave?.push(leavecallback)
     }
 
     public Open() {
