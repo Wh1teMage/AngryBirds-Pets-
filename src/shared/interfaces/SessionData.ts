@@ -33,6 +33,8 @@ export interface ISessionData {
     deletePets: Array<string>,
     selectedVoid?: IDBPetData,
 
+    activeBuffs: Array<string>,
+
     headStats: BillboardGui,
     leaderStats: Folder
 }
@@ -84,6 +86,8 @@ export const SessionData: ISessionData = {
     ],
     deletePets: [],
 
+    activeBuffs: [],
+
     headStats: (ReplicatedStorage.WaitForChild('Templates').WaitForChild('HeadStats') as BillboardGui),
     leaderStats: (ReplicatedStorage.WaitForChild('Templates').WaitForChild('leaderstats') as Folder)
 }
@@ -95,6 +99,8 @@ export const cloneSessionData = () => {
     data.claimedRewards = []
     data.activePassives = []
 
+    data.stats = new Map<string, any>()
+
     data.friendList = []
     data.leftToFollow = [
         399939444,
@@ -103,6 +109,8 @@ export const cloneSessionData = () => {
     ]
     data.deletePets = []
     data.sessionTime = 0
+
+    data.activeBuffs = [],
 
     data.multipliers = {
         other: table.clone(DefaultMultipliers),

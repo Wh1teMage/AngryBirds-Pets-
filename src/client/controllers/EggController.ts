@@ -42,10 +42,12 @@ export class EggController implements OnStart, OnInit {
 
         let luck2List: ImageLabel[] = []
         let luck3List: ImageLabel[] = []
+        let x3eggList: ImageButton[] = []
 
         this._playerController.replica.ListenToChange('Profile.Products', (newval) => {
             luck2List.forEach((val) => { val.Visible = !newval.includes('luck1') })
             luck3List.forEach((val) => { val.Visible = !newval.includes('luck2') })
+            x3eggList.forEach((val) => { val.Visible = !newval.includes('3egghatch') })
         })
 
         for (let egg of EggsData) {
@@ -77,6 +79,7 @@ export class EggController implements OnStart, OnInit {
 
             luck2List.push(passes.Luck2.Lock)
             luck3List.push(passes.Luck3.Lock)
+            x3eggList.push(data.model.Floor.EggUI.BillboardGui.Frame.x3Open)
 
             eggFrame.EggName.Text = data.name
 

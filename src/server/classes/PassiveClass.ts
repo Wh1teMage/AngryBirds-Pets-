@@ -16,6 +16,7 @@ export abstract class PassiveClass implements IPassiveData {
 
     public onStart = () => {}
     public onShoot = () => {}
+    public onTrigger = () => {}
 
     public onStrengthChanged = (newvalue: number, oldvalue: number) => {}
     public onWinsChanged = (newvalue: number, oldvalue: number) => {}

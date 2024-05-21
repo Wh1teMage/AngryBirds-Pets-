@@ -50,8 +50,8 @@ export class FlyingObjectClass {
 
         this.length = world.startingPosition.sub(world.endingPosition).Magnitude
 
-        let yvelocity = math.min(math.max(newPower*math.sin(math.rad(this.angle)), this.density*this.gravity/5*7), this.density*this.gravity*10)
-        let zvelocity = math.max(newPower*math.cos(math.rad(this.angle)), this.density*70)
+        let yvelocity = math.min(math.max(newPower*math.sin(math.rad(this.angle)), this.density*this.gravity/5*7/5), this.density*this.gravity*10)
+        let zvelocity = math.max(newPower*math.cos(math.rad(this.angle)), this.density*70/5)
 
         this.currentVelocity = new Vector3(0, yvelocity, -zvelocity).div(this.density)//.div(this.delta)
         this.energy = this.currentVelocity.Magnitude**2/2

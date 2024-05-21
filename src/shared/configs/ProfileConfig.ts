@@ -1,7 +1,7 @@
 import { WorldType } from "shared/enums/WorldEnums";
 import { IProfileData } from "shared/interfaces/ProfileData";
 
-export const ORDERED_UPDATE_TIME = 60*10
+export const ORDERED_UPDATE_TIME = 60*10/2
 export const DBName = 'Main'
 export const VERSION = 1.3
 
@@ -29,6 +29,7 @@ export const defaultValue: IProfileData = {
 
         LastDayTime: 0, // os.time()
         LastDailyChestTime: 0,
+        LastGroupChestTime: 0, 
 
         DayAmount: 0,
         IngameTime: 0,

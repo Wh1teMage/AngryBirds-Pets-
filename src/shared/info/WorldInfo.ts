@@ -19,7 +19,7 @@ WorldsData.set(WorldType.Cave, {
     price: 1,
 
     maxClicks: 100,
-    reward: 250,
+    reward: 250/2,
     starsReward: 10,
 
     gravity: 10,
@@ -49,7 +49,7 @@ WorldsData.set(WorldType.NeonCity, {
     price: 100,
 
     maxClicks: 100,
-    reward: 28000,
+    reward: 28000/2,
     starsReward: 100,
 
     gravity: 10,
@@ -79,7 +79,7 @@ WorldsData.set(WorldType.Space, {
     price: 10000,
 
     maxClicks: 100,
-    reward: 2800000,
+    reward: 2800000/2,
     starsReward: 1000,
 
     gravity: 10,

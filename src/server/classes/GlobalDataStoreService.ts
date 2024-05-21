@@ -19,8 +19,6 @@ export class GlobalDataService {
         defaultGlobal.forEach((val, scope) => {
             let value = GlobalDataService.datastore.GetAsync(scope)
             GlobalDataService.values.set(scope, value[0] as number)
-
-            task.wait(2)
         })
 
         Events.ReplicateEffect.broadcast('LimitedPets', new Map<string, Map<string, number>>([['Info', GlobalDataService.values]]))

@@ -239,7 +239,7 @@ export class UIControllerSetup implements OnStart, OnInit {
     onInit() {
         
         this.UIPath = ComponentsInitializer.InitializeObject(mainUIInterface, mainUI)
-        let replicaData = this._playerController.replica.Data
+
         print(this.UIPath)
         let dynamicCodesText = new DynamicText(
             this.UIPath.Codes.get<ImageComponent>().instance.WaitForChild('Info') as TextLabel, 
@@ -396,10 +396,6 @@ export class UIControllerSetup implements OnStart, OnInit {
 
         this.UIPath.VoidMachine.get<ImageComponent>().BindToClose((obj) => {
             UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.VoidMachine.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         })
 
         this.UIPath.MutationMachine.get<ImageComponent>().BindToClose((obj) => {
@@ -596,6 +592,18 @@ export class UIControllerSetup implements OnStart, OnInit {
             this.UIPath.Index.get<ImageComponent>().Close()
         })
 
+        this.UIPath.VoidMachine.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.VoidMachine.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.MutationMachine.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.MutationMachine.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.CleanseMachine.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.CleanseMachine.get<ImageComponent>().Close()
+        })
+
         this.UIPath.RightList.Buttons.Settings.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.Settings.get<ImageComponent>().Change()
         })
@@ -633,11 +641,11 @@ export class UIControllerSetup implements OnStart, OnInit {
         })
 
         // ! НИЖЕ БОГА НЕТ
-        // !! ДО РЕЛИЗА НЕ ТРОГАТЬ !!
-        // this.UIPath.Rebirth.Close.get<ButtonComponent>().BindToClick(() => {
-        //     this.UIPath.Rebirth.get<ImageComponent>().Close()
-        // })
-        // !! ДО РЕЛИЗА НЕ ТРОГАТЬ !!
+
+        this.UIPath.Rebirth.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Rebirth.get<ImageComponent>().Close()
+        })
+
         // ! ВЫШЕ БОГА НЕТ
 
 

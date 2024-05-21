@@ -328,6 +328,7 @@ export class UIController implements OnStart, OnInit {
     private sortedPetNames: string[] = []
 
     private worldPurchaseTime = 0
+    private lastRebirthNotify = 0
 
     constructor(playerController: PlayerController, uiControllerSetup: UIControllerSetup) {
         this._playerController = playerController
@@ -500,6 +501,8 @@ export class UIController implements OnStart, OnInit {
             if (first) { this.petInventory.set(button.instance, pet) }
         }
 
+        print(this.petInventory, 'this.petInventory', this.Pets)
+
         //return petsUI
     }
 
@@ -578,7 +581,7 @@ export class UIController implements OnStart, OnInit {
                 (UIObject.WaitForChild('Lock') as ImageLabel).Visible = newpet.locked;
                 (UIObject.WaitForChild('X') as ImageLabel).Visible = false;
     
-                let redactedPet = PetUtilities.DBToPetTransfer(newpet)!
+                //let redactedPet = PetUtilities.DBToPetTransfer(newpet)!
     
                 //let multiplier = math.round(redactedPet.multipliers.get('strength')!*10) 
 
@@ -1192,6 +1195,8 @@ export class UIController implements OnStart, OnInit {
 
         PetsData.forEach((value, petname) => {
 
+            if (petname === 'GigaRaccoon') { return }
+
             let obj = petInventory.WaitForChild('Template')!.WaitForChild('PetExample')!.Clone() as GuiButton;
             obj.Parent = parent
             obj.Visible = true;
@@ -1358,6 +1363,8 @@ export class UIController implements OnStart, OnInit {
             print(sling)
             let proximity = new Instance('ProximityPrompt')
 
+            proximity.MaxActivationDistance = 10
+            proximity.RequiresLineOfSight = false
             proximity.Parent = sling
 
             proximity.Triggered.Connect(() => {
@@ -1375,6 +1382,11 @@ export class UIController implements OnStart, OnInit {
         let percentbar = bar.WaitForChild('HowMuch') as TextLabel
         let countdown = bar.WaitForChild('Countdown') as TextLabel
         let clickicon = bar.WaitForChild('ClickIcon') as ImageLabel
+
+        let roadFrame = this.UIPath.LowerList.Road.get<ImageComponent>().instance
+        let lapsText = roadFrame.WaitForChild('You').WaitForChild('Laps')  as TextLabel
+
+        lapsText.Visible = false;
 
         let countdownChain = ['5', '4', '3', '2', '1', 'GO!']
 
@@ -1463,8 +1475,8 @@ export class UIController implements OnStart, OnInit {
 
         let luckList = new Map<string, number>([
             ['Lucky1', 722093437],
-            ['Lucky2', 722436217],
-            ['Lucky3', 722472169],
+            ['Lucky2', 1779469996],
+            ['Lucky3', 1779470301],
         ])
 
         let storeFrame = this.UIPath.Store.get<FrameComponent>().instance.WaitForChild('ScrollingFrame')
@@ -1808,6 +1820,8 @@ export class UIController implements OnStart, OnInit {
                 this.giftsReady += 1
             }
     
+            //print(this._playerController.replica.Data.Session.claimedRewards.size(), 'Size')
+
             if (this._playerController.replica.Data.Session.claimedRewards.includes(index)) {
                 (gift.WaitForChild('ClaimFrame') as Frame).Visible = true;
                 (gift.WaitForChild('ClaimFrame').WaitForChild('Timer') as TextLabel).Text = 'Claimed!'
@@ -1984,12 +1998,13 @@ export class UIController implements OnStart, OnInit {
         camera2.Parent = pet2
 
         clonnedPet1.Parent = pet1
-        clonnedPet2.Parent = pet1
+        clonnedPet2.Parent = pet2
 
         pet1.CurrentCamera = camera1
-        pet2.CurrentCamera = camera2
+        pet2.CurrentCamera = camera2;
 
-        print(camera1.Parent)
+        (pet1.WaitForChild('PetMutation') as TextLabel).Text = redactedPet.additional.mutation
+
     }
 
     private goldenCallback(pet: IDBPetData, obj: GuiObject) {
@@ -2114,7 +2129,8 @@ export class UIController implements OnStart, OnInit {
 
             print(quest?.requirements.get('time'), questProgress.get('time'));
 
-            (label1.Parent?.WaitForChild('Progress') as TextLabel).Text = tostring(questProgress.get('time'))+'/'+tostring(quest?.requirements.get('time'));
+            (label1.Parent?.WaitForChild('Progress') as TextLabel).Text = 
+                GUIUtilities.GuiTimeFormatter(questProgress.get('time'))+'/'+GUIUtilities.GuiTimeFormatter(quest?.requirements.get('time'));
 
             TweenService.Create(label1, new TweenInfo(.1), 
             {'Size': UDim2.fromScale(math.min(quest?.requirements.get('time'), questProgress.get('time'))/quest?.requirements.get('time'), 1)}).Play();
@@ -2206,6 +2222,7 @@ export class UIController implements OnStart, OnInit {
         
         let gems = this._playerController.replica.Data.Profile.Values.GemsVal
         let wins = this._playerController.replica.Data.Profile.Values.WinsVal
+        let newGems = gems+(nextRebirthData.Values!.Gems || 0)*this._playerController.replica.Data.Profile.Multipliers.GemsMul
         let holder = rebirthUI.WaitForChild('StatsHolder');
 
 
@@ -2217,15 +2234,16 @@ export class UIController implements OnStart, OnInit {
         (holder.WaitForChild('Stats1').WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(wins);
 
         (holder.WaitForChild('Stats2').WaitForChild('Boost').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(additional.get('Multiplier')!*100)+'%';
-        (holder.WaitForChild('Stats2').WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(gems+(nextRebirthData.Values!.Gems || 0));
+        (holder.WaitForChild('Stats2').WaitForChild('Gems').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(newGems);
         (holder.WaitForChild('Stats2').WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(newWins);
 
         (rebirthUI.WaitForChild('Wins').WaitForChild('Value') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(wins)+'/'+GUIUtilities.getSIPrefixSymbol(additional.get('Wins')!)
         TweenService.Create(rebirthUI.WaitForChild('Wins').WaitForChild('stroke') as ImageLabel, new TweenInfo(.1), { 'Size': UDim2.fromScale(math.min(1, wins/additional.get('Wins')!), 1) }).Play()
 
-        if (wins >= additional.get('Wins')!) [
+        if ((wins >= additional.get('Wins')!) && (os.time() - this.lastRebirthNotify > 60)) {
+            this.lastRebirthNotify = os.time()
             PlayEffect('Notify', new Map([['Message', 'Rebirth Is Ready!'], ['Image', 'RebirthPossible']]))
-        ]
+        }
 
     }
 
@@ -2595,6 +2613,7 @@ export class UIController implements OnStart, OnInit {
                 (storeFrame.WaitForChild('GiftingTo') as TextLabel).Visible = true
 
                 passListUI.GetChildren().forEach((val) => {
+                    if (!val.IsA('ImageButton')) { return }
                     (val.WaitForChild('PriceFrame').WaitForChild('Price') as TextLabel).Text = ''+tostring( passList.get(val.Name)! )
                 })
 
@@ -2626,6 +2645,10 @@ export class UIController implements OnStart, OnInit {
             (obj.WaitForChild('Number') as TextLabel).Text = '1/1';
 
         }
+
+        if (profileData.CompletedQuests.includes('PetQuest1')) {
+            (questFrame.WaitForChild('Reward').WaitForChild('Claim').WaitForChild('TextLabel') as TextLabel).Text = 'Claimed!'
+        }
  
     }
 
@@ -2634,7 +2657,7 @@ export class UIController implements OnStart, OnInit {
         let wheelButton = this.UIPath.RightList.Wheel.get<ImageComponent>().instance as Instance
         let profileData = this._playerController.replica.Data.Profile;
 
-        let timeLeft = profileData.StatValues.LastSpinTime+10-os.time();
+        let timeLeft = profileData.StatValues.LastSpinTime+24*60*60-os.time();
 
         (wheel.WaitForChild('Spin2').WaitForChild('Amount') as TextLabel).Text = 'x'+tostring(profileData.StatValues.SpinCount);
         (wheelButton.WaitForChild('Timer') as TextLabel).Text = GUIUtilities.GuiTimeFormatter(math.max(0, timeLeft));
@@ -2678,6 +2701,20 @@ export class UIController implements OnStart, OnInit {
         let timer = dailyBillboard.WaitForChild('Frame').WaitForChild('Timer') as TextLabel
 
         let timeLeft = profileData.StatValues.LastDailyChestTime+(24*60*60)-os.time();
+        
+        timer.Text = GUIUtilities.GuiTimeFormatter(math.max(0, timeLeft));
+
+        if (timeLeft <= 0) { timer.Text = 'CLAIM!' }
+    }
+
+    public updateGroupChestBillboard() {
+        let profileData = this._playerController.replica.Data.Profile;
+        let groupChestPart = Workspace.WaitForChild('InstaReplica').WaitForChild('GroupChest')
+
+        let groupBillboard = groupChestPart.WaitForChild('Attachment1').WaitForChild('BillboardGui') as BillboardGui
+        let timer = groupBillboard.WaitForChild('Frame').WaitForChild('Timer') as TextLabel
+
+        let timeLeft = profileData.StatValues.LastGroupChestTime+(24*60*60)-os.time();
         
         timer.Text = GUIUtilities.GuiTimeFormatter(math.max(0, timeLeft));
 
@@ -2935,6 +2972,7 @@ export class UIController implements OnStart, OnInit {
         TweenService.Create(attachment, new TweenInfo(.4), { 'WorldCFrame': oldCFrame }).Play()
 
         //model.PrimaryPart!.Anchored = false
+        obj.CFrame = oldobj.CFrame
         model.PrimaryPart!.CFrame = obj.CFrame.mul(pet.stats.rotationOffset)
 
         Workspace.CurrentCamera!.CameraSubject = obj
@@ -3037,6 +3075,8 @@ export class UIController implements OnStart, OnInit {
         sound.Play()
 
         let prevoiusVelocity = oldobj.AssemblyLinearVelocity
+
+        obj.CFrame = oldobj.CFrame
 
         print('Fuck me 5')
 
@@ -3209,8 +3249,8 @@ export class UIController implements OnStart, OnInit {
         let nightmatePets = new Map([
             ['NightmareBunny', PetsData.get('Nightmare Bunny')],
             ['NightmareCat', PetsData.get('Nightmare Cat')],
-            ['NightmareSpirit', PetsData.get('Nightmare Spirit')],
             ['NightmareYeti', PetsData.get('Nightmare Yeti')],
+            ['DevilSpider', PetsData.get('Devil Spider')], 
             ['Observer', PetsData.get('Observer')],
         ])
 
@@ -3382,182 +3422,14 @@ export class UIController implements OnStart, OnInit {
         this.setupAutoTrain()
         this.setupAutoShoot()
 
-        this.UIPath = ComponentsInitializer.InitializeObject(mainUIInterface, mainUI)
+        this.UIPath = this._uiControllerSetup.UIPath//ComponentsInitializer.InitializeObject(mainUIInterface, mainUI)
         let replicaData = this._playerController.replica.Data
-        print(this.UIPath)
-        let dynamicCodesText = new DynamicText(
-            this.UIPath.Codes.get<ImageComponent>().instance.WaitForChild('Info') as TextLabel, 
-            '<stroke color="#163542" joins="miter" thickness="2.5" transparency="0">Follow <font color="rgb(255, 0, 0)">@StudioBosses</font>, <font color="rgb(237,0,203)">@4upahero</font> and <font color="rgb(89, 255, 29)">@KetwilDev</font> for powerful codes!</stroke>',
-            new Map<number, StrokeInfo>([[200, {Speed: 70}]])
-        )
 
-
-        this.UIPath.Codes.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.512*3), size: obj.Size })
-        })
-
-        this.UIPath.Codes.get<ImageComponent>().BindToOpen((obj) => {
-            dynamicCodesText.Start()
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.512), size: obj.Size })
-        })
-
-        this.UIPath.Follow.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.512*3), size: obj.Size })
-        })
-
-        this.UIPath.Follow.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.512), size: obj.Size })
-        })
-
-        this.UIPath.Settings.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Settings.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Store.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Store.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Invite.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Invite.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.PetInventory.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.PetInventory.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Rebirth.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Rebirth.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.TradePlayerList.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.TradePlayerList.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Teleport.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Teleport.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.DailyRewards.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.DailyRewards.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Limited.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Limited.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Guide.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Guide.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Guide.get<ImageComponent>().CanBeClosedByOthers = false
-
-        this.UIPath.WheelSpin.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.WheelSpin.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Event.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Event.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Index.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.475*3), size: obj.Size })
-        })
-
-        this.UIPath.Index.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.475), size: obj.Size })
-        })
-
-        this.UIPath.Quest.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Quest.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.UpdateLog.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.Gifts.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.Gifts.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.UpdateLog.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.VoidMachine.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.VoidMachine.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.MutationMachine.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
+        print(this._playerController.replica.Data.Session.claimedRewards.size(), 'Size')
 
         this.UIPath.MutationMachine.get<ImageComponent>().BindToOpen((obj) => {
             this.setupMutationGui()
             UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.CleanseMachine.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
         })
 
         this.UIPath.CleanseMachine.get<ImageComponent>().BindToOpen((obj) => {
@@ -3565,163 +3437,14 @@ export class UIController implements OnStart, OnInit {
             UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         })
 
-        this.UIPath.SlingshotStore.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.456*3), size: obj.Size })
-        })
-
-        this.UIPath.SlingshotStore.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.456), size: obj.Size })
-        })
-
-        this.UIPath.CavePack.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.CavePack.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.NeonPack.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.NeonPack.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.SpacePack.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.SpacePack.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.GiftPlayerList.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.497, 0.522*3), size: obj.Size })
-        })
-
-        this.UIPath.GiftPlayerList.get<ImageComponent>().BindToOpen((obj) => {
-            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.497, 0.522), size: obj.Size })
-        })
-
-        this.UIPath.GoldMachine.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
         this.UIPath.GoldMachine.get<ImageComponent>().BindToOpen((obj) => {
             this.setupGoldenGui()
             UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         })
 
-        this.UIPath.StarterPack.get<ImageComponent>().BindToClose((obj) => {
-            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
-        })
-
-        this.UIPath.StarterPack.get<ImageComponent>().BindToOpen((obj) => {
+        this.UIPath.VoidMachine.get<ImageComponent>().BindToOpen((obj) => {
+            this.setupVoidPets()
             UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
-        })
-
-        this.UIPath.PetInventory.PetInfo.get<FrameComponent>().BindToOpen((obj) => {
-            obj.Visible = true
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: UDim2.fromScale(0.641, 0.132), size: UDim2.fromScale(0.348, 0.672) }).Play()
-        })
-        
-        this.UIPath.PetInventory.PetInfo.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: UDim2.fromScale(1, 0.132), size: UDim2.fromScale(0, 0.672) }).Play()
-            task.wait(.2)
-            obj.Visible = false
-        })
-
-        this.UIPath.GoldMachine.GoldenInfo.GoldenHolder.get<FrameComponent>().BindToOpen((obj) => {
-            obj.Visible = true
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: UDim2.fromScale(0.641, 0), size: UDim2.fromScale(0.357, 0.995) }).Play()
-        })
-        
-        this.UIPath.GoldMachine.GoldenInfo.GoldenHolder.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: UDim2.fromScale(1, 0), size: UDim2.fromScale(0, 0.995) }).Play()
-            task.wait(.2)
-            obj.Visible = false
-        })
-
-        this.UIPath.VoidMachine.CraftInfo.get<FrameComponent>().BindToOpen((obj) => {
-            obj.Visible = true
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: UDim2.fromScale(0.641, 0), size: UDim2.fromScale(0.357, 0.995) }).Play()
-        })
-        
-        this.UIPath.VoidMachine.CraftInfo.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: UDim2.fromScale(1, 0), size: UDim2.fromScale(0, 0.995) }).Play()
-            task.wait(.2)
-            obj.Visible = false
-        })
-
-        this.UIPath.PetInventory.PetsFrame.get<FrameComponent>().BindToOpen((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2),{ position: obj.Position, size: UDim2.fromScale(0.621, 0.675) }).Play()
-        })
-        
-        this.UIPath.PetInventory.PetsFrame.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: obj.Position, size: UDim2.fromScale(0.935, 0.675) }).Play()
-        })
-
-        this.UIPath.GoldMachine.GoldenInfo.PetsHolder.get<FrameComponent>().BindToOpen((obj) => { 
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2),{ position: obj.Position, size: UDim2.fromScale(0.645, 0.996) }).Play()
-        })
-        
-        this.UIPath.GoldMachine.GoldenInfo.PetsHolder.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: obj.Position, size: UDim2.fromScale(0.994, 0.996) }).Play()
-        })
-
-        this.UIPath.MutationMachine.MutationInfo.get<FrameComponent>().BindToOpen((obj) => {
-            obj.Visible = true
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2),{ position: UDim2.fromScale(0.641, 0.132), size: UDim2.fromScale(0.348, 0.793) }).Play()
-        })
-        
-        this.UIPath.MutationMachine.MutationInfo.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: UDim2.fromScale(1, 0.132), size: UDim2.fromScale(0, 0.793) }).Play()
-            obj.Visible = false
-        })
-        
-        this.UIPath.MutationMachine.PetsFrame.get<FrameComponent>().BindToOpen((obj) => { 
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2),{ position: obj.Position, size: UDim2.fromScale(0.587, 0.697) }).Play()
-        })
-        
-        this.UIPath.MutationMachine.PetsFrame.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: obj.Position, size: UDim2.fromScale(0.94, 0.697) }).Play()
-        })
-
-        this.UIPath.CleanseMachine.CleanseInfo.get<FrameComponent>().BindToOpen((obj) => {
-            obj.Visible = true
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2),{ position: UDim2.fromScale(0.641, 0.132), size: UDim2.fromScale(0.348, 0.793) }).Play()
-        })
-        
-        this.UIPath.CleanseMachine.CleanseInfo.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: UDim2.fromScale(1, 0.132), size: UDim2.fromScale(0, 0.793) }).Play()
-            obj.Visible = false
-        })
-        
-        this.UIPath.CleanseMachine.PetsFrame.get<FrameComponent>().BindToOpen((obj) => { 
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2),{ position: obj.Position, size: UDim2.fromScale(0.587, 0.697) }).Play()
-        })
-        
-        this.UIPath.CleanseMachine.PetsFrame.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: obj.Position, size: UDim2.fromScale(0.94, 0.697) }).Play()
-        })
-
-
-        this.UIPath.VoidMachine.PetsFrame.get<FrameComponent>().BindToOpen((obj) => { 
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2),{ position: obj.Position, size: UDim2.fromScale(0.587, 0.697) }).Play()
-        })
-        
-        this.UIPath.VoidMachine.PetsFrame.get<FrameComponent>().BindToClose((obj) => {
-            UIAnimations.TestAnimation(obj, new TweenInfo(.2), { position: obj.Position, size: UDim2.fromScale(0.947, 0.697) }).Play()
-        })
-
-        this.UIPath.Potions.PremiumBoost.get<ButtonComponent>().BindToClick(() => {
-            MarketplaceService.PromptPremiumPurchase(this._playerController.component.instance)
-        })
-
-        this.UIPath.RightList.Premium.get<ButtonComponent>().BindToClick(() => {
-            MarketplaceService.PromptPremiumPurchase(this._playerController.component.instance)
         })
 
         this.UIPath.Gifts.UnlockAll.get<ButtonComponent>().BindToClick(() => {
@@ -3732,177 +3455,20 @@ export class UIController implements OnStart, OnInit {
             Events.PurchasePrompt.fire(722529168)
         })
 
-        this.UIPath.RightList.Buttons.Codes.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Codes.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Potions.XBoost.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Follow.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Potions.FriendBoost.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Invite.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.GoldMachine.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.GoldMachine.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.SlingshotStore.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.SlingshotStore.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.Codes.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Codes.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.Follow.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Follow.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.Index.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Index.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.RightList.Buttons.Settings.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Settings.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Settings.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Settings.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.LeftList.Store.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Store.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Store.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Store.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.LeftList.Invite.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Invite.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Invite.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Invite.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.LeftList.Pets.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.PetInventory.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.PetInventory.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.PetInventory.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.LeftList.Rebirth.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Rebirth.get<ImageComponent>().Change()
-        })
-
-        // ! НИЖЕ БОГА НЕТ
-        // !! ДО РЕЛИЗА НЕ ТРОГАТЬ !!
-        // this.UIPath.Rebirth.Close.get<ButtonComponent>().BindToClick(() => {
-        //     this.UIPath.Rebirth.get<ImageComponent>().Close()
-        // })
-        // !! ДО РЕЛИЗА НЕ ТРОГАТЬ !!
-        // ! ВЫШЕ БОГА НЕТ
-
-
         this.UIPath.StarterPack.Buy.get<ButtonComponent>().BindToClick(() => {
             Events.PurchasePrompt.fire(1779438971)
-        })
-
-        this.UIPath.StarterPack.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.StarterPack.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.LeftList.Trade.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.TradePlayerList.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.TradePlayerList.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.TradePlayerList.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.LeftList.Teleport.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Teleport.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Teleport.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Teleport.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.RightList.Buttons.Daily.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.DailyRewards.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.DailyRewards.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.DailyRewards.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.RightList.Gifts.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Gifts.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Gifts.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Gifts.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.RightList.Limited.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Limited.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Limited.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Limited.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.PetInventory.Info.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Guide.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Guide.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Guide.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.RightList.Wheel.Image.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.WheelSpin.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.RightList.Event.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Event.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Event.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Event.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.RightList.Quest.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Quest.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.Quest.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.Quest.get<ImageComponent>().Close()
-        })
-
-        this.UIPath.RightList.UpdateLog.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.UpdateLog.get<ImageComponent>().Change()
-        })
-
-        this.UIPath.UpdateLog.Close.get<ButtonComponent>().BindToClick(() => {
-            this.UIPath.UpdateLog.get<ImageComponent>().Close()
         })
 
         let enableNotifications = this.UIPath.Settings.get<ImageComponent>().instance.WaitForChild('ScrollingFrame').WaitForChild('Notify').WaitForChild('Enable') as GuiButton
         let disableNotifications = enableNotifications.WaitForChild('Disable') as GuiButton
 
         ButtonFabric.CreateButton(enableNotifications).BindToClick(() => {
-            PlayerController.enabledNotifications = true
+            PlayerController.enabledNotifications = false
             disableNotifications.Visible = true
         })
 
         ButtonFabric.CreateButton(disableNotifications).BindToClick(() => {
-            PlayerController.enabledNotifications = false
+            PlayerController.enabledNotifications = true
             disableNotifications.Visible = false
         })
 
@@ -4235,9 +3801,12 @@ export class UIController implements OnStart, OnInit {
             //let pets: IPetData[] = []
             //newValue.forEach((val) => { pets.push(PetUtilities.DBToPetTransfer(val)!) })
 
+            
+            let start = os.clock()
+
             this.Pets = newValue
 
-            
+            print('pass1', os.clock()-start)
             this.Pets.sort((a, b) => {
                 let vala = PetUtilities.DBToPetTransfer(a)!
                 let valb = PetUtilities.DBToPetTransfer(b)!
@@ -4245,7 +3814,7 @@ export class UIController implements OnStart, OnInit {
                 return vala.multipliers!.get('strength')! < valb.multipliers!.get('strength')!
             })
             
-    
+            print('pass2', os.clock()-start)
 
             let appendValues: IDBPetData[] = []
             let removeValues: IDBPetData[] = []
@@ -4267,23 +3836,23 @@ export class UIController implements OnStart, OnInit {
 
             newValue.forEach((value, index) => {
                 let pass = false
-                this.petInventory.forEach((oldval) => {if (Functions.compareObjects(value, oldval)) { pass = true } })
-                if (!pass) { updateValues.push(value) }
+                this.petInventory.forEach((oldval) => {if (!Functions.compareObjects(value, oldval) && (value.id === oldval.id)) { pass = true } })
+                if (pass) { updateValues.push(value) }
             })
+
+            print('pass3', os.clock()-start)
 
             let test: string[] = []
             newValue.forEach((newval) => { if (test.includes(newval.id!)) { print(newval) } else { test.push(newval.id!) }})
 
             print(updateValues, appendValues, removeValues, oldValue, newValue, this.petInventory)
 
-            if (this.selectedPet) {
-                newValue.forEach((value, index) => {if (value.id === this.selectedPet!.id) { print(this.selectedPet, value)} })
-            }
-
-            if (updateValues.size() > 0) { this.updatePetInventory(updateValues) }
             if (appendValues.size() > 0) { this.appendPetInventory(appendValues) }
             if (removeValues.size() > 0) { this.removePetInventory(removeValues) }
+            if (updateValues.size() > 0) { this.updatePetInventory(this.Pets) }
             
+            print('pass4', os.clock()-start)
+
             appendValues.clear()
             removeValues.clear()
             updateValues.clear()
@@ -4293,6 +3862,8 @@ export class UIController implements OnStart, OnInit {
             this.EquippedPets = newEquippedPets
 
             this.updatePets()
+
+            print('pass5', os.clock()-start)
 
             if (this.UIPath.PetInventory.Buttons.get<FrameComponent>().instance.Visible) {
                 
@@ -4334,6 +3905,7 @@ export class UIController implements OnStart, OnInit {
             if (goldCircle.enabled) { this.setupGoldenGui() }
             if (voidPart.enabled) { this.setupVoidPets() }
             if (mutationPart.enabled) { this.setupMutationGui() }
+            if (cleansePart.enabled) { this.setupCleanseGui() }
 
         })
 
@@ -4409,7 +3981,7 @@ export class UIController implements OnStart, OnInit {
         })
 
         this._playerController.replica.ListenToChange('Profile.CompletedQuests', (newValue) => {
-
+            this.updateFollowQuest()
         })
 
         this._playerController.replica.ListenToChange('Profile.CurrentQuestsProgress', (newValue) => {
@@ -4531,11 +4103,11 @@ export class UIController implements OnStart, OnInit {
         this.ownedTools = replicaData.Profile.OwnedTools
 
         this.setupSlingshots()
-        this.setupVoidPets()
         this.setupPetIndex()
         this.setupGifts()
         this.setupDaily()
         this.setupPets()
+        this.setupVoidPets()
         this.setupBigSlingshots()
         this.setupDonations()
         this.setupWorldTeleports()
@@ -4596,6 +4168,7 @@ export class UIController implements OnStart, OnInit {
                 this.updateSpins()
                 this.updateWheelSpin()
                 this.updateDailyChestBillboard()
+                this.updateGroupChestBillboard()
                 this.updateStarterPack()
                 this.updatePotionBuffs()
                 this.updateStorePacks()
@@ -4611,7 +4184,11 @@ export class UIController implements OnStart, OnInit {
                     TweenService.Create(Lighting, new TweenInfo(.2), {'ClockTime': 23}).Play() 
                 }
 
-                if (replica.Data.Session.currentWorld !== WorldType.Space) { 
+                if (replica.Data.Session.currentWorld === WorldType.NeonCity) { 
+                    TweenService.Create(Lighting, new TweenInfo(.2), {'ClockTime': 20}).Play() 
+                }
+
+                if (replica.Data.Session.currentWorld !== WorldType.Space && replica.Data.Session.currentWorld !== WorldType.NeonCity) { 
                     TweenService.Create(Lighting, new TweenInfo(.2), {'ClockTime': 13}).Play()
                 }
                 

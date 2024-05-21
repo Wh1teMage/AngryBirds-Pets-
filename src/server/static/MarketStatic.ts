@@ -503,6 +503,17 @@ MarketCallbacks.set('starterpack', (player) => {
     player.AppendPotion(PotionType.WinsPotion, 1)
     player.SetWins(profileData.Values.WinsVal + 300)
 
+    player.AppendPet({
+        name: 'Magma Doggy',
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    })
+
     player.replica.SetValue('Profile.Config.MaxEquippedPets', profileData.Config.MaxEquippedPets)
     profileData.Products.push('starterpack')
 

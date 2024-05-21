@@ -21,6 +21,7 @@ let StartUpdating = () => {
             OrderedDataService.updateValues()
             OrderedDataService.replicateLeaderboardValues()
             GlobalDataService.updateValues()
+
             task.wait(ORDERED_UPDATE_TIME)
         }
         
@@ -48,6 +49,12 @@ export const LoadProfile = (player: Player) => {
 
     print('ReplicReplicatingReplicatingReplicatingReplicatingating')
     StartUpdating()
+
+    task.spawn(() => {
+        while (task.wait(ORDERED_UPDATE_TIME)) {
+            OrderedDataService.saveValues(tostring(player.UserId), profile!.Data)
+        }
+    })
 
     profile.AddUserId(player.UserId);
     profile.ListenToRelease(()=>{

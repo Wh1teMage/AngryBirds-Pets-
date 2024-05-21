@@ -15,6 +15,7 @@ export interface IPassiveData {
 
     onStart: () => void
     onShoot: () => void
+    onTrigger: () => void
 
     onStrengthChanged: (newvalue: number, oldvalue: number) => void
     onWinsChanged: (newvalue: number, oldvalue: number) => void

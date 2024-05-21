@@ -223,7 +223,7 @@ EggsData.set('Nightmare', {
         { weight: 500, name:  'Nightmare Cat'},
         { weight: 250, name:  'Nightmare Bunny'},
         { weight: 150, name: 'Nightmare Yeti' },
-        { weight: 50, name: 'Nightmare Spirit' },
+        { weight: 50, name: 'Devil Spider' },
         { weight: 5, name: 'Observer' },
     ],
     //model: Workspace.WaitForChild('World1').WaitForChild('StoneEgg') as IEggModel

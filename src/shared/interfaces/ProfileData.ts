@@ -26,6 +26,7 @@ export interface IProfileData {
 
         LastDayTime: number
         LastDailyChestTime: number
+        LastGroupChestTime: number
 
         DayAmount: number
         IngameTime: number

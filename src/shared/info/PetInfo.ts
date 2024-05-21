@@ -765,6 +765,25 @@ PetsData.set('King Ant', {
     model: Pets.WaitForChild('King Ant', 5) as Model
 })
 
+PetsData.set('Kitsune', {
+    name: 'Kitsune',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 20]]),
+    stats: {
+        rarity: Rarities.Exclusive,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Kitsune', 5) as Model
+})
+
+
 // *
 
 PetsData.set('Mystery Cat', {
@@ -1393,7 +1412,7 @@ PetsData.set('Red Devil', {
     name: 'Red Devil',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 350]]),
+    multipliers: new Map([['strength', 50]]),
     stats: {
         rarity: Rarities.Mythic,
         sizeOffset: new Vector3(0,0,0),
@@ -1503,15 +1522,15 @@ PetsData.set('Devils Soul', {
 
 // !!GigaRacoon!!
 
-/*  мир ещё не готов
-PetsData.set('GigaRacoon', {
-    name: 'GigaRacoon',
+/*  мир уже готов */
+PetsData.set('GigaRaccoon', {
+    name: 'GigaRaccoon',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 1]]),
+    multipliers: new Map([['strength', 100000000000000]]),
     stats: {
-        rarity: Rarities.Common,
-        sizeOffset: new Vector3(0,0,0),
+        rarity: Rarities.Exclusive,
+        sizeOffset: new Vector3(0,20,0),
         rotationOffset: new CFrame(0,0,0),
     },
     additional: {
@@ -1519,9 +1538,29 @@ PetsData.set('GigaRacoon', {
         evolution: Evolutions.Normal,
         mutation: Mutations.Default
     },
-    model: Pets.WaitForChild('GigaRacoon', 5) as Model
+    model: Pets.WaitForChild('GigaRaccoon', 5) as Model
 })
-*/
 
 // !!GigaRacoon!!
 
+/*
+
+PetsData.set('Glitch Hunter', {
+    name: 'Glitch Hunter',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 3000]]),
+    stats: {
+        rarity: Rarities.Exclusive,
+        sizeOffset: new Vector3(0,-1,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Glitch Hunter', 5) as Model
+})
+
+*/

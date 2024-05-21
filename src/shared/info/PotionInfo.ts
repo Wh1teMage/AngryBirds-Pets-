@@ -4,7 +4,7 @@ import { IPotionData } from "shared/interfaces/PotionData";
 export const PotionsData = new Map<PotionType, IPotionData>()
 
 PotionsData.set(PotionType.LuckPotion, {
-    duration: 10,
+    duration: 30*60,
     buffname: 'LuckPotionBuff',
     enableEffect: (player) => {
         player.session.multipliers.potion.luck += .1
@@ -15,18 +15,20 @@ PotionsData.set(PotionType.LuckPotion, {
 })
 
 PotionsData.set(PotionType.WinsPotion, {
-    duration: 10,
+    duration: 30*60,
     buffname: 'WinPotionBuff',
     enableEffect: (player) => {
         player.session.multipliers.potion.wins += 1
+        print(player.session.multipliers.potion.wins, 'player.session.multipliers.potion.wins')
     },
     disableEffect: (player) => {
         player.session.multipliers.potion.wins -= 1
+        print(player.session.multipliers.potion.wins, 'player.session.multipliers.potion.wins')
     }
 })
 
 PotionsData.set(PotionType.GoldPotion, {
-    duration: 10,
+    duration: 30*60,
     buffname: 'GoldPotionBuff',
     enableEffect: (player) => {
         player.session.stats.set('GoldPotionBuff', true)
@@ -37,7 +39,7 @@ PotionsData.set(PotionType.GoldPotion, {
 })
 
 PotionsData.set(PotionType.VoidPotion, {
-    duration: 10,
+    duration: 30*60,
     buffname: 'VoidPotionBuff',
     enableEffect: (player) => {
         player.session.stats.set('VoidPotionBuff', true)

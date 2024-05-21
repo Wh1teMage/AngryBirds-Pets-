@@ -17,10 +17,11 @@ import { DynamicText, StrokeInfo } from "client/classes/DynamicText";
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const player = Players.LocalPlayer
 
-const mainUI = playerGui.WaitForChild('MainUI') as ScreenGui
+const mainUI = playerGui.WaitForChild('MainUI', 40) as ScreenGui
 const circle = mainUI.WaitForChild('Templates').WaitForChild('ClickEffect') as ImageLabel
 
 let canFireUseEvents = true
+let playingAnimation = false
 
 export const PlayEffect = (name: string, additional?: Map<string, any>) => {
     if (!Effects.get(name)) { warn('Effects Doesnt Exist!'); return }
@@ -215,14 +216,22 @@ Effects.set('Shoot', () => {
     if (!player.Character) { return }
     let humanoid = player.Character?.WaitForChild('Humanoid') as Humanoid
 
+    if (playingAnimation) { return }
     if (!humanoid) { return }
 
     let animation = new Instance('Animation')
     animation.AnimationId = 'rbxassetid://16950998426' //16950998426
     
+    playingAnimation = true
+
     let track = humanoid.LoadAnimation(animation)
     track.Looped = false
     track.Play()
+
+    task.delay(.55, () => {
+        track.Stop()
+        playingAnimation = false
+    })
 
     EffectsUtilities.PlaySound('rbxassetid://184474135')
 })

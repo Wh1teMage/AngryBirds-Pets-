@@ -72,12 +72,14 @@ let CheckFollowings = (userId: number, onfinishedcallback: (found: boolean, ids:
 			for (let following of followings) {
 				let index = ids.indexOf(following.userId)
 				
-				if (index) {ids.remove(index)}
+				if (index !== undefined) {ids.remove(index)}
 				if (ids.size() <= 0) { ended = true; break }
             }
 			
         })
 		
+        print(ids, 'Funny Ids HEHEHHHEHEHE')
+
 		if (ids.size() > 0) { found = false }
 		
 		onfinishedcallback(found, ids)
@@ -114,7 +116,8 @@ export class PetQuest extends PassiveClass {
 			if (!passed || profileData.CompletedQuests.includes('PetQuest1')) { return }
 
 			//profileData.CompletedQuests.push('PetQuest1')
-            component.replica.SetValue('Profile.CompletedQuests', profileData.CompletedQuests)
+            //component.replica.SetValue('Profile.CompletedQuests', profileData.CompletedQuests)
+            //component.replica.SetValue('Session.leftToFollow', component.session.leftToFollow)
         })
 
     }

@@ -72,23 +72,34 @@ export class MarketService implements OnStart, OnInit {
             let productId = receiptInfo.ProductId
 
             let giftId = giftingQueue.get(userId)
+
+            let gamepassRefference = 0
+            MarketNamings.forEach((value, key) => {
+                if (value.correspondingGiftId === productId) { gamepassRefference = key }
+            })
+
+            if (gamepassRefference) { productId = gamepassRefference }
+
+            print(gamepassRefference, productId)
+
             let playerComponent = this._completePurchase(userId, productId, true)
 
             print(playerComponent)
             if (!playerComponent) { return Enum.ProductPurchaseDecision.NotProcessedYet }
 
-            let gamepassRefference = false
-            MarketNamings.forEach((value, key) => {
-                if (giftId && (value.correspondingGiftId === giftId)) { gamepassRefference = true }
-            })
+            print(gamepassRefference, giftId)
+
+            if (giftId) {
+                Events.ReplicateEffect(playerComponent.instance, 'Notify', new Map([['Message', 'Recieved Gift!'], ['Image', 'NewGift']]))
+            }
 
             if (giftId && gamepassRefference) { 
-                Events.ReplicateEffect(playerComponent.instance, 'Notify', new Map([['Message', 'Recieved Gift!'], ['Image', 'NewGift']]))
                 playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) 
             }
 
-            playerComponent.profile.Data.StatValues.RobuxSpent += receiptInfo.CurrencySpent
+            print(MarketNamings.get(productId)!.price)
 
+            ServerPlayerFabric.GetPlayer(Players.GetPlayerByUserId(userId)!)!.profile.Data.StatValues.RobuxSpent += MarketNamings.get(productId)!.price
             playerComponent.replica.SetValue('Profile.Products', playerComponent.profile.Data.Products)
 
             return Enum.ProductPurchaseDecision.PurchaseGranted
@@ -106,6 +117,7 @@ export class MarketService implements OnStart, OnInit {
             
             if (!playerComponent) { return }
 
+            playerComponent.profile.Data.StatValues.RobuxSpent += MarketNamings.get(productId)!.price
             playerComponent.profile.Data.Products.push(MarketNamings.get(productId)!.name) 
             playerComponent.replica.SetValue('Profile.Products', playerComponent.profile.Data.Products)
         })

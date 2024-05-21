@@ -28,7 +28,7 @@ SessionRewardsData.push({
     Values: {
         Strength: 500
     },
-    Time: 60/10,
+    Time: 60,
     World: WorldType.Cave,
 })
 
@@ -178,9 +178,9 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Strength: 500000
+        Strength: 500000/3
     },
-    Time: 10,
+    Time: 60,
     World: WorldType.NeonCity,
 })
 
@@ -194,7 +194,7 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Strength: 1000000
+        Strength: 1000000/3
     },
     Time: 60*5,
     World: WorldType.NeonCity,
@@ -223,7 +223,7 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Strength: 1500000
+        Strength: 1500000/3
     },
     Time: 60*15,
     World: WorldType.NeonCity,
@@ -330,9 +330,9 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Strength: 50000000
+        Strength: 50000000/3
     },
-    Time: 10,
+    Time: 60,
     World: WorldType.Space,
 })
 
@@ -346,7 +346,7 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Strength: 100000000
+        Strength: 100000000/3
     },
     Time: 60*5,
     World: WorldType.Space,
@@ -375,7 +375,7 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Strength: 150000000
+        Strength: 150000000/3
     },
     Time: 60*15,
     World: WorldType.Space,
@@ -586,192 +586,214 @@ DailyRewardsData.push({
     Time: 14
 })
 
-
-CodesRewardsData.set('testcode', {
+CodesRewardsData.set('release', {
     Values: {
-        Strength: 10
+        Wins: 25
     },
+    Potions: [{potion: PotionType.LuckPotion, amount: 1}],
+    Time: 1
+})
+
+CodesRewardsData.set('ketwil', {
+    Values: {},
+    Potions: [
+        {potion: PotionType.WinsPotion, amount: 1},
+        {potion: PotionType.LuckPotion, amount: 1},
+        {potion: PotionType.GoldPotion, amount: 1},
+        {potion: PotionType.VoidPotion, amount: 1}
+    ],
+    Time: 1
+})
+
+CodesRewardsData.set('4upahero', {
+    Values: {},
+    Potions: [
+        {potion: PotionType.WinsPotion, amount: 1},
+        {potion: PotionType.LuckPotion, amount: 1},
+        {potion: PotionType.GoldPotion, amount: 1},
+        {potion: PotionType.VoidPotion, amount: 1}
+    ],
     Time: 1
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test',
-    Additional: new Map([['Wins', 100], ['Multiplier', .1]]) //[{data: 'Wins', amount: 10}, {data: 'Multiplier', amount: .1}],
+    Additional: new Map([['Wins', 100], ['Multiplier', .1-.1]]) //[{data: 'Wins', amount: 10}, {data: 'Multiplier', amount: .1}],
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test2',
-    Additional: new Map([['Wins', 250], ['Multiplier', .2]])
+    Additional: new Map([['Wins', 250], ['Multiplier', .2-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test3',
-    Additional: new Map([['Wins', 1000], ['Multiplier', .3]])
+    Additional: new Map([['Wins', 1000], ['Multiplier', .3-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test4',
-    Additional: new Map([['Wins', 2000], ['Multiplier', .4]])
+    Additional: new Map([['Wins', 2000], ['Multiplier', .4-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test5',
-    Additional: new Map([['Wins', 5000], ['Multiplier', .5]])
+    Additional: new Map([['Wins', 5000], ['Multiplier', .5-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test6',
-    Additional: new Map([['Wins', 10000], ['Multiplier', .6]])
+    Additional: new Map([['Wins', 10000], ['Multiplier', .6-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test7',
-    Additional: new Map([['Wins', 20000], ['Multiplier', .7]])
+    Additional: new Map([['Wins', 20000], ['Multiplier', .7-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test8',
-    Additional: new Map([['Wins', 50000], ['Multiplier', .8]])
+    Additional: new Map([['Wins', 50000], ['Multiplier', .8-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test9',
-    Additional: new Map([['Wins', 100000], ['Multiplier', .9]])
+    Additional: new Map([['Wins', 100000], ['Multiplier', .9-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test10',
-    Additional: new Map([['Wins', 200000], ['Multiplier', 1]])
+    Additional: new Map([['Wins', 200000], ['Multiplier', 1-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test11',
-    Additional: new Map([['Wins', 400000], ['Multiplier', 1.1]])
+    Additional: new Map([['Wins', 400000], ['Multiplier', 1.1-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test12',
-    Additional: new Map([['Wins', 800000], ['Multiplier', 1.2]])
+    Additional: new Map([['Wins', 800000], ['Multiplier', 1.2-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test13',
-    Additional: new Map([['Wins', 1200000], ['Multiplier', 1.3]])
+    Additional: new Map([['Wins', 1200000], ['Multiplier', 1.3-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test14',
-    Additional: new Map([['Wins', 1800000], ['Multiplier', 1.4]])
+    Additional: new Map([['Wins', 1800000], ['Multiplier', 1.4-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test15',
-    Additional: new Map([['Wins', 2700000], ['Multiplier', 1.5]])
+    Additional: new Map([['Wins', 2700000], ['Multiplier', 1.5-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test16',
-    Additional: new Map([['Wins', 4090000], ['Multiplier', 1.6]])
+    Additional: new Map([['Wins', 4090000], ['Multiplier', 1.6-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test17',
-    Additional: new Map([['Wins', 6100000], ['Multiplier', 1.7]])
+    Additional: new Map([['Wins', 6100000], ['Multiplier', 1.7-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test18',
-    Additional: new Map([['Wins', 9100000], ['Multiplier', 1.8]])
+    Additional: new Map([['Wins', 9100000], ['Multiplier', 1.8-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test19',
-    Additional: new Map([['Wins', 14000000], ['Multiplier', 1.9]])
+    Additional: new Map([['Wins', 14000000], ['Multiplier', 1.9-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test20',
-    Additional: new Map([['Wins', 21000000], ['Multiplier', 2]])
+    Additional: new Map([['Wins', 21000000], ['Multiplier', 2-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test21',
-    Additional: new Map([['Wins', 31000000], ['Multiplier', 2.1]])
+    Additional: new Map([['Wins', 31000000], ['Multiplier', 2.1-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test22',
-    Additional: new Map([['Wins', 46000000], ['Multiplier', 2.2]])
+    Additional: new Map([['Wins', 46000000], ['Multiplier', 2.2-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test23',
-    Additional: new Map([['Wins', 69000000], ['Multiplier', 2.3]])
+    Additional: new Map([['Wins', 69000000], ['Multiplier', 2.3-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test24',
-    Additional: new Map([['Wins', 100000000], ['Multiplier', 2.4]])
+    Additional: new Map([['Wins', 100000000], ['Multiplier', 2.4-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test25',
-    Additional: new Map([['Wins', 160000000], ['Multiplier', 2.5]])
+    Additional: new Map([['Wins', 160000000], ['Multiplier', 2.5-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test26',
-    Additional: new Map([['Wins', 230000000], ['Multiplier', 2.6]])
+    Additional: new Map([['Wins', 230000000], ['Multiplier', 2.6-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test27',
-    Additional: new Map([['Wins', 350000000], ['Multiplier', 2.7]])
+    Additional: new Map([['Wins', 350000000], ['Multiplier', 2.7-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 1 },
     Title: 'Test28',
-    Additional: new Map([['Wins', 530000000], ['Multiplier', 2.8]])
+    Additional: new Map([['Wins', 530000000], ['Multiplier', 2.8-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test29',
-    Additional: new Map([['Wins', 790000000], ['Multiplier', 2.9]])
+    Additional: new Map([['Wins', 790000000], ['Multiplier', 2.9-.1]])
 })
 
 RebirthsRewardsData.push({
     Values: { Gems: 0 },
     Title: 'Test30',
-    Additional: new Map([['Wins', 1200000000], ['Multiplier', 3]])
+    Additional: new Map([['Wins', 1200000000], ['Multiplier', 3-.1]])
 })
 
 export const SpinRewardData: IRewardData = {
@@ -817,7 +839,7 @@ export const DailyChestRewardData: IRewardData = {
     Chances: [
         {weight: 30, name: 'Wins', reward: {
             Values: {
-                Wins: 1000,
+                Wins: 10,
             }
         }},
         {weight: 25, name: 'PotinonGiren', reward: {
@@ -852,7 +874,7 @@ export const GroupChestRewardData: IRewardData = {
     Chances: [
         {weight: 50, name: 'Wins1', reward: {
             Values: {
-                Wins: 1000,
+                Wins: 100,
             }
         }},
         {weight: 46, name: 'PotinonGiren', reward: {
