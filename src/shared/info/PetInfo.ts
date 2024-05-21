@@ -11,7 +11,7 @@ PetsData.set('Cat', {
     name: 'Cat',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 1.4]]),
+    multipliers: new Map([['strength', 1.5]]),
     stats: {
         rarity: Rarities.Common,
         sizeOffset: new Vector3(0,0,0),
