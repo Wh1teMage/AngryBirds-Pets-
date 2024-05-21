@@ -169,7 +169,7 @@ ToolsData.set('Slingshot6W2', {
     sizeOffset: new Vector3(0,0,0),
     rotationOffset: CFrame.Angles(0,0,math.rad(90)),
 
-    name: 'Mtyhical',
+    name: 'Mythical',
     // name: 'я четырнадцати летняя проститутка из Никгура',
     addition: 140,
     firerate: 1/1,
