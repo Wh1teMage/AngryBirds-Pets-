@@ -53,7 +53,7 @@ WorldsData.set(WorldType.NeonCity, {
     starsReward: 100,
 
     gravity: 10,
-    density: 190907,
+    density: 190907*1.25,
 
     startingPosition: new Vector3(-3469.713, -115.327, 1036.427),
     endingPosition: new Vector3(-3470.269, -130, -3060.84),
