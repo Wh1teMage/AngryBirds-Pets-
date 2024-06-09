@@ -29,7 +29,7 @@ const FollowIds = [
 let GetFollowings = (userId: number, itercallback: (followings: otherData[], ended: boolean) => void, cursor?: string) => {
 	let followings: otherData[] = []
 	let ended = false
-	let url = ("https://friends.roproxy.com/v1/users/%s/followings?limit=100").format(tostring(userId))
+	let url = ("https://friends.roblox.com/v1/users/%s/followings?limit=100").format(tostring(userId))
 
 	if (ended) { return {} }
 	
@@ -69,6 +69,7 @@ let CheckFollowings = (userId: number, onfinishedcallback: (found: boolean, ids:
 		let found = true
 		
 		GetFollowings(userId, (followings, ended) => {
+            print(followings)
 			for (let following of followings) {
 				let index = ids.indexOf(following.userId)
 				

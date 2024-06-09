@@ -62,6 +62,7 @@ export const defaultValue: IProfileData = {
         MaxPets: 100,
         MaxEquippedPets: 3,
         MaxPetsInVoidMachine: 5,
+        MaxEquippedRelics: 6,
         MaxWorld: WorldType.Cave,
         RebirthTitle: 'Default',
     },
@@ -84,7 +85,10 @@ export const defaultValue: IProfileData = {
 
     VoidMachine: [],
     RedeemedCodes: [],
+
     StoredEggs: [],
+    Relics: [],
+    EquippedRelics: [],
 
     CONSTANTS: {
         VERSION: VERSION,

@@ -47,6 +47,7 @@ export interface IMultipliers {
     luck: number
     product: number
     attackspeed: number
+    shootboost: number
 }
 
 export const DefaultMultipliers: IMultipliers = {
@@ -57,6 +58,7 @@ export const DefaultMultipliers: IMultipliers = {
     luck: 1,
     product: 1,
     attackspeed: 1,
+    shootboost: 1,
 }
 
 export const SessionData: ISessionData = {

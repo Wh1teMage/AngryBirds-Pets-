@@ -509,7 +509,7 @@ DailyRewardsData.push({
 
 DailyRewardsData.push({
     Values: {},
-    Additional: new Map([['MaxPets', 1]]),
+    Additional: new Map([['MaxPets', 25]]),
     Time: 4
 })
 

@@ -40,6 +40,7 @@ import { Passives } from "server/classes/PassiveClass";
 import { BadgeManager } from "server/services/BadgeManager";
 import { BadgeType } from "shared/interfaces/BadgeData";
 import { MarketCallbacks } from "server/static/MarketStatic";
+import { RelicPassiveNames } from "shared/info/RelicsInfo";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -60,10 +61,13 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     private _playerTradeController = new PlayerTradeController(this)
     private _playerWorldController = new PlayerWorldController(this)
     private _playerHttpsController = new PlayerHttpsController(this)
+    private _playerRelicsController = new PlayerRelicsController(this)
     private _playerPotionController = new PlayerPotionController(this)
     private _playerFlyingController = new PlayerFlyingController(this)
     private _playerRewardController = new PlayerRewardController(this)
+    
     private _playerMultiplersController = new PlayerMultiplersController(this)
+    
     
     public FindPet = (pet: IDBPetData) => this._playerPetController.FindPet(pet)
     public AppendPet = (pet: IDBPetData | undefined, ignore?: boolean) => this._playerPetController.AppendPet(pet, ignore)
@@ -94,7 +98,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public SetStrength = (value: number, source?: IncomeSource) => this._playerValueController.SetStrength(value, source)
 
     public BuyEgg = (name: string, buytype: EggBuyType) => this._playerEggController.BuyEgg(name, buytype)
-    public OpenEggBypass = (name: string, buytype: EggBuyType) => this._playerEggController.OpenEggBypass(name, buytype)
+    public OpenEggBypass = (name: string, buytype: EggBuyType, noeffect?: boolean) => this._playerEggController.OpenEggBypass(name, buytype, noeffect)
 
     public SetupTrade = (trade: Trade) => this._playerTradeController.SetupTrade(trade)
     public UpdateTrade = (pet: IDBPetData, status: TradeUpdateStatus) => this._playerTradeController.UpdateTrade(pet, status)
@@ -140,6 +144,10 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
     public ClaimBadge = (id: number) => this._playerBadgeController.ClaimBadge(id)
     public AddBadgeToInventory = (id: number) => this._playerBadgeController.AddBadgeToInventory(id)
+
+    public AppendRelic = (name: string, level: number, amout?: number) => this._playerRelicsController.AppendRelic(name, level, amout)
+    public EquipRelic = (name: string, level: number) => this._playerRelicsController.EquipRelic(name, level)
+    public UnequipRelic = (name: string, level: number) => this._playerRelicsController.UnequipRelic(name, level)
 
     onStart() {
 
@@ -254,8 +262,15 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             }
             */
             
+            /*
+            for (let i = 1; i < 8; i++) {
+                this.AppendRelic('test'+tostring(i), 8, 1)
+                this.EquipRelic('test'+tostring(i), 8)
 
-            
+                print('test'+tostring(i))
+            }
+            */
+
             
             if (this.profile.Data.Pets.size() < 1) {
 
@@ -813,7 +828,7 @@ class PlayerEggController {
         this.player = player
     }
 
-    public OpenEggBypass(name: string, buytype: EggBuyType) {
+    public OpenEggBypass(name: string, buytype: EggBuyType, noeffect?: boolean) {
         let profileData = this.player.profile.Data
         let sessionData = this.player.session
 
@@ -825,7 +840,7 @@ class PlayerEggController {
         let pets: string[] = []
 
         for (let i = 0; i < amount; i++) {
-            let petName = PetUtilities.RandomWeight(eggInfo.petchances, profileData.Config.Luck)
+            let petName = PetUtilities.RandomWeight(eggInfo.petchances, profileData.Config.Luck+sessionData.multipliers.other.luck-1)
             let pet = PetUtilities.NameToDBPetWithEgg(petName, eggInfo.name)
 
             let goldenChance = math.random(1, 1000)
@@ -842,6 +857,8 @@ class PlayerEggController {
         
         this.player.replica.SetValue('Profile.Pets', this.player.profile.Data.Pets)
         this.player.replica.SetValue('Profile.PetIndex', this.player.profile.Data.PetIndex)
+
+        if (noeffect) { return }
 
         Events.ReplicateEffect.fire(this.player.instance, 'EggHatched', new Map<string, any>([
             ['EggName', name], ['Pets', pets], ['Speed', this.player.profile.Data.Multipliers.HatchSpeedMul]
@@ -871,6 +888,8 @@ class PlayerEggController {
                 print(eggInfo, 1)
 
                 this.OpenEggBypass(name, buytype)
+
+                this.player.session.activePassives.forEach((value) => { value.onEggOpened(eggInfo!, amount, buytype) })
 
                 /*
                 for (let i = 0; i < amount; i++) {
@@ -1516,7 +1535,7 @@ class PlayerToolController {
     public UseTool() {
         let profileData = this.player.profile.Data
         let toolInfo = ToolsData.get(profileData.EquippedTool)!
-        print('using')
+
         if (!this.canUse(toolInfo)) { return }
 
         this.using = true
@@ -1526,7 +1545,9 @@ class PlayerToolController {
         this.lastUsed = tick()
         this.using = false
 
-        this.player.session.activePassives.forEach((value) => { value.onShoot() })
+        print(this.player.session.activePassives)
+
+        this.player.session.activePassives.forEach((value) => { print(value.onShoot()); value.onShoot() })
         
         Events.ReplicateEffect.fire(this.player.instance, toolInfo.effectname)
     }
@@ -1998,7 +2019,7 @@ class PlayerFlyingController {
         print(profileData.Values.StrengthVal, currentWorld.density, power)
         print(profileData.Values.StrengthVal/currentWorld.gravity/3*power, profileData.Values.StrengthVal/currentWorld.density*power)
 
-        let object = new FlyingObjectClass(flyingPart, profileData.Values.StrengthVal*power, sessionData.currentWorld)
+        let object = new FlyingObjectClass(flyingPart, profileData.Values.StrengthVal*power*sessionData.multipliers.other.shootboost, sessionData.currentWorld)
         let length = currentWorld.startingPosition.sub(currentWorld.endingPosition).Magnitude
         
         let isFlying = true
@@ -2096,6 +2117,131 @@ class PlayerFlyingController {
         object.Activate()
     }
 
+}
+
+class PlayerRelicsController {
+    
+    private player: ServerPlayerComponent
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+
+    public FindRelic(name: string, level: number) {
+
+        let profileData = this.player.profile.Data
+
+        let index = -1
+        profileData.Relics.forEach((val, i) => { if (val.name === name && val.level === level) { index = i } })
+        if (index < 0) { return }
+
+        return profileData.Relics[index]
+        
+    }
+
+    public FindEquippedRelic(name: string, level: number) {
+
+        let profileData = this.player.profile.Data
+
+        let index = -1
+        profileData.EquippedRelics.forEach((val, i) => { if (val.name === name && val.level === level) { index = i } })
+        if (index < 0) { return }
+
+        return profileData.EquippedRelics[index]
+        
+    }
+
+    public AppendRelic(name: string, level: number, amount?: number) {
+
+        let profileData = this.player.profile.Data
+        let finalAmount = 1
+
+        if (amount) { finalAmount = amount }
+
+        let relic = this.FindRelic(name, level)
+        if (relic) { relic.amount += finalAmount; return }
+
+        profileData.Relics.push({ name: name, level: level, amount: finalAmount })
+        this.player.replica.SetValue('Profile.Relics', profileData.Relics)
+
+    }
+
+    public DeleteRelic(name: string, level: number, amount?: number) {
+
+        let profileData = this.player.profile.Data
+        let finalAmount = 1
+
+        if (amount) { finalAmount = amount }
+
+        let relic = this.FindRelic(name, level)
+        if (!relic) { return }
+        if (relic) { relic.amount -= finalAmount }
+
+        if (relic.amount <= 0) {
+            let index = -1
+            profileData.Relics.forEach((val, i) => { if (val.name === name && val.level === level) { index = i } })
+    
+            profileData.Relics.remove(index)
+        }
+
+        this.player.replica.SetValue('Profile.Relics', profileData.Relics)
+
+    }
+
+    public UnequipRelic(name: string, level: number) {
+        
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        if (profileData.EquippedRelics.size() <= 0) { return }
+
+        let relic = this.FindEquippedRelic(name, level)
+        if (!relic) { return }
+
+        let index = -1
+        profileData.EquippedRelics.forEach((val, i) => { if (val.name === name && val.level === level) { index = i } })
+        profileData.EquippedRelics.remove(index)
+
+        let passiveName = RelicPassiveNames.get(name)!
+
+        index = -1
+        sessionData.activePassives.forEach((val) => { if (val.name === passiveName && val.level === level && (index < 0)) { val.onEnd() } })
+
+        sessionData.activePassives.remove(index)
+        this.AppendRelic(name, level)
+
+        this.player.replica.SetValue('Profile.EquippedRelics', profileData.EquippedRelics)
+    }
+
+    public EquipRelic(name: string, level: number) {
+
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        if (profileData.EquippedRelics.size() >= profileData.Config.MaxEquippedRelics) { return }
+
+        let relic = this.FindRelic(name, level)
+        if (!relic) { return }
+
+        profileData.EquippedRelics.push({name: name, level: level})
+
+        let passiveName = RelicPassiveNames.get(name)!
+
+        let passive = Passives.get(passiveName)!() 
+
+        passive.setOwner(this.player.instance)
+        passive.level = level
+
+        sessionData.activePassives.push(passive)
+        passive.onStart()
+
+        print('sessionData.activePassives', sessionData.activePassives)
+
+        this.DeleteRelic(name, level)
+
+        this.player.replica.SetValue('Profile.EquippedRelics', profileData.EquippedRelics)
+
+    }
 }
 
 class PlayerBadgeController { // add a debug method if playerData has badge but playerInventory doesnt (not sure about request rate)

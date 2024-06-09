@@ -90,6 +90,9 @@ export const MarketNamings = new Map<number, IProductData>([
     [1762896251, {name: 'buy10spin', producttype: ProductType.DevProduct, price: 399}],
     [1762896353, {name: 'buy100spin', producttype: ProductType.DevProduct, price: 2299}],
 
+    [1762885561, {name: '25storage',     producttype: ProductType.DevProduct, price: 49}],
+    [1762885322, {name: '1equipped', producttype: ProductType.DevProduct, price: 99}],
+
     [1779420282, {name: 'limited1', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
         if (defaultGlobal.get('Limited1')! < 0) { return false }
         return true

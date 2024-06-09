@@ -1,3 +1,4 @@
+import { EggBuyType, IEggData } from "./EggData"
 import { IDBPetData } from "./PetData"
 
 export enum PassiveValues {
@@ -13,7 +14,11 @@ export interface IPassiveData {
     name: string
     description: string
 
+    level: number
+
     onStart: () => void
+    onEnd: () => void
+
     onShoot: () => void
     onTrigger: () => void
 
@@ -23,6 +28,8 @@ export interface IPassiveData {
     onStarsChanged: (newvalue: number, oldvalue: number) => void
     onRebirthsChanged: (newvalue: number, oldvalue: number) => void
     onValueChanged: (value: PassiveValues) => void
+
+    onEggOpened: (egg: IEggData, amount: number, buytype: EggBuyType) => void
 
     onFriendsChanged: () => void
     onTick: () => void

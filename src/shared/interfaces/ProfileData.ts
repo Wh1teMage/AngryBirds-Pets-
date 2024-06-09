@@ -59,6 +59,7 @@ export interface IProfileData {
         MaxPets: number
         MaxEquippedPets: number
         MaxPetsInVoidMachine: number
+        MaxEquippedRelics: number
         MaxWorld: WorldType
         RebirthTitle: string
     }
@@ -83,6 +84,9 @@ export interface IProfileData {
     RedeemedCodes: Array<string>
 
     StoredEggs: Array<{name: string, amount: number}>
+
+    Relics: Array<{name: string, level: number, amount: number}>
+    EquippedRelics: Array<{name: string, level: number}>
     
     CONSTANTS: {
         VERSION: number

@@ -363,13 +363,15 @@ export class UIController implements OnStart, OnInit {
         let amountInfo = petInventory.WaitForChild('Backpack').WaitForChild('AmountInfo') as Frame
 
         ButtonFabric.CreateButton(amountInfo.WaitForChild('Backpack').WaitForChild('Plus') as ImageButton).BindToClick(() => {
-            if (!profileData.Products.includes('100storage')) { Events.PurchasePrompt(722039542) }
-            if (!profileData.Products.includes('250storage')) { Events.PurchasePrompt(722093443) }
+            if (!profileData.Products.includes('100storage')) { Events.PurchasePrompt(722039542); return }
+            if (!profileData.Products.includes('250storage')) { Events.PurchasePrompt(722093443); return }
+            Events.PurchasePrompt(1762885561);
         })
 
         ButtonFabric.CreateButton(amountInfo.WaitForChild('Equip').WaitForChild('Plus') as ImageButton).BindToClick(() => {
-            if (!profileData.Products.includes('3equipped')) { Events.PurchasePrompt(722111374) }
-            if (!profileData.Products.includes('5equipped')) { Events.PurchasePrompt(721938617) }
+            if (!profileData.Products.includes('3equipped')) { Events.PurchasePrompt(722111374); return }
+            if (!profileData.Products.includes('5equipped')) { Events.PurchasePrompt(721938617); return }
+            Events.PurchasePrompt(1762885322);
         })
     }
 
@@ -4040,6 +4042,14 @@ export class UIController implements OnStart, OnInit {
 
         this._playerController.replica.ListenToChange('Profile.ActiveBuffs', () => {
             this.updatePotionBuffs()
+        })
+
+        this._playerController.replica.ListenToChange('Profile.Config.MaxEquippedPets', () => {
+            this.updatePets()
+        })
+
+        this._playerController.replica.ListenToChange('Profile.Config.MaxPets', () => {
+            this.updatePets()
         })
 
         this._playerController.replica.ListenToChange('Session.currentFlyingObject', (newValue) => {

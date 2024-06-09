@@ -1,5 +1,6 @@
 import { Modding } from "@flamework/core";
 import { Constructor } from "@flamework/core/out/utility";
+import { EggBuyType, IEggData } from "shared/interfaces/EggData";
 import { IPassiveData, PassiveValues } from "shared/interfaces/PassiveData";
 import { IDBPetData } from "shared/interfaces/PetData";
 
@@ -9,12 +10,15 @@ export abstract class PassiveClass implements IPassiveData {
     public abstract description: string
 
     public player: Player | undefined
+    public level = 1
 
     constructor(player?: Player) {
         this.player = player
     }
 
     public onStart = () => {}
+    public onEnd = () => {}
+
     public onShoot = () => {}
     public onTrigger = () => {}
 
@@ -24,6 +28,8 @@ export abstract class PassiveClass implements IPassiveData {
     public onStarsChanged = (newvalue: number, oldvalue: number) => {}
     public onRebirthsChanged = (newvalue: number, oldvalue: number) => {}
     public onValueChanged = (value: PassiveValues) => {}
+
+    public onEggOpened = (egg: IEggData, amount: number, buytype: EggBuyType) => {}
 
     public onFriendsChanged = () => {}
     public onTick = () => {}

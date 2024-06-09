@@ -697,3 +697,15 @@ MarketCallbacks.set('voidskip', (player) => {
     player.ClaimVoidPet(player.session.selectedVoid!, true)
     //profileData.StatValues.RobuxSpent += 199
 })
+
+MarketCallbacks.set('25storage', (player) => {
+    let profileData = player.profile.Data
+    profileData.Config.MaxPets += 25
+    player.replica.SetValue('Profile.Config.MaxPets', profileData.Config.MaxPets)
+})
+
+MarketCallbacks.set('1equipped', (player) => {
+    let profileData = player.profile.Data
+    profileData.Config.MaxEquippedPets += 1
+    player.replica.SetValue('Profile.Config.MaxEquippedPets', profileData.Config.MaxEquippedPets)
+})
