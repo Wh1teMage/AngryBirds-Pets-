@@ -8,6 +8,7 @@ export const FriendQuestsData = new Map<string, IQuestData>()
 export const PetIndexQuestsData = new Map<string, IQuestData>()
 export const PetQuestsData = new Map<string, IQuestData>()
 export const EggQuestsData = new Map<string, IQuestData>()
+export const RelicQuestsData = new Map<string, IQuestData>()
 
 FriendQuestsData.set('FriendQuest1', {
     requirements: new Map([['friends', 1]]),
@@ -147,6 +148,30 @@ EggQuestsData.set('Shadow', {
         player.replica.SetValue('Profile.CurrentQuestsProgress', progress)
 
         if (progress.get('Shadow')!.get('time') === 0) {
+            return true
+        }
+        return false
+    }
+})
+
+RelicQuestsData.set('RelicQuest1', {
+    requirements: new Map([['time', 20*60], ['count', 800]]),
+    reward: {
+        Values: {},
+        Additional: new Map([['EventTest', 1]])
+    },
+    checkCallback: (player) => {
+        let profileData = player.profile.Data
+        let sessionData = player.session
+        let progress = profileData.CurrentQuestsProgress
+
+        progress.set('RelicQuest1', new Map( 
+            [['time', sessionData.sessionTime%(10)]]
+        ))
+
+        player.replica.SetValue('Profile.CurrentQuestsProgress', progress)
+
+        if (progress.get('RelicQuest1')!.get('time') === 0) {
             return true
         }
         return false

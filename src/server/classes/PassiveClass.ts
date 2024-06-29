@@ -19,6 +19,8 @@ export abstract class PassiveClass implements IPassiveData {
     public onStart = () => {}
     public onEnd = () => {}
 
+    public onLeft = () => {}
+
     public onShoot = () => {}
     public onTrigger = () => {}
 

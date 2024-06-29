@@ -1470,7 +1470,7 @@ PetsData.set('Ultra Capybara', {
     name: 'Ultra Capybara',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 75]]),
+    multipliers: new Map([['strength', 600]]),
     stats: {
         rarity: Rarities.Limited,
         sizeOffset: new Vector3(0,0,0),
@@ -1488,7 +1488,7 @@ PetsData.set('Psycho', {
     name: 'Psycho',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 275]]),
+    multipliers: new Map([['strength', 1500]]),
     stats: {
         rarity: Rarities.Limited,
         sizeOffset: new Vector3(0,0,0),
@@ -1506,7 +1506,7 @@ PetsData.set('Devils Soul', {
     name: 'Devils Soul',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 1250]]),
+    multipliers: new Map([['strength', 10000]]),
     stats: {
         rarity: Rarities.Limited,
         sizeOffset: new Vector3(0,0,0),
@@ -1518,6 +1518,350 @@ PetsData.set('Devils Soul', {
         mutation: Mutations.Default
     },
     model: Pets.WaitForChild('Devils Soul', 5) as Model
+})
+
+// *World4
+
+PetsData.set('Devil Golem', {
+    name: 'Devil Golem',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 500]]),
+    stats: {
+        rarity: Rarities.Common,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Devil Golem', 5) as Model
+})
+
+PetsData.set('Darkness Shark', {
+    name: 'Darkness Shark',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 625]]),
+    stats: {
+        rarity: Rarities.Uncommon,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Shark', 5) as Model
+})
+
+PetsData.set('Darkness Parrot', {
+    name: 'Darkness Parrot',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 781]]),
+    stats: {
+        rarity: Rarities.Rare,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Parrot', 5) as Model
+})
+
+PetsData.set('Darkness Dragon', {
+    name: 'Darkness Dragon',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 976]]),
+    stats: {
+        rarity: Rarities.Epic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Dragon', 5) as Model
+})
+
+PetsData.set('Darkness Steampunk', {
+    name: 'Darkness Steampunk',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1950]]),
+    stats: {
+        rarity: Rarities.Legendary,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Steampunk', 5) as Model
+})
+
+PetsData.set('Darkness Flower Power', {
+    name: 'Darkness Flower Power',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 800]]),
+    stats: {
+        rarity: Rarities.Rare,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Flower Power', 5) as Model
+})
+
+PetsData.set('Darkness Horse', {
+    name: 'Darkness Horse',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1000]]),
+    stats: {
+        rarity: Rarities.Epic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Horse', 5) as Model
+})
+
+PetsData.set('Darkness Happy Demon', {
+    name: 'Darkness Happy Demon',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1250]]),
+    stats: {
+        rarity: Rarities.Legendary,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Happy Demon', 5) as Model
+})
+
+PetsData.set('Darkness Spider', {
+    name: 'Darkness Spider',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1560]]),
+    stats: {
+        rarity: Rarities.Mythic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Spider', 5) as Model
+})
+
+PetsData.set('Darkness', {
+    name: 'Darkness',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 3120]]),
+    stats: {
+        rarity: Rarities.Secret,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness', 5) as Model
+})
+
+PetsData.set('Sinister Pumpkin', {
+    name: 'Sinister Pumpkin',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1350]]),
+    stats: {
+        rarity: Rarities.Rare,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Sinister Pumpkin', 5) as Model
+})
+
+PetsData.set('Darkness Robux', {
+    name: 'Darkness Robux',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1680]]),
+    stats: {
+        rarity: Rarities.Epic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Robux', 5) as Model
+})
+
+PetsData.set('Matrix Dog', {
+    name: 'Matrix Dog',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 2100]]),
+    stats: {
+        rarity: Rarities.Legendary,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Matrix Dog', 5) as Model
+})
+
+PetsData.set('Matrix Kitty', {
+    name: 'Matrix Kitty',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 2630]]),
+    stats: {
+        rarity: Rarities.Mythic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Matrix Kitty', 5) as Model
+})
+
+PetsData.set('Skeletal Samurai', {
+    name: 'Skeletal Samurai',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 5270]]),
+    stats: {
+        rarity: Rarities.Secret,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Skeletal Samurai', 5) as Model
+})
+
+PetsData.set('Skeletal Demon', {
+    name: 'Skeletal Demon',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 4000]]),
+    stats: {
+        rarity: Rarities.Legendary,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Skeletal Demon', 5) as Model
+})
+
+PetsData.set('Pink Fury', {
+    name: 'Pink Fury',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 5000]]),
+    stats: {
+        rarity: Rarities.Mythic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Pink Fury', 5) as Model
+})
+
+PetsData.set('Darkness Alien', {
+    name: 'Darkness Alien',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 9800]]),
+    stats: {
+        rarity: Rarities.Secret,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Darkness Alien', 5) as Model
+})
+
+PetsData.set('Backrooms Cat', {
+    name: 'Backrooms Cat',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 6666]]),
+    stats: {
+        rarity: Rarities.Limited,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Backrooms Cat', 5) as Model
 })
 
 // !!GigaRacoon!!
@@ -1562,5 +1906,42 @@ PetsData.set('Glitch Hunter', {
     },
     model: Pets.WaitForChild('Glitch Hunter', 5) as Model
 })
+
+PetsData.set('Contributor', {
+    name: 'Contributor',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 3000]]),
+    stats: {
+        rarity: Rarities.Exclusive,
+        sizeOffset: new Vector3(0,-1,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Glitch Hunter', 5) as Model
+})
+
+PetsData.set('Developer', {
+    name: 'Developer',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 3000]]),
+    stats: {
+        rarity: Rarities.Exclusive,
+        sizeOffset: new Vector3(0,-1,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Glitch Hunter', 5) as Model
+})
+
 
 */

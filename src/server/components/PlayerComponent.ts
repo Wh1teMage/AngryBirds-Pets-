@@ -40,7 +40,8 @@ import { Passives } from "server/classes/PassiveClass";
 import { BadgeManager } from "server/services/BadgeManager";
 import { BadgeType } from "shared/interfaces/BadgeData";
 import { MarketCallbacks } from "server/static/MarketStatic";
-import { RelicPassiveNames } from "shared/info/RelicsInfo";
+import { RelicPassiveNames, RelicsCases, RelicsInfo } from "shared/info/RelicsInfo";
+import { RelicCaseType } from "shared/interfaces/RelicData";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -129,6 +130,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public GivePremiumReward = () => this._playerHttpsController.GivePremiumReward()
 
     public ApplyReward = (reward: IRewardData) => this._playerRewardController.ApplyReward(reward)
+    public GetChanceReward = (reward: IRewardData) => this._playerRewardController.GetChanceReward(reward)
     public ClaimPetQuestReward = () => this._playerRewardController.ClaimPetQuestReward()
     public ClaimSessionReward = (rewardindex: number) => this._playerRewardController.ClaimSessionReward(rewardindex)
     public ClaimDailyReward = () => this._playerRewardController.ClaimDailyReward()
@@ -148,6 +150,10 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public AppendRelic = (name: string, level: number, amout?: number) => this._playerRelicsController.AppendRelic(name, level, amout)
     public EquipRelic = (name: string, level: number) => this._playerRelicsController.EquipRelic(name, level)
     public UnequipRelic = (name: string, level: number) => this._playerRelicsController.UnequipRelic(name, level)
+    public MergeRelic = (name: string, level: number) => this._playerRelicsController.MergeRelic(name, level)
+
+    public OpenRelicCase = (name: string, amount: number) => this._playerRelicsController.OpenRelicCase(name, amount)
+    public OpenRelicCaseBypass = (name: string, amount: number) => this._playerRelicsController.OpenRelicCaseBypass(name, amount)
 
     onStart() {
 
@@ -184,7 +190,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
         }
 
         let defaultPassives = [
-            'EggQuest', 'FriendQuest', 'PetQuest', 'PetIndexQuest'
+            'EggQuest', 'FriendQuest', 'PetQuest', 'PetIndexQuest', 'RelicQuest'
         ]
 
         for (let passiveName of defaultPassives) {
@@ -262,15 +268,26 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             }
             */
             
+            this.profile.Data.EquippedRelics.forEach((val) => {
+                let passiveName = RelicPassiveNames.get(val.name)!
+
+                let passive = Passives.get(passiveName)!() 
+        
+                passive.setOwner(this.instance)
+                passive.level = val.level
+        
+                this.session.activePassives.push(passive)
+                passive.onStart()
+            })
+            
             /*
-            for (let i = 1; i < 8; i++) {
-                this.AppendRelic('test'+tostring(i), 8, 1)
-                this.EquipRelic('test'+tostring(i), 8)
+            for (let i = 1; i < 9; i++) {
+                this.AppendRelic('test'+tostring(i), 1, 1)
+                //this.EquipRelic('test'+tostring(i), 1)
 
                 print('test'+tostring(i))
             }
             */
-
             
             if (this.profile.Data.Pets.size() < 1) {
 
@@ -288,7 +305,9 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                 )
 
             }
-            
+
+            //this.AppendRelic('Golden Egg', 5, 11)
+
             print(this.profile.Data, 'Profile')
             
             //this.UseWorldTeleport(this.profile.Data.Config.MaxWorld)
@@ -398,6 +417,8 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             task.spawn(() => {
                 while (task.wait(1) && this.instance.Parent) {
 
+                    //this.AppendRelic('BonusShotRelic', 1, 1)
+
                     this.profile.Data.StatValues.IngameTime += 1
                     this.session.sessionTime += 1
                     print(this.session.claimedRewards.size(), this.instance.Name)
@@ -435,6 +456,9 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public OnLeft() {
         if (!this.profile) {return}
         if (this.session.activeTrade) { this.session.activeTrade.Deny() }
+
+        this.session.activePassives.forEach((passive) => { passive.onLeft(); })
+
         this.profile.Release()
         this.replica.Destroy()
     }
@@ -602,7 +626,7 @@ class PlayerMultiplersController {
         this.player.profile.Data.Pets.forEach((pet) => {
             if (!pet.equipped) { return }
 
-            let petData = PetUtilities.DBToPetTransfer(pet)
+            let petData = PetUtilities.DBToPetTransfer(pet, true)
 
             for (let multi of petData!.multipliers) {
                 this.player.session.multipliers.pet[multi[0] as keyof typeof DefaultMultipliers] += multi[1]
@@ -616,7 +640,8 @@ class PlayerMultiplersController {
     public SetWorldMultipliers() {
 
         let sessionData = this.player.session
-        let selectedWorld = table.clone( WorldsData.get(sessionData.currentWorld)! ) 
+        let profileData = this.player.profile.Data
+        let selectedWorld = table.clone( WorldsData.get(profileData.Config.MaxWorld)! ) 
 
         for (let multi of selectedWorld!.multipliers) {
             this.player.session.multipliers.world[multi[0] as keyof typeof DefaultMultipliers] = multi[1]
@@ -1149,8 +1174,8 @@ class PlayerPetController {
         print(os.clock()-start, 'pass3')
         
         profileData.Pets.sort((a, b) => {
-            let petData1 = PetUtilities.DBToPetTransfer(a)!
-            let petData2 = PetUtilities.DBToPetTransfer(b)!
+            let petData1 = PetUtilities.DBToPetTransfer(a, true)!
+            let petData2 = PetUtilities.DBToPetTransfer(b, true)!
 
             return petData1.multipliers!.get('strength')! > petData2.multipliers!.get('strength')!
         })
@@ -1481,7 +1506,7 @@ class PlayerToolController {
     }
 
     private canUse(toolinfo: IToolData) {
-        if ((this.lastUsed + toolinfo.firerate*(1/1)) > tick()) { return }
+        if ((this.lastUsed + toolinfo.firerate*(1/this.player.session.multipliers.other.attackspeed)) > tick()) { return }
         if (this.using) { return }
         return true
     }
@@ -1547,7 +1572,7 @@ class PlayerToolController {
 
         print(this.player.session.activePassives)
 
-        this.player.session.activePassives.forEach((value) => { print(value.onShoot()); value.onShoot() })
+        this.player.session.activePassives.forEach((value) => { value.onShoot() })
         
         Events.ReplicateEffect.fire(this.player.instance, toolInfo.effectname)
     }
@@ -1621,12 +1646,19 @@ class PlayerRewardController {
             }
         })
 
+        reward.Relics?.forEach((value) => {
+            for (let i = 0; i < value.amount; i++) {
+                this.player.AppendRelic(value.name, value.level, value.amount)
+            }
+        })
+
         if (reward.Additional?.get('MaxEquippedPets')) { profile.Config.MaxEquippedPets += reward.Additional?.get('MaxEquippedPets')! }
         if (reward.Additional?.get('MaxPets')) { profile.Config.MaxPets += reward.Additional?.get('MaxPets')! }
         if (reward.Additional?.get('SpinCount')) { profile.StatValues.SpinCount += reward.Additional?.get('SpinCount')! }
 
         if (reward.Additional?.get('StrengthMul')) { profile.Multipliers.StrengthMul += reward.Additional?.get('StrengthMul')! }
         if (reward.Additional?.get('tinypackwins')) { MarketCallbacks.get('tinypackwins')!(this.player) }
+        if (reward.Additional?.get('smallpackwins')) { MarketCallbacks.get('smallpackwins')!(this.player) }
 
         this.player.SetStrength(profile.Values.StrengthVal + (reward.Values?.Strength || 0))
         this.player.SetStars(profile.Values.StarsVal + (reward.Values?.Stars || 0))
@@ -1634,16 +1666,20 @@ class PlayerRewardController {
         this.player.SetGems(profile.Values.GemsVal + (reward.Values?.Gems || 0))
 
         if (reward.Values?.Strength) {
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${reward.Values?.Strength} Accuracy!`], ['Image', 'Accuracy']]))
+            let val = CreationUtilities.getSIPrefixSymbol(reward.Values?.Strength)
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${val} Accuracy!`], ['Image', 'Accuracy']]))
         }
         if (reward.Values?.Wins) {
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${reward.Values?.Wins} Wins!`], ['Image', 'Wins']]))
+            let val = CreationUtilities.getSIPrefixSymbol(reward.Values?.Wins)
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${val} Wins!`], ['Image', 'Wins']]))
         }
         if (reward.Values?.Stars) {
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${reward.Values?.Stars} Stars!`], ['Image', 'Stars']]))
+            let val = CreationUtilities.getSIPrefixSymbol(reward.Values?.Stars)
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${val} Stars!`], ['Image', 'Stars']]))
         }
         if (reward.Values?.Gems) {
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${reward.Values?.Gems} Gems!`], ['Image', 'Gems']]))
+            let val = CreationUtilities.getSIPrefixSymbol(reward.Values?.Gems)
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${val} Gems!`], ['Image', 'Gems']]))
         }
 
         this.player.replica.SetValue('Profile.Config.MaxEquippedPets', profile.Config.MaxEquippedPets)
@@ -2151,7 +2187,7 @@ class PlayerRelicsController {
         
     }
 
-    public AppendRelic(name: string, level: number, amount?: number) {
+    public AppendRelic(name: string, level: number, amount?: number, ignore?: boolean) {
 
         let profileData = this.player.profile.Data
         let finalAmount = 1
@@ -2159,11 +2195,15 @@ class PlayerRelicsController {
         if (amount) { finalAmount = amount }
 
         let relic = this.FindRelic(name, level)
-        if (relic) { relic.amount += finalAmount; return }
 
-        profileData.Relics.push({ name: name, level: level, amount: finalAmount })
+        if (relic) { relic.amount += finalAmount }
+        else { profileData.Relics.push({ name: name, level: level, amount: finalAmount }) }
+
         this.player.replica.SetValue('Profile.Relics', profileData.Relics)
 
+        if (ignore) { return }
+
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${name} Relic!`], ['Image', 'Gems']]))
     }
 
     public DeleteRelic(name: string, level: number, amount?: number) {
@@ -2205,10 +2245,10 @@ class PlayerRelicsController {
         let passiveName = RelicPassiveNames.get(name)!
 
         index = -1
-        sessionData.activePassives.forEach((val) => { if (val.name === passiveName && val.level === level && (index < 0)) { val.onEnd() } })
+        sessionData.activePassives.forEach((val, i) => { if (val.name === passiveName && val.level === level && (index < 0)) { val.onEnd(); index = i } })
 
         sessionData.activePassives.remove(index)
-        this.AppendRelic(name, level)
+        this.AppendRelic(name, level, undefined, true)
 
         this.player.replica.SetValue('Profile.EquippedRelics', profileData.EquippedRelics)
     }
@@ -2242,6 +2282,108 @@ class PlayerRelicsController {
         this.player.replica.SetValue('Profile.EquippedRelics', profileData.EquippedRelics)
 
     }
+
+    public MergeRelic(name: string, level: number) {
+
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        //if (profileData.EquippedRelics.size() >= profileData.Config.MaxEquippedRelics) { return }
+
+        let relicInfo = RelicsInfo.get(RelicPassiveNames.get(name)!)!
+
+        let relic = this.FindRelic(name, level)
+        if (!relic) { return }
+        if (relic.amount < 3) { return }
+        if (relic.level >= relicInfo.size()) { return }
+
+        this.DeleteRelic(name, level, 3)
+        this.AppendRelic(name, level+1)
+
+        this.player.replica.SetValue('Profile.EquippedRelics', profileData.EquippedRelics)
+
+    }
+
+    public OpenRelicCaseBypass(name: string, amount: number, noeffect?: boolean) {
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        let relicCaseInfo = RelicsCases.get(name)
+
+        print(relicCaseInfo)
+
+        if (!relicCaseInfo) {return}
+
+        for (let i = 0; i < amount; i++) {
+            let data = this.player.GetChanceReward(relicCaseInfo.reward)
+            print(data)
+            this.player.ApplyReward(data.reward)
+        }
+
+        if (noeffect) { return }
+
+        /*
+        Events.ReplicateEffect.fire(this.player.instance, 'EggHatched', new Map<string, any>([
+            ['EggName', name], ['Pets', pets], ['Speed', this.player.profile.Data.Multipliers.HatchSpeedMul]
+        ]))
+        */
+    }
+
+    public OpenRelicCase(name: string, amount: number) {
+        if (!this.player.profile) { return }
+        let profileData = this.player.profile.Data
+        let relicCaseInfo = RelicsCases.get(name)
+
+        print(amount, 'amount')
+
+        //i should prob add checks here but im way too lazy today
+
+        if (!relicCaseInfo) { return }
+
+        switch (relicCaseInfo.valuetype) {
+            case RelicCaseType.Gems:
+
+                if (profileData.Values.GemsVal < relicCaseInfo.price*amount) {return}
+                this.OpenRelicCaseBypass(name, amount)
+
+                //this.player.session.activePassives.forEach((value) => { value.onEggOpened(eggInfo!, amount, buytype) })
+
+                this.player.SetGems(profileData.Values.GemsVal - relicCaseInfo.price*amount)
+
+                break
+            case RelicCaseType.VBugs:
+                /*
+
+                let id = eggInfo.productid!
+                if (buytype === EggBuyType.Triple) { id = eggInfo.productidx3! }
+
+                Events.ReplicateEffect.fire(this.player.instance, EffectName.ReplicatePurchase, new Map<string, number>([['productId', id]]))
+
+                // should rebuilt this egg system btw (esp with paid once)
+                */ //indev
+                break
+            case RelicCaseType.Stored:
+
+                let foundIndex = -1
+                profileData.StoredRelicCases.forEach((val, index) => { if (val.name === name) { foundIndex = index } })
+                print(foundIndex)
+                if (foundIndex < 0) { return }
+                if (profileData.StoredRelicCases[foundIndex].amount < relicCaseInfo.price*amount) { return }
+
+                this.OpenRelicCaseBypass(name, amount)
+
+                profileData.StoredRelicCases[foundIndex].amount -= relicCaseInfo.price*amount
+                print(profileData.StoredRelicCases[foundIndex].amount)
+
+                this.player.replica.SetValue('Profile.StoredRelicCases', profileData.StoredRelicCases)
+
+                break
+            default:
+            
+        }
+
+    }
+
 }
 
 class PlayerBadgeController { // add a debug method if playerData has badge but playerInventory doesnt (not sure about request rate)

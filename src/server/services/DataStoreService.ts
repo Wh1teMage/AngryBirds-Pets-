@@ -18,10 +18,10 @@ let StartUpdating = () => {
         while (true) {
             print('Replicating')
     
+            GlobalDataService.updateValues()
             OrderedDataService.updateValues()
             OrderedDataService.replicateLeaderboardValues()
-            GlobalDataService.updateValues()
-
+            
             task.wait(ORDERED_UPDATE_TIME)
         }
         

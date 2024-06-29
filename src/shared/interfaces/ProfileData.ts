@@ -83,6 +83,7 @@ export interface IProfileData {
     VoidMachine: Array<{pet: IDBPetData, endTime: number, startTime: number}>
     RedeemedCodes: Array<string>
 
+    StoredRelicCases: Array<{name: string, amount: number}>
     StoredEggs: Array<{name: string, amount: number}>
 
     Relics: Array<{name: string, level: number, amount: number}>

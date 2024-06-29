@@ -43,3 +43,13 @@ badgeCallbacks.set('world3', {
         return true
     }
 })
+
+badgeCallbacks.set('world4', {
+    name: 'world4',
+    valueType: BadgeType.World,
+    badgeId: 3550120015411487,
+    checkCallback: (player: IServerPlayerComponent) => {
+        if (WorldsData.get(player.profile.Data.Config.MaxWorld)!.weight < WorldsData.get(WorldType.Backrooms)!.weight) { return }
+        return true
+    }
+})

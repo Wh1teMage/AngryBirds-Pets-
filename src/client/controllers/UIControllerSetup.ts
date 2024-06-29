@@ -1,12 +1,13 @@
 import { Controller, OnStart, OnInit } from "@flamework/core";
 import { ComponentsInitializer } from "client/classes/ComponentsInitializer";
 import { Players, Workspace, RunService, SocialService, TweenService, MarketplaceService, ReplicatedStorage, UserInputService, TeleportService, Lighting } from "@rbxts/services";
-import { ButtonComponent } from "client/components/UIComponents/ButtonComponent";
+import { ButtonComponent, ButtonFabric } from "client/components/UIComponents/ButtonComponent";
 import { ImageComponent } from "client/components/UIComponents/ImageComponent";
 import { FrameComponent } from "client/components/UIComponents/FrameComponent";
 import { UIAnimations } from "shared/utility/UIAnimations";
 import { DynamicText, StrokeInfo } from "client/classes/DynamicText";
 import { PlayerController } from "./PlayerController";
+import { Events } from "client/network";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const mainUI   = playerGui.WaitForChild('MainUI') as ScreenGui
@@ -38,6 +39,7 @@ const mainUIInterface =
             {name: 'Limited', objComponent: 'Button'},
             {name: 'Premium', objComponent: 'Button'},
             {name: 'Quest', objComponent: 'Button'},
+            {name: 'GachaEvent', objComponent: 'Button'},
             {name: 'UpdateLog', objComponent: 'Button'},
             {name: 'Wheel', objComponent: 'Image', children:[
                 {name: 'Image', objComponent: 'Button'},
@@ -53,6 +55,7 @@ const mainUIInterface =
             {name: 'Teleport', objComponent: 'Button'},
             {name: 'Trade', objComponent: 'Button'},
             {name: 'VIP', objComponent: 'Button'},
+            {name: 'Relics', objComponent: 'Button'},
         ]},
 
         {name: 'LowerList', objComponent: 'Frame', children: [
@@ -218,18 +221,48 @@ const mainUIInterface =
             {name: 'FriendBoost', objComponent: 'Button'},
             {name: 'PremiumBoost', objComponent: 'Button'},
             {name: 'XBoost', objComponent: 'Button'},
+            {name: 'WorldBoost', objComponent: 'Button'}
         ]},
 
         {name: 'StatsInfo', objComponent: 'Frame'},
         {name: 'PetOverlay', objComponent: 'Image'},
-        {name: 'SpeedLines', objComponent: 'Frame'}
+        {name: 'SpeedLines', objComponent: 'Frame'},
+
+        {name: 'Relics', objComponent: 'Image', children: [
+            {name: 'RelicsFrame', objComponent: 'Frame'},
+            {name: 'PlayerRelics', objComponent: 'Frame'},
+            {name: 'Merge', objComponent: 'Frame'},
+            {name: 'Close', objComponent: 'Button'},
+        ]},
+
+        {name: 'RelicOpen', objComponent: 'Image', children: [
+
+        ]},
+
+        {name: 'RelicsEvent', objComponent: 'Image', children: [
+            {name: 'Close', objComponent: 'Button'},
+        ]},
+
+        {name: 'RelicOverlay', objComponent: 'Image', children: [
+
+        ]},
+
+        {name: 'BackroomsPack', objComponent: 'Image', children: [
+            {name: 'Buy', objComponent: 'Button'},
+            {name: 'Close', objComponent: 'Button'},
+        ]},
+
+        {name: 'RelicsPack', objComponent: 'Image', children: [
+            {name: 'Buy', objComponent: 'Button'},
+            {name: 'Close', objComponent: 'Button'},
+        ]},
     ]
 
 
 @Controller({})
 export class UIControllerSetup implements OnStart, OnInit {
     
-    private _playerController: PlayerController
+    public _playerController: PlayerController
     public UIPath = ComponentsInitializer.InitializeObject(mainUIInterface, mainUI)
 
     constructor(playerController: PlayerController) {
@@ -246,6 +279,30 @@ export class UIControllerSetup implements OnStart, OnInit {
             '<stroke color="#163542" joins="miter" thickness="2.5" transparency="0">Follow <font color="rgb(255, 0, 0)">@StudioBosses</font>, <font color="rgb(237,0,203)">@4upahero</font> and <font color="rgb(89, 255, 29)">@KetwilDev</font> for powerful codes!</stroke>',
             new Map<number, StrokeInfo>([[200, {Speed: 70}]])
         )
+
+        this.UIPath.RelicsEvent.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.RelicsEvent.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
+        this.UIPath.RelicOpen.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.RelicOpen.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
+        this.UIPath.Relics.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.Relics.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
 
         this.UIPath.Codes.get<ImageComponent>().BindToClose((obj) => {
             UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.512*3), size: obj.Size })
@@ -438,6 +495,22 @@ export class UIControllerSetup implements OnStart, OnInit {
             UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
         })
 
+        this.UIPath.RelicsPack.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.RelicsPack.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
+        this.UIPath.BackroomsPack.get<ImageComponent>().BindToClose((obj) => {
+            UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.5, 0.5*3), size: obj.Size })
+        })
+
+        this.UIPath.BackroomsPack.get<ImageComponent>().BindToOpen((obj) => {
+            UIAnimations.MainFrameAnimationOpen(obj, { position: UDim2.fromScale(0.5, 0.5), size: obj.Size })
+        })
+
         this.UIPath.GiftPlayerList.get<ImageComponent>().BindToClose((obj) => {
             UIAnimations.MainFrameAnimationClose(obj, { position: UDim2.fromScale(0.497, 0.522*3), size: obj.Size })
         })
@@ -620,6 +693,14 @@ export class UIControllerSetup implements OnStart, OnInit {
             this.UIPath.Store.get<ImageComponent>().Close()
         })
 
+        this.UIPath.LeftList.Relics.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Relics.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.Relics.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.Relics.get<ImageComponent>().Close()
+        })
+
         this.UIPath.LeftList.Invite.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.Invite.get<ImageComponent>().Change()
         })
@@ -653,12 +734,28 @@ export class UIControllerSetup implements OnStart, OnInit {
             this.UIPath.StarterPack.get<ImageComponent>().Close()
         })
 
+        this.UIPath.RelicsPack.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.RelicsPack.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.BackroomsPack.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.BackroomsPack.get<ImageComponent>().Close()
+        })
+
         this.UIPath.LeftList.Trade.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.TradePlayerList.get<ImageComponent>().Change()
         })
 
         this.UIPath.TradePlayerList.Close.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.TradePlayerList.get<ImageComponent>().Close()
+        })
+
+        this.UIPath.RightList.GachaEvent.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.RelicsEvent.get<ImageComponent>().Change()
+        })
+
+        this.UIPath.RelicsEvent.Close.get<ButtonComponent>().BindToClick(() => {
+            this.UIPath.RelicsEvent.get<ImageComponent>().Close()
         })
 
         this.UIPath.LeftList.Teleport.get<ButtonComponent>().BindToClick(() => {
@@ -727,6 +824,19 @@ export class UIControllerSetup implements OnStart, OnInit {
 
         this.UIPath.UpdateLog.Close.get<ButtonComponent>().BindToClick(() => {
             this.UIPath.UpdateLog.get<ImageComponent>().Close()
+        })
+
+
+
+        let relicsEvent = this.UIPath.RelicsEvent.get<ImageComponent>().instance
+        let quests = relicsEvent.WaitForChild('Quests') as Frame
+
+        ButtonFabric.CreateButton(quests.WaitForChild('Buy50') as ImageButton).BindToClick(() => {
+            Events.PurchasePrompt(1854850559)
+        })
+
+        ButtonFabric.CreateButton(quests.WaitForChild('Buy600') as ImageButton).BindToClick(() => {
+            Events.PurchasePrompt(1854851073)
         })
     }
 

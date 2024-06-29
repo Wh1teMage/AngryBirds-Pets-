@@ -14,7 +14,7 @@ WorldsData.set(WorldType.Cave, {
     shopName: 'World1',
     worldIcon: 'rbxassetid://16290423194',
 
-    multipliers: new Map([['strength', 1]]),
+    multipliers: new Map([['strength', 1.1], ['wins', 1.1]]),
     weight: 1,
     price: 1,
 
@@ -44,7 +44,7 @@ WorldsData.set(WorldType.NeonCity, {
     shopName: 'World2',
     worldIcon: 'rbxassetid://16526402587',
 
-    multipliers: new Map([['strength', 1]]),
+    multipliers: new Map([['strength', 1.1], ['wins', 1.1]]),
     weight: 2,
     price: 100,
 
@@ -74,7 +74,7 @@ WorldsData.set(WorldType.Space, {
     shopName: 'World3',
     worldIcon: 'rbxassetid://16526412141',
     
-    multipliers: new Map([['strength', 1]]),
+    multipliers: new Map([['strength', 1.05], ['wins', 1.05]]),
     weight: 3,
     price: 10000,
 
@@ -89,6 +89,36 @@ WorldsData.set(WorldType.Space, {
     endingPosition: new Vector3(-1549.756, 626, 3400.771),
 
     minY: 626,
+    angle: 10,
+    energyLoss: 70,
+    lapEnergyLoss: 50,
+
+    maxPower: 4*10**9*5*10000,
+})
+
+WorldsData.set(WorldType.Backrooms, {
+    hitbox: instaReplica.WaitForChild('BackroomsPart') as Part,
+    teleportPart: instaReplica.WaitForChild('BackroomsTPPart') as Part,
+    slingshotPart: game.Workspace.WaitForChild('World4').WaitForChild('Slingshot').WaitForChild('Main') as Part,
+    shop: ['Slingshot1W4', 'Slingshot2W4', 'Slingshot3W4', 'Slingshot4W4', 'Slingshot5W4', 'Slingshot6W4', 'SlingshotD1W4'],
+    shopName: 'World4',
+    worldIcon: 'rbxassetid://17793386718',
+    
+    multipliers: new Map([['strength', 1], ['wins', 1]]),
+    weight: 4,
+    price: 100000,
+
+    maxClicks: 100,
+    reward: 125000000,
+    starsReward: 10000,
+
+    gravity: 10,
+    density: 100818181*10000,
+    
+    startingPosition: new Vector3(9102, -1317, 833),
+    endingPosition: new Vector3(9102, -1317, -3136),
+
+    minY: -1323,
     angle: 10,
     energyLoss: 70,
     lapEnergyLoss: 50,

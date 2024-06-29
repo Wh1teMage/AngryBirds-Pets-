@@ -13,6 +13,7 @@ export interface IRewardData {
     }
     Pets?: Array<{pet: IDBPetData, amount: number}>
     Potions?: Array<{potion: PotionType, amount: number}>
+    Relics?: Array<{name: string, level: number, amount: number}>
     Eggs?: Array<{egg: string, amount: number, type: EggBuyType}>
     Additional?: Map<string, any>
     Chances?: Array<{weight: number, name: string, reward: IRewardData}>

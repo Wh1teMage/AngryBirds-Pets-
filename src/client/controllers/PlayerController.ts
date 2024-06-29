@@ -25,6 +25,8 @@ export class PlayerController implements OnStart, OnInit, ILocalPlayer {
     static currentClicks = new Binding<number>(0)
     static lastClick = os.time()
 
+    public selectedMergeRelic?: {name: string, level: number}
+
     onInit() {
         
         this.component = ClientPlayerFabric.CreatePlayer(Players.LocalPlayer)

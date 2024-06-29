@@ -105,6 +105,10 @@ export const MarketNamings = new Map<number, IProductData>([
         if (defaultGlobal.get('Limited3')! < 0) { return false }
         return true
     }, price: 9999}],
+    [1854949901, {name: 'limited4', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
+        if (defaultGlobal.get('Limited4')! < 0) { return false }
+        return true
+    }, price: 6666}],
 
     [1762894442, {name: 'nightmare1', producttype: ProductType.DevProduct, price: 400}],
     [1762894847, {name: 'nightmare3', producttype: ProductType.DevProduct, price: 1200}],
@@ -124,9 +128,20 @@ export const MarketNamings = new Map<number, IProductData>([
     [1779476876, {name: 'luminousstone', producttype: ProductType.DevProduct, price: 99}],
     [1779477226, {name: 'strongshield', producttype: ProductType.DevProduct, price: 249}],
     [1779477513, {name: 'lightsaber', producttype: ProductType.DevProduct, price: 449}],
+    [1854874267, {name: 'soulcatcher', producttype: ProductType.DevProduct, price: 999}],
 
     [1802315798, {name: 'voidskip', producttype: ProductType.DevProduct, checkCallback: (player: IServerPlayerComponent) => {
         if (!player.session.selectedVoid) { return false }
         return true
     }, price: 199}],
+
+    [1854974372, {name: '10relics', producttype: ProductType.DevProduct, price: 499}],
+    [1854795275, {name: '5equippedrelics', producttype: ProductType.DevProduct, price: 299}],
+
+    [1854850559, {name: '50reliceventspins', producttype: ProductType.DevProduct, price: 239}],
+    [1854851073, {name: '600reliceventspins', producttype: ProductType.DevProduct, price: 2100}],
+
+    [1854854970, {name: 'backroomspack', producttype: ProductType.DevProduct, price: 999}],
+    [1854855561, {name: 'relicspack', producttype: ProductType.DevProduct, price: 499}],
+
 ])

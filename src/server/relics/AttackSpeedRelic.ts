@@ -3,9 +3,9 @@ import { ServerPlayerFabric } from "server/components/PlayerComponent";
 import { RelicsInfo } from "shared/info/RelicsInfo";
 import { ToolsData } from "shared/info/ToolInfo";
 
-@PassiveDecorator('ShootBoostRelic')
-export class ShootBoostRelic extends PassiveClass {
-    public name = 'ShootBoostRelic'
+@PassiveDecorator('AttackSpeedRelic')
+export class AttackSpeedRelic extends PassiveClass {
+    public name = 'AttackSpeedRelic'
     public description = 'test'
 
     public setOwner = (player: Player) => {
@@ -18,7 +18,7 @@ export class ShootBoostRelic extends PassiveClass {
         let info = RelicsInfo.get(this.name)!
 
         let component = ServerPlayerFabric.GetPlayer(this.player)
-        component.session.multipliers.other.shootboost -= info[this.level-1].stats.get('multi')! / 100
+        component.session.multipliers.other.attackspeed -= info[this.level-1].stats.get('multi')! / 100
     };
 
     public onStart = () => {
@@ -27,6 +27,6 @@ export class ShootBoostRelic extends PassiveClass {
         let info = RelicsInfo.get(this.name)!
 
         let component = ServerPlayerFabric.GetPlayer(this.player)
-        component.session.multipliers.other.shootboost += info[this.level-1].stats.get('multi')! / 100
+        component.session.multipliers.other.attackspeed += info[this.level-1].stats.get('multi')! / 100
     };
 }

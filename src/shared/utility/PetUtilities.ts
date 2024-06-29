@@ -15,10 +15,14 @@ export class PetUtilities {
         })
     }
 
-    static DBToPetTransfer(info: IDBPetData) {
+    static DBToPetTransfer(info: IDBPetData, ignore?: boolean) {
         if (!PetsData.get(info.name)) { warn(info.name+' pet doesnt exist!'); return }
 
         let originalPet = PetsData.get(info.name)!
+        let model = originalPet.model
+
+        if (!ignore) { model = model.Clone() }
+
         let pet: IPetData = {
             name: originalPet.name,
             locked: info.locked,
@@ -26,7 +30,7 @@ export class PetUtilities {
             stats: table.clone( originalPet.stats ),
             additional: table.clone( info.additional ),
             multipliers: table.clone( originalPet.multipliers ),
-            model: originalPet.model.Clone()
+            model: model
         }
 
         PetUtilities.modifyPetMultipliers(pet)

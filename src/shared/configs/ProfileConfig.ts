@@ -86,7 +86,9 @@ export const defaultValue: IProfileData = {
     VoidMachine: [],
     RedeemedCodes: [],
 
+    StoredRelicCases: [],
     StoredEggs: [],
+
     Relics: [],
     EquippedRelics: [],
 

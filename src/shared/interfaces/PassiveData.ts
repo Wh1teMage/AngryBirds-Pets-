@@ -19,6 +19,8 @@ export interface IPassiveData {
     onStart: () => void
     onEnd: () => void
 
+    onLeft: () => void
+
     onShoot: () => void
     onTrigger: () => void
 

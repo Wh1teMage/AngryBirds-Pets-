@@ -26,6 +26,7 @@ export interface IEggData {
     exceptions?: Map<string, IDBPetData>
 
     rotationOffset?: CFrame
+    rotationAxis?: Vector3
 }
 
 export interface IEggModel extends Model {

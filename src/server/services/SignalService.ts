@@ -17,6 +17,7 @@ import { WorldsData } from "shared/info/WorldInfo";
 import { PotionOperationStatus } from "shared/interfaces/PotionData";
 import { PotionType } from "shared/enums/PotionEnum";
 import { ReplicationOperationStatus } from "shared/enums/ReplicationEnums";
+import { RelicOperationStatus } from "shared/enums/RelicEnums";
 
 @Service({})
 export class SignalService implements OnStart, OnInit {
@@ -165,6 +166,16 @@ export class SignalService implements OnStart, OnInit {
             if (operation === ReplicationOperationStatus.AutoTrain) { playerComp.profile.Data.StatValues.WasTraining = additional as boolean }
             if (operation === ReplicationOperationStatus.Favorite) { playerComp.profile.Data.StatValues.Favorited = additional as boolean }
             if (operation === ReplicationOperationStatus.AutoRebirth) { playerComp.profile.Data.StatValues.WasRebirthing = additional as boolean }
+        })
+
+        Events.ManageRelic.connect((player: Player, operation: RelicOperationStatus, name: string, level: number) => {
+            let playerComp = ServerPlayerFabric.GetPlayer(player)
+            if (!playerComp) { return }
+
+            if (operation === RelicOperationStatus.Equip) { playerComp.EquipRelic(name, level) }
+            if (operation === RelicOperationStatus.Unequip) { playerComp.UnequipRelic(name, level) }
+            if (operation === RelicOperationStatus.Merge) { playerComp.MergeRelic(name, level) }
+            if (operation === RelicOperationStatus.OpenCase) { playerComp.OpenRelicCase(name, level) }
         })
 
     }

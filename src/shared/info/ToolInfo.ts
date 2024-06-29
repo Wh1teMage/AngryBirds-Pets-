@@ -296,3 +296,106 @@ ToolsData.set('SlingshotD1W3', {
     valuetype: ToolValueType.VBugs,
     productid: 1779477513
 })
+
+
+// !World 4
+ToolsData.set('Slingshot1W4', {
+    model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World4').WaitForChild('Common') as Model,
+    sizeOffset: new Vector3(0,0,0),
+    rotationOffset: CFrame.Angles(-math.rad(90),0,0),
+
+    name: 'Common',
+    addition: 2000,
+    firerate: 1/1,
+    effectname: 'Shoot',
+
+    price: 0,
+    valuetype: ToolValueType.Strength
+})
+
+ToolsData.set('Slingshot2W4', {
+    model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World4').WaitForChild('Uncommon') as Model,
+    sizeOffset: new Vector3(0,0,0),
+    rotationOffset: CFrame.Angles(-math.rad(90),0,0),
+
+    name: 'Uncommon',
+    addition: 3000,
+    firerate: 1/1,
+    effectname: 'Shoot',
+
+    price: 150000000000,
+    valuetype: ToolValueType.Strength
+})
+
+ToolsData.set('Slingshot3W4', {
+    model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World4').WaitForChild('Rare') as Model,
+    sizeOffset: new Vector3(0,0,0),
+    rotationOffset: CFrame.Angles(-math.rad(90),0,0),
+
+    name: 'Rare',
+    addition: 4500,
+    firerate: 1/1,
+    effectname: 'Shoot',
+
+    price: 450000000000,
+    valuetype: ToolValueType.Strength
+})
+
+
+ToolsData.set('Slingshot4W4', {
+    model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World4').WaitForChild('Epic') as Model,
+    sizeOffset: new Vector3(0,0,0),
+    rotationOffset: CFrame.Angles(-math.rad(90),0,0),
+
+    name: 'Epic',
+    addition: 6500,
+    firerate: 1/1,
+    effectname: 'Shoot',
+
+    price: 1250000000000,
+    valuetype: ToolValueType.Strength
+})
+
+
+ToolsData.set('Slingshot5W4', {
+    model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World4').WaitForChild('Legendary') as Model,
+    sizeOffset: new Vector3(0,0,0),
+    rotationOffset: CFrame.Angles(-math.rad(90),0,0),
+
+    name: 'Legendary',
+    addition: 12000,
+    firerate: 1/1,
+    effectname: 'Shoot',
+
+    price: 8250000000000,
+    valuetype: ToolValueType.Strength
+})
+
+ToolsData.set('Slingshot6W4', {
+    model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World4').WaitForChild('Mythical') as Model,
+    sizeOffset: new Vector3(0,0,0),
+    rotationOffset: CFrame.Angles(-math.rad(90),0,0),
+
+    name: 'Mythical',
+    addition: 20000,
+    firerate: 1/1,
+    effectname: 'Shoot',
+
+    price: 50250000000000,
+    valuetype: ToolValueType.Strength
+})
+
+ToolsData.set('SlingshotD1W4', {
+    model: ReplicatedStorage.WaitForChild('Slingshots').WaitForChild('World4').WaitForChild('Paid') as Model,
+    sizeOffset: new Vector3(0,0,0),
+    rotationOffset: CFrame.Angles(-math.rad(90),0,0),
+
+    name: 'Soul Catcher',
+    addition: 88800,
+    firerate: 1/1,
+    effectname: 'Shoot',
+
+    price: 999,
+    valuetype: ToolValueType.VBugs,
+    productid: 1854874267
+})

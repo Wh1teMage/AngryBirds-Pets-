@@ -213,6 +213,76 @@ EggsData.set('Cursed', {
 
 // !World 3 /\
 
+// !World 4 \/
+
+EggsData.set('Entity', {
+    name: 'Entity',
+    price: 80000000,
+    valuetype: EggValueType.Wins,
+    petchances: [
+        { weight: 500, name:  'Devil Golem'},
+        { weight: 330, name:  'Darkness Shark'},
+        { weight: 120, name: 'Darkness Parrot' },
+        { weight: 50, name: 'Darkness Dragon' },
+        { weight: 3, name: 'Darkness Steampunk' },
+    ],
+    
+    model: Workspace.WaitForChild('World4').WaitForChild('Entity Egg') as IEggModel,
+    rotationOffset: CFrame.Angles(-math.rad(90), 0, 0),
+    rotationAxis: new Vector3(0, 0, 1)
+})
+
+EggsData.set('Confusion', {
+    name: 'Confusion',
+    price: 400000000,
+    valuetype: EggValueType.Wins,
+    petchances: [
+        { weight: 520, name:  'Darkness Flower Power'},
+        { weight: 340, name:  'Darkness Horse'},
+        { weight: 110, name: 'Darkness Happy Demon' },
+        { weight: 30, name: 'Darkness Spider' },
+        { weight: 2, name: 'Darkness' },
+    ],
+
+    model: Workspace.WaitForChild('Confusion Egg') as IEggModel,
+    rotationOffset: CFrame.Angles(-math.rad(90), 0, 0),
+    rotationAxis: new Vector3(0, 0, 1)
+})
+
+EggsData.set('Eyes', {
+    name: 'Eyes',
+    price: 2000000000,
+    valuetype: EggValueType.Wins,
+    petchances: [
+        { weight: 540, name:  'Sinister Pumpkin'},
+        { weight: 350, name:  'Darkness Robux'},
+        { weight: 100, name: 'Matrix Dog' },
+        { weight: 10, name: 'Matrix Kitty' },
+        { weight: 1, name: 'Skeletal Samurai' },
+    ],
+
+    model: Workspace.WaitForChild('Eyes Egg') as IEggModel,
+    rotationOffset: CFrame.Angles(-math.rad(90), 0, 0),
+    rotationAxis: new Vector3(0, 0, 1)
+})
+
+EggsData.set('Observer', {
+    name: 'Observer',
+    price: 8000000000,
+    valuetype: EggValueType.Wins,
+    petchances: [
+        { weight: 790, name:  'Skeletal Demon'},
+        { weight: 210, name:  'Pink Fury'},
+        { weight: 1, name: 'Darkness Alien' },
+    ],
+
+    model: Workspace.WaitForChild('Observer Egg') as IEggModel,
+    rotationOffset: CFrame.Angles(-math.rad(90), 0, 0),
+    rotationAxis: new Vector3(0, 0, 1)
+})
+
+// !World 4 /\
+
 // !Other eggs \/
 
 EggsData.set('Nightmare', {

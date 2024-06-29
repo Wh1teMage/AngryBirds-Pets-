@@ -262,6 +262,7 @@ Effects.set('LimitedPets', (additional) => {
         ['Limited1', 'LimitedPet1'],
         ['Limited2', 'LimitedPet2'],
         ['Limited3', 'LimitedPet3'],
+        ['Limited4', 'LimitedPet4'],
     ])
 
     info.forEach((val, key) => {
@@ -364,10 +365,15 @@ Effects.set('EggHatched', (additional) => {
             let delta = .5
             let i = 0 
 
+            let axis = egg.rotationAxis
+            if (!axis) { axis = new Vector3(0,1,0) }
+
             while (i < 360*7) {
                 i += delta
                 delta += .2*speed**2
-                eggModel.PivotTo(new CFrame(eggModel.GetPivot().Position).mul(eggRotationOffset).mul(CFrame.Angles(math.rad(90), math.sin(math.rad(i)), 0)))
+                eggModel.PivotTo(new CFrame(eggModel.GetPivot().Position).mul(eggRotationOffset).mul(
+                    CFrame.Angles(math.rad(90) + math.sin(math.rad(i)) * axis.X, math.sin(math.rad(i)) * axis.Y, math.sin(math.rad(i)) * axis.Z))
+                )
                 //make tween instead of this
                 
                 //TweenService.Create(viewCamera, new TweenInfo(.01), {'CFrame': new CFrame(viewCamera.CFrame.Position).mul(CFrame.Angles( 0, 0, math.sin(math.rad(i)) ))}).Play()

@@ -3,9 +3,9 @@ import { ServerPlayerFabric } from "server/components/PlayerComponent";
 import { RelicsInfo } from "shared/info/RelicsInfo";
 import { ToolsData } from "shared/info/ToolInfo";
 
-@PassiveDecorator('ShootBoostRelic')
-export class ShootBoostRelic extends PassiveClass {
-    public name = 'ShootBoostRelic'
+@PassiveDecorator('EquipSlotRelic')
+export class EquipSlotRelic extends PassiveClass {
+    public name = 'EquipSlotRelic'
     public description = 'test'
 
     public setOwner = (player: Player) => {
@@ -18,8 +18,13 @@ export class ShootBoostRelic extends PassiveClass {
         let info = RelicsInfo.get(this.name)!
 
         let component = ServerPlayerFabric.GetPlayer(this.player)
-        component.session.multipliers.other.shootboost -= info[this.level-1].stats.get('multi')! / 100
+        component.UnequipAll()
+        component.profile.Data.Config.MaxEquippedPets -= info[this.level-1].stats.get('amount')!
+
+        component.replica.SetValue('Profile.Config.MaxEquippedPets', component.profile.Data.Config.MaxEquippedPets)
     };
+
+    public onLeft = this.onEnd
 
     public onStart = () => {
         if (!this.player) { return }
@@ -27,6 +32,8 @@ export class ShootBoostRelic extends PassiveClass {
         let info = RelicsInfo.get(this.name)!
 
         let component = ServerPlayerFabric.GetPlayer(this.player)
-        component.session.multipliers.other.shootboost += info[this.level-1].stats.get('multi')! / 100
+        component.profile.Data.Config.MaxEquippedPets += info[this.level-1].stats.get('amount')!
+
+        component.replica.SetValue('Profile.Config.MaxEquippedPets', component.profile.Data.Config.MaxEquippedPets)
     };
 }

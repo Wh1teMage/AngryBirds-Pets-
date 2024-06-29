@@ -520,6 +520,29 @@ MarketCallbacks.set('starterpack', (player) => {
     //profileData.StatValues.RobuxSpent += 99
 })
 
+MarketCallbacks.set('relicspack', (player) => {
+    let profileData = player.profile.Data
+
+    player.AppendRelic('Dice of Power', 4, 1)
+    player.AppendRelic('Cashback Ticket', 4, 1)
+    player.AppendRelic('Mobility Shoes', 4, 1)
+    player.SetGems(profileData.Values.GemsVal + 100)
+
+    profileData.Products.push('relicspack')
+})
+
+MarketCallbacks.set('backroomspack', (player) => {
+    let profileData = player.profile.Data
+
+    player.AppendRelic('Pet Wings', 5, 1)
+    player.AppendRelic('Mysterious Paw', 1, 3)
+    player.SetWins(profileData.Values.WinsVal + 1e+9)
+    player.SetGems(profileData.Values.GemsVal + 200)
+
+    profileData.Products.push('backroomspack')
+})
+
+
 MarketCallbacks.set('buy1spin', (player) => {
     let profileData = player.profile.Data
 
@@ -595,6 +618,24 @@ MarketCallbacks.set('limited3', (player) => {
     })
 
     GlobalDataService.setValue('Limited3', GlobalDataService.values.get('Limited3')!-1)
+    //profileData.StatValues.RobuxSpent += 9999
+})
+
+MarketCallbacks.set('limited4', (player) => {
+    let profileData = player.profile.Data
+
+    player.AppendPet({
+        name: 'Backrooms Cat',
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    })
+
+    GlobalDataService.setValue('Limited4', GlobalDataService.values.get('Limited4')!-1)
     //profileData.StatValues.RobuxSpent += 9999
 })
 
@@ -692,6 +733,11 @@ MarketCallbacks.set('lightsaber', (player) => {
     //profileData.StatValues.RobuxSpent += 449
 })
 
+MarketCallbacks.set('soulcatcher', (player) => {
+    let profileData = player.profile.Data
+    player.AppendTool('SlingshotD1W4')
+})
+
 MarketCallbacks.set('voidskip', (player) => {
     let profileData = player.profile.Data
     player.ClaimVoidPet(player.session.selectedVoid!, true)
@@ -709,3 +755,52 @@ MarketCallbacks.set('1equipped', (player) => {
     profileData.Config.MaxEquippedPets += 1
     player.replica.SetValue('Profile.Config.MaxEquippedPets', profileData.Config.MaxEquippedPets)
 })
+
+MarketCallbacks.set('10relics', (player) => {
+    let profileData = player.profile.Data
+    profileData.Products.push('10relics')
+})
+
+MarketCallbacks.set('5equippedrelics', (player) => {
+    let profileData = player.profile.Data
+    profileData.Config.MaxEquippedRelics += 5
+    profileData.Products.push('5equippedrelics')
+    player.replica.SetValue('Profile.Config.MaxEquippedRelics', profileData.Config.MaxEquippedRelics)
+})
+
+MarketCallbacks.set('50reliceventspins', (player) => {
+    let profileData = player.profile.Data
+
+    let foundIndex = -1
+    profileData.StoredRelicCases.forEach((val3, index3) => { if (val3.name === 'EventTest') { foundIndex = index3 } })
+
+    if (foundIndex < 0) { 
+        profileData.StoredRelicCases.push({ name: 'EventTest', amount: 0 })
+        foundIndex = profileData.StoredRelicCases.size()-1
+    }
+
+    profileData.StoredRelicCases[foundIndex]!.amount += 50
+
+    player.replica.SetValue('Profile.CompletedQuests', profileData.CompletedQuests)
+    player.replica.SetValue('Profile.StoredRelicCases', profileData.StoredRelicCases)
+
+})
+
+MarketCallbacks.set('600reliceventspins', (player) => {
+    let profileData = player.profile.Data
+
+    let foundIndex = -1
+    profileData.StoredRelicCases.forEach((val3, index3) => { if (val3.name === 'EventTest') { foundIndex = index3 } })
+
+    if (foundIndex < 0) { 
+        profileData.StoredRelicCases.push({ name: 'EventTest', amount: 0 })
+        foundIndex = profileData.StoredRelicCases.size()-1
+    }
+
+    profileData.StoredRelicCases[foundIndex]!.amount += 600
+
+    player.replica.SetValue('Profile.CompletedQuests', profileData.CompletedQuests)
+    player.replica.SetValue('Profile.StoredRelicCases', profileData.StoredRelicCases)
+
+})
+

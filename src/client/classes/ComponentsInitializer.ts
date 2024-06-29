@@ -11,7 +11,7 @@ interface IGlobalObject {
     children?: IGlobalObject[]
 }
 
-interface IPathObject {
+export interface IPathObject {
     [key: string]: IPathObject & { get: (<T>() => T) }
 }
 
