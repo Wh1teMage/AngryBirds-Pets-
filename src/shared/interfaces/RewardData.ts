@@ -6,10 +6,8 @@ import { EggBuyType, EggValueType } from "./EggData"
 export interface IRewardData {
     Values?: {
         Strength?: number
-        Wins?: number
-        Stars?: number
         Rebirths?: number
-        Gems?: number
+        Wins?: number
     }
     Pets?: Array<{pet: IDBPetData, amount: number}>
     Potions?: Array<{potion: PotionType, amount: number}>

@@ -9,23 +9,17 @@ export const defaultValue: IProfileData = {
     Values: {
         StrengthVal: 0,
         WinsVal: 0,
-        StarsVal: 0,
-        RebirthsVal: 0,
-        GemsVal: 0,
     },
 
     MaxValues: {
         StrengthMaxVal: 0,
         WinsMaxVal: 0,
-        StarsMaxVal: 0,
-        RebirthsMaxVal: 0,
-        GemsMaxVal: 0,
     },
 
     StatValues: {
         FirstJoin: os.time(),
         LastJoined: os.time(),
-        LastSpinTime: 0,
+        LastSpinTime: os.time()-24*60*60+60*15,
 
         LastDayTime: 0, // os.time()
         LastDailyChestTime: 0,
@@ -34,9 +28,8 @@ export const defaultValue: IProfileData = {
         DayAmount: 0,
         IngameTime: 0,
         RobuxSpent: 0,
-
+        
         SpinCount: 0,
-        RebirthSkips: 0,
         FriendsCount: 0,
         //EquippedPetsCount: 0,
 
@@ -45,16 +38,15 @@ export const defaultValue: IProfileData = {
         WasRebirthing: false,
 
         Favorited: false,
+        MaxWorldTeleport: true,
     },
 
     Multipliers: {
         StrengthMul: 1,
-        GemsMul: 1,
         WinsMul: 1,
-        StarsMul: 1,
-        RebirthsMul: 1,
         HatchSpeedMul: 1,
         VoidMachineMul: 1,
+        AttackSpeedMul: 1,
     },
 
     Config: {
@@ -64,7 +56,7 @@ export const defaultValue: IProfileData = {
         MaxPetsInVoidMachine: 5,
         MaxEquippedRelics: 6,
         MaxWorld: WorldType.Cave,
-        RebirthTitle: 'Default',
+        RebirthTitle: 'Rokie',
     },
 
     CompletedQuests: [],
@@ -80,8 +72,11 @@ export const defaultValue: IProfileData = {
 
     PetIndex: [],
 
-    OwnedTools: ['Slingshot1W1'],
-    EquippedTool: 'Slingshot1W1',
+    OwnedTools: ['ToolF1'],
+    EquippedTool: 'ToolF1',
+
+    OwnedTrails: [],
+    EquippedTrail: '',
 
     VoidMachine: [],
     RedeemedCodes: [],

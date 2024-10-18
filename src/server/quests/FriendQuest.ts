@@ -28,10 +28,15 @@ export class FriendQuest extends PassiveClass  {
         //sessionData.friendList
 
         profileData.StatValues.FriendsCount = math.max(profileData.StatValues.FriendsCount, sessionData.friendList.size())
-        sessionData.multipliers.friends.wins = 1+profileData.StatValues.FriendsCount/20
+        sessionData.multipliers.friends.strength = 1+sessionData.friendList.size()/20
 
         component.replica.SetValues('Session.multipliers.friends', sessionData.multipliers.friends)
-        print('Changed', profileData.StatValues.FriendsCount, sessionData.multipliers.friends.wins, 'testtesttesttest')
+        print('Changed', profileData.StatValues.FriendsCount, sessionData.multipliers.friends.strength, 'testtesttesttest')
+
+        component.replica.SetValue('Profile.StatValues.FriendsCount', profileData.StatValues.FriendsCount)
+        component.replica.SetValue('Profile.CompletedQuests', profileData.CompletedQuests)
+
+        /*
         FriendQuestsData.forEach((value, key) => {
             print(profileData.StatValues.FriendsCount < value.requirements.get('friends'))
             if (profileData.CompletedQuests.includes(key) || (profileData.StatValues.FriendsCount < value.requirements.get('friends'))) { return }
@@ -39,9 +44,7 @@ export class FriendQuest extends PassiveClass  {
             profileData.CompletedQuests.push(key)
             component.ApplyReward(value.reward)
         })
-
-        component.replica.SetValue('Profile.StatValues.FriendsCount', profileData.StatValues.FriendsCount)
-        component.replica.SetValue('Profile.CompletedQuests', profileData.CompletedQuests)
+        */
     }
 
 }

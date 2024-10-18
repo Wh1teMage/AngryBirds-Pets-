@@ -46,7 +46,8 @@ export class PetUtilities {
     }
 
     static NameToDBPet(name: string) {
-        if (!PetsData.get(name)) {return}
+        let data = PetsData.get(name)
+        if (!data) {return}
 
         let pet: IDBPetData = {
             name: name,
@@ -58,6 +59,8 @@ export class PetUtilities {
                 mutation: Mutations.Default,
             }
         }
+
+        if (data.additional.perks) { pet.additional.perks = table.clone(data.additional.perks) }
 
         return pet
     }

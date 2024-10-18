@@ -18,7 +18,7 @@ export class UpdateService implements OnStart, OnInit {
             task.wait(10) // to make sure that all players will teleport
             */
 
-            (StarterGui.WaitForChild('MainUI').WaitForChild('SoftShutdown') as CanvasGroup).Visible = true
+            //(StarterGui.WaitForChild('MainUI').WaitForChild('SoftShutdown') as CanvasGroup).Visible = true
         })
 
     }

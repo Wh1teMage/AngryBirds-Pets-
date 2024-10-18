@@ -28,7 +28,7 @@ export interface IDBPetData {
         evolution: Evolutions
         mutation: Mutations
         limit?: number
-        perks?: Array<string>
+        perks?: Array<{name: string, level: number}>
     },
 }
 

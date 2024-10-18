@@ -16,8 +16,10 @@ import { FlyingObjectStatus } from "shared/enums/FlyingObjectEnums";
 import { WorldsData } from "shared/info/WorldInfo";
 import { PotionOperationStatus } from "shared/interfaces/PotionData";
 import { PotionType } from "shared/enums/PotionEnum";
-import { ReplicationOperationStatus } from "shared/enums/ReplicationEnums";
+import { BattlefieldOperationStatus, ReplicationOperationStatus } from "shared/enums/ReplicationEnums";
 import { RelicOperationStatus } from "shared/enums/RelicEnums";
+import { BattlefieldClassFabric } from "server/classes/BattlefieldClass";
+import { MessagingService, HttpService } from "@rbxts/services";
 
 @Service({})
 export class SignalService implements OnStart, OnInit {
@@ -108,8 +110,9 @@ export class SignalService implements OnStart, OnInit {
             if (!playerComp) { return }
 
             if (operation === ToolOperationStatus.Equip) { playerComp.EquipTool(toolname) }
-            if (operation === ToolOperationStatus.Buy) { playerComp.BuyTool(toolname) }
-            if (operation === ToolOperationStatus.Use) { playerComp.UseTool() }
+            if (operation === ToolOperationStatus.Equip && toolname === 'Item') { playerComp.EquipLastFreeTool() }
+            //if (operation === ToolOperationStatus.Buy) { playerComp.BuyTool(toolname) }
+            if (operation === ToolOperationStatus.Use) { playerComp.UseTool(toolname) }
         })
 
         Events.ManageWorld.connect((player: Player, operation: WorldOperationStatus, world?: WorldType) => {
@@ -130,7 +133,7 @@ export class SignalService implements OnStart, OnInit {
                 let redactedPower = math.clamp(power!, .1, 1)*0.2+1
                 print(redactedPower)
                 if (playerComp.profile.Data.Products.includes('instantpower')) { redactedPower = 1.2 }
-                playerComp.ShootObject(redactedPower)
+                //playerComp.ShootObject(redactedPower)
              }
             
         })
@@ -143,7 +146,7 @@ export class SignalService implements OnStart, OnInit {
             if (rewardtype === RewardType.Session) { playerComp.ClaimSessionReward(info!) }
             if (rewardtype === RewardType.Daily) { playerComp.ClaimDailyReward() }
             if (rewardtype === RewardType.Code) { playerComp.RedeemCode(info!) }
-            if (rewardtype === RewardType.Rebirth) { playerComp.DoRebirth() }
+            //if (rewardtype === RewardType.Rebirth) { playerComp.DoRebirth() }
             if (rewardtype === RewardType.FollowQuest) { playerComp.ClaimFollowReward() }
             if (rewardtype === RewardType.SpinWheel) { playerComp.ClaimSpinReward() }
             if (rewardtype === RewardType.DailyChest) { playerComp.ClaimDailyChest() }
@@ -166,6 +169,14 @@ export class SignalService implements OnStart, OnInit {
             if (operation === ReplicationOperationStatus.AutoTrain) { playerComp.profile.Data.StatValues.WasTraining = additional as boolean }
             if (operation === ReplicationOperationStatus.Favorite) { playerComp.profile.Data.StatValues.Favorited = additional as boolean }
             if (operation === ReplicationOperationStatus.AutoRebirth) { playerComp.profile.Data.StatValues.WasRebirthing = additional as boolean }
+            if (operation === ReplicationOperationStatus.LastWorldRespawn) { playerComp.profile.Data.StatValues.MaxWorldTeleport = additional as boolean }
+
+            if (operation === ReplicationOperationStatus.ReplicateMessage) { 
+                additional.sender = player.Name
+                print(additional, 'additional', HttpService.JSONEncode(additional)); 
+                MessagingService.PublishAsync('RarePetMessage', HttpService.JSONEncode(additional)) 
+            }
+
         })
 
         Events.ManageRelic.connect((player: Player, operation: RelicOperationStatus, name: string, level: number) => {
@@ -176,6 +187,15 @@ export class SignalService implements OnStart, OnInit {
             if (operation === RelicOperationStatus.Unequip) { playerComp.UnequipRelic(name, level) }
             if (operation === RelicOperationStatus.Merge) { playerComp.MergeRelic(name, level) }
             if (operation === RelicOperationStatus.OpenCase) { playerComp.OpenRelicCase(name, level) }
+        })
+
+        Events.ManageBattlefield.connect((player: Player, operation: BattlefieldOperationStatus) => {
+            let playerComp = ServerPlayerFabric.GetPlayer(player)
+            if (!playerComp) { return }
+
+            let battlefield = game.Workspace.WaitForChild('InstaReplica').WaitForChild('ArenaPart') as Part
+
+            if (operation === BattlefieldOperationStatus.AcceptInvite) { BattlefieldClassFabric.GetBattlefield(battlefield)!.AcceptInvite(player) }
         })
 
     }

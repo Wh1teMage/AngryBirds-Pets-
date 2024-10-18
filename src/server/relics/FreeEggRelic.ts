@@ -21,6 +21,6 @@ export class FreeEggRelic extends PassiveClass {
 
         if (chance > this.level + 100) { return }
 
-        component.SetWins(component.profile.Data.Values.WinsVal + egg.price * amount)
+        //component.SetGems(component.profile.Data.Values.GemsVal + egg.price * amount)
     }
 }

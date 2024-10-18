@@ -22,7 +22,7 @@ FriendQuestsData.set('FriendQuest2', {
     requirements: new Map([['friends', 3]]),
     reward: {
         Values: {
-            Gems: 3
+            Wins: 3
         },
         Additional: new Map([['SpinCount', 1]])
     }
@@ -32,10 +32,10 @@ FriendQuestsData.set('FriendQuest3', {
     requirements: new Map([['friends', 5]]),
     reward: {
         Values: {
-            Gems: 5
+            Wins: 5
         },
         Potions: [
-            { potion: PotionType.LuckPotion, amount: 1 }
+            { potion: PotionType.StrengthPotion2, amount: 1 }
         ],
         Additional: new Map([['SpinCount', 2]])
     }
@@ -45,11 +45,11 @@ FriendQuestsData.set('FriendQuest4', {
     requirements: new Map([['friends', 10]]),
     reward: {
         Values: {
-            Gems: 10
+            Wins: 10
         },
         Potions: [
-            { potion: PotionType.WinsPotion, amount: 1 },
-            { potion: PotionType.GoldPotion, amount: 1 },
+            { potion: PotionType.StrengthPotion2, amount: 1 },
+            { potion: PotionType.StrengthPotion2, amount: 1 },
         ],
         Additional: new Map([['SpinCount', 3]])
     }
@@ -60,7 +60,7 @@ FriendQuestsData.set('FriendQuest5', {
     reward: {
         Values: {},
         Potions: [
-            { potion: PotionType.WinsPotion, amount: 2 },
+            { potion: PotionType.StrengthPotion2, amount: 2 },
         ],
         Additional: new Map([['SpinCount', 6], ['MaxEquippedPets', 1]])
     }
@@ -134,7 +134,7 @@ EggQuestsData.set('Shadow', {
     requirements: new Map([['time', 20*60]]),
     reward: {
         Values: {},
-        Additional: new Map([['Shadow', 1]])
+        Additional: new Map([['ShadowStored', 1]])
     },
     checkCallback: (player) => {
         let profileData = player.profile.Data
@@ -142,14 +142,14 @@ EggQuestsData.set('Shadow', {
         let progress = profileData.CurrentQuestsProgress
 
         progress.set('Shadow', new Map( 
-            [['time', sessionData.sessionTime%(20*60)]]
+            //[['kills', profileData.StatValues.KillsVal%(5)]]
         ))
 
         player.replica.SetValue('Profile.CurrentQuestsProgress', progress)
 
-        if (progress.get('Shadow')!.get('time') === 0) {
-            return true
-        }
+        //if (progress.get('Shadow')!.get('kills') === 0 && profileData.StatValues.KillsVal > 0) {
+            //return true
+        //}
         return false
     }
 })
@@ -165,15 +165,15 @@ RelicQuestsData.set('RelicQuest1', {
         let sessionData = player.session
         let progress = profileData.CurrentQuestsProgress
 
-        progress.set('RelicQuest1', new Map( 
-            [['time', sessionData.sessionTime%(10)]]
-        ))
+        //progress.set('RelicQuest1', new Map( 
+            //[['time', sessionData.sessionTime%(10)]]
+        //))
 
-        player.replica.SetValue('Profile.CurrentQuestsProgress', progress)
+        //player.replica.SetValue('Profile.CurrentQuestsProgress', progress)
 
-        if (progress.get('RelicQuest1')!.get('time') === 0) {
-            return true
-        }
+        //if (progress.get('RelicQuest1')!.get('time') === 0) {
+            //return true
+        //}
         return false
     }
 })

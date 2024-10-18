@@ -49,6 +49,8 @@ export class UIRelicController {
             Events.PurchasePrompt(1854795275)
         })
 
+        relicOverlay.Visible = false;
+
         this._playerController.replica.Data.Profile.Relics.forEach((val) => {
 
             let relicUI = template.Clone()

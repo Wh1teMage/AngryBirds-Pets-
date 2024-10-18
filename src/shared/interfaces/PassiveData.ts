@@ -15,6 +15,7 @@ export interface IPassiveData {
     description: string
 
     level: number
+    id?: string
 
     onStart: () => void
     onEnd: () => void
@@ -23,6 +24,7 @@ export interface IPassiveData {
 
     onShoot: () => void
     onTrigger: () => void
+    onKill: () => void
 
     onStrengthChanged: (newvalue: number, oldvalue: number) => void
     onWinsChanged: (newvalue: number, oldvalue: number) => void
@@ -37,6 +39,9 @@ export interface IPassiveData {
     onTick: () => void
 
     onPetAdded: (pet: IDBPetData) => void
+    onPetMultiplierChanged: () => void
 
     setOwner: (player: Player) => void
+    setPet: (pet: IDBPetData) => void
+    
 }

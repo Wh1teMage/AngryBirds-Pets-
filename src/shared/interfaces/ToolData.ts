@@ -5,7 +5,7 @@ export enum ToolValueType {
 }
 
 export interface IToolData {
-    model:          Model
+    //model:          Model
     sizeOffset:     Vector3
     rotationOffset: CFrame
 
@@ -17,6 +17,7 @@ export interface IToolData {
     price:      number
     valuetype:  ToolValueType
     productid?: number
+    weight:     number
 }
 
 export enum ToolOperationStatus {

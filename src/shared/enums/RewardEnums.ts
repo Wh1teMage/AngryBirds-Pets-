@@ -9,4 +9,5 @@ export enum RewardType {
     DailyChest = 'DailyChest',
     GroupChest = 'GroupChest',
     FollowCode  = 'FollowCode',
+    WeaponQuest  = 'WeaponQuest',
 }

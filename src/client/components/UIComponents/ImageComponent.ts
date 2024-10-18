@@ -81,4 +81,8 @@ export class ImageFabric {
         return component
     }
 
+    static GetImage(image: ImageLabel) {
+        return Dependency<Components>().getComponent<ImageComponent>(image)
+    }
+
 }

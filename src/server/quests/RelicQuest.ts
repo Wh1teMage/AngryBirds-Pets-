@@ -70,12 +70,14 @@ export class RelicQuest extends PassiveClass {
         let progress = profileData.CurrentQuestsProgress
 
         progress.set('RelicQuest1', new Map( 
-            [['time', sessionData.sessionTime%(20*60)], ['count', this.counter%800]]
+            [['time', sessionData.sessionTime%(20*60)], ['count', this.counter%(800)]]
         ))
 
         component.replica.SetValue('Profile.CurrentQuestsProgress', progress)
 
-        if ((progress.get('RelicQuest1')!.get('time') !== 0) && (progress.get('RelicQuest1')!.get('counter') === 0)) {
+        print(progress.get('RelicQuest1')!.get('count'), progress.get('RelicQuest1')!.get('time'))
+
+        if ((progress.get('RelicQuest1')!.get('time') !== 0) && (progress.get('RelicQuest1')!.get('count') === 0)) {
             this.giveReward()
         }
 
@@ -93,12 +95,12 @@ export class RelicQuest extends PassiveClass {
         let progress = profileData.CurrentQuestsProgress
 
         progress.set('RelicQuest1', new Map( 
-            [['time', sessionData.sessionTime%(20*60)], ['count', this.counter%800]]
+            [['time', sessionData.sessionTime%(20*60)], ['count', this.counter%(800)]]
         ))
 
         component.replica.SetValue('Profile.CurrentQuestsProgress', progress)
 
-        if (progress.get('RelicQuest1')!.get('time') === 0 && (progress.get('RelicQuest1')!.get('counter') !== 0)) {
+        if ((progress.get('RelicQuest1')!.get('time') === 0) && (progress.get('RelicQuest1')!.get('count') !== 0)) {
             this.giveReward()
         }
     }

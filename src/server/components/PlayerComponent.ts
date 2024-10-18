@@ -24,13 +24,13 @@ import { Players, HttpService, BadgeService, Workspace, ReplicatedStorage, Tween
 import { PetModelManager } from "server/classes/PetModelClass";
 import { PotionType } from "shared/enums/PotionEnum";
 import { PotionsData } from "shared/info/PotionInfo";
-import { PetsData } from "shared/info/PetInfo";
+import { PetPerkNames, PetsData } from "shared/info/PetInfo";
 import { WorldsData } from "shared/info/WorldInfo";
 import { ToolsData } from "shared/info/ToolInfo";
 import { IToolData, ToolValueType } from "shared/interfaces/ToolData";
 import { WorldType } from "shared/enums/WorldEnums";
 import { CreationUtilities } from "shared/utility/CreationUtilities";
-import { CodesRewardsData, DailyChestRewardData, DailyRewardsData, FollowCodeRewardData, GroupChestRewardData, RebirthsRewardsData, SelectDailyReward, SelectSessionReward, SpinRewardData } from "shared/info/RewardInfo";
+import { CodesRewardsData, DailyChestRewardData, DailyRewardsData, FollowCodeRewardData, GetNextBar, GetNextRebirth, GroupChestRewardData, RebirthTitles, SelectDailyReward, SelectSessionReward, SpinRewardData } from "shared/info/RewardInfo";
 import { IRewardData } from "shared/interfaces/RewardData";
 import { PassiveValues } from "shared/interfaces/PassiveData";
 import { FlyingObjectClass } from "server/classes/FlyingObjectClass";
@@ -42,6 +42,8 @@ import { BadgeType } from "shared/interfaces/BadgeData";
 import { MarketCallbacks } from "server/static/MarketStatic";
 import { RelicPassiveNames, RelicsCases, RelicsInfo } from "shared/info/RelicsInfo";
 import { RelicCaseType } from "shared/interfaces/RelicData";
+import { LocationsData } from "shared/info/Locations";
+import { TrailsData } from "shared/info/TrailInfo";
 
 const ReplicaToken = ReplicaService.NewClassToken('PlayerData')
 
@@ -68,12 +70,17 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     private _playerRewardController = new PlayerRewardController(this)
     
     private _playerMultiplersController = new PlayerMultiplersController(this)
-    
+    //private _playerBarController = new PlayerBarController(this)
+    private _playerTrailController = new PlayerTrailController(this)
     
     public FindPet = (pet: IDBPetData) => this._playerPetController.FindPet(pet)
     public AppendPet = (pet: IDBPetData | undefined, ignore?: boolean) => this._playerPetController.AppendPet(pet, ignore)
     public RemovePet = (pet: IDBPetData) => this._playerPetController.RemovePet(pet)
     public LockPet = (pet: IDBPetData) => this._playerPetController.LockPet(pet)
+
+    public BuyTrail = (name: string) => this._playerTrailController.BuyTrail(name)
+    public EquipTrail = (name: string) => this._playerTrailController.EquipTrail(name)
+    public ReplicateTrail = (name: string) => this._playerTrailController.ReplicateTrail(name)
 
     public EquipPet = (pet: IDBPetData) => this._playerPetController.EquipPet(pet)
     public UnequipPet = (pet: IDBPetData) => this._playerPetController.UnequipPet(pet)
@@ -93,10 +100,13 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public MultiUnlock = (pets: IDBPetData[]) => this._playerPetController.MultiUnlock(pets)
     public UpdateAutoDelete = (petnames: string[]) => this._playerPetController.UpdateAutoDelete(petnames)
 
+    public AddPetPerks = (pet: IDBPetData, activate?: boolean) => this._playerPetController.AddPetPerks(pet, activate)
+    public RemovePetPerks = (pet: IDBPetData) => this._playerPetController.RemovePetPerks(pet)
+
+    //public SetGems = (value: number, source?: IncomeSource) => this._playerValueController.SetGems(value, source)
     public SetWins = (value: number, source?: IncomeSource) => this._playerValueController.SetWins(value, source)
-    public SetGems = (value: number, source?: IncomeSource) => this._playerValueController.SetGems(value, source)
-    public SetStars = (value: number, source?: IncomeSource) => this._playerValueController.SetStars(value, source)
     public SetStrength = (value: number, source?: IncomeSource) => this._playerValueController.SetStrength(value, source)
+    //public SetRebirths = (value: number, source?: IncomeSource) => this._playerValueController.SetRebirths(value, source)
 
     public BuyEgg = (name: string, buytype: EggBuyType) => this._playerEggController.BuyEgg(name, buytype)
     public OpenEggBypass = (name: string, buytype: EggBuyType, noeffect?: boolean) => this._playerEggController.OpenEggBypass(name, buytype, noeffect)
@@ -113,18 +123,19 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public SetWorldMultipliers = () => this._playerMultiplersController.SetWorldMultipliers()
     public CalculateMultiplier = (multiname: keyof IMultipliers) => this._playerMultiplersController.CalculateMultiplier(multiname)
 
-    public UseTool = () => this._playerToolController.UseTool()
+    public UseTool = (status: string) => this._playerToolController.UseTool(status)
     public BuyTool = (toolname: string) => this._playerToolController.BuyTool(toolname)
     public EquipTool = (toolname: string) => this._playerToolController.EquipTool(toolname)
     public AppendTool = (toolname: string) => this._playerToolController.AppendTool(toolname)
-    public ReplicateModel = () => this._playerToolController.ReplicateModel()
+    //public ReplicateModel = () => this._playerToolController.ReplicateModel()
 
     public BuyMaxWorld = (world: WorldType) => this._playerWorldController.BuyMaxWorld(world)
     public ChangeWorld = () => this._playerWorldController.ChangeWorld()
+    public ChangeLocation = () => this._playerWorldController.ChangeLocation()
+    public IsInSafezone = () => this._playerWorldController.IsInSafezone()
     public UseWorldTeleport = (world: WorldType) => this._playerWorldController.UseWorldTeleport(world)
 
     public InitializeObject = () => this._playerFlyingController.InitializeObject()
-    public ShootObject = (power: number) => this._playerFlyingController.ShootObject(power)
 
     public IsFriends = (id: number) => this._playerHttpsController.CheckIsFriend(id)
     public GivePremiumReward = () => this._playerHttpsController.GivePremiumReward()
@@ -132,10 +143,11 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public ApplyReward = (reward: IRewardData) => this._playerRewardController.ApplyReward(reward)
     public GetChanceReward = (reward: IRewardData) => this._playerRewardController.GetChanceReward(reward)
     public ClaimPetQuestReward = () => this._playerRewardController.ClaimPetQuestReward()
+    public ClaimWeaponQuestReward = () => this._playerRewardController.ClaimWeaponQuestReward()
     public ClaimSessionReward = (rewardindex: number) => this._playerRewardController.ClaimSessionReward(rewardindex)
     public ClaimDailyReward = () => this._playerRewardController.ClaimDailyReward()
     public RedeemCode = (code: string) => this._playerRewardController.RedeemCode(code)
-    public DoRebirth = (skip?: boolean) => this._playerRewardController.DoRebirth(skip)
+    //public DoRebirth = (skip?: boolean) => this._playerRewardController.DoRebirth(skip)
 
     public ClaimFollowReward = () => this._playerRewardController.ClaimFollowReward()
     public ApplySpin = () => this._playerRewardController.ApplySpin() 
@@ -155,23 +167,33 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
     public OpenRelicCase = (name: string, amount: number) => this._playerRelicsController.OpenRelicCase(name, amount)
     public OpenRelicCaseBypass = (name: string, amount: number) => this._playerRelicsController.OpenRelicCaseBypass(name, amount)
 
+    //public SetBarLevel = (level: number) => this._playerBarController.SetBarLevel(level)
+    //public UpdateBar = () => this._playerBarController.UpdateBar()
+
+    public EquipLastFreeTool = () => this._playerToolController.EquipLastFreeTool()
+    public UnequipTool = () => this._playerToolController.UnequipTool()
+
     onStart() {
 
-        this.instance
+        //this.instance
         
+        print('Loading')
+
         this.initProfile()
         this.initReplica()
+
+        print('Profile Loaded')
         
         this.instance.CharacterAppearanceLoaded.Connect((character) => {
             CharacterFabric.CreateCharacter(character, this) 
-            this.ReplicateModel()
+            //this.ReplicateModel()
             //this._character = character as ICharacter
             //this.session.character = character as ICharacter
         })
 
         if (this.instance.Character) { 
             CharacterFabric.CreateCharacter(this.instance.Character, this); 
-            this.ReplicateModel()
+            //this.ReplicateModel()
             //this._character = this.instance.Character as ICharacter 
             //this.session.character = this.instance.Character as ICharacter
         }
@@ -180,6 +202,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
         for (let pet of this.profile.Data.Pets) {
             if (!pet.equipped) { continue }
             PetModelManager.AddPet(this.instance, pet)
+            this.AddPetPerks(pet)
         }
 
         this.profile.Data.StatValues.LastJoined = os.time()
@@ -190,16 +213,16 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
         }
 
         let defaultPassives = [
-            'EggQuest', 'FriendQuest', 'PetQuest', 'PetIndexQuest', 'RelicQuest'
+            'EggQuest', //'FriendQuest', 'GameBoostQuest', 'WeaponQuest'
+            //'EggQuest', 'FriendQuest', 'PetQuest', 'PetIndexQuest', 'RelicQuest'
         ]
 
+        
         for (let passiveName of defaultPassives) {
             let passive = Passives.get(passiveName)!() 
             passive.setOwner(this.instance)
             this.session.activePassives.push(passive)
         }
-
-        print(this.session.leftToFollow)
 
         for (let badge of BadgeManager.GetBadgesByType(BadgeType.Start)) { this.ClaimBadge(badge.badgeId) }
 
@@ -207,23 +230,32 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
 
         this.session.activePassives.forEach((value) => { value.onStart() })
 
-        Players.GetPlayers().forEach((player) => {
-            if (!this.IsFriends(player.UserId)) { return }
-            if (player === this.instance) { return }
+        task.spawn(() => {
+            while (Players.FindFirstChild(this.instance.Name) && task.wait(15)) {
 
-            let component = ServerPlayerFabric.GetPlayer(player)
-            if (!component) { return }
-            if (component.session.friendList.includes(this.instance.Name)) { return }
+                print(this.profile, this.replica)
 
-            component.session.friendList.push(this.instance.Name)
-            this.session.friendList.push(player.Name)
+                this.session.friendList = []
 
-            component.session.activePassives.forEach((value) => { value.onFriendsChanged() })
-            for (let badge of BadgeManager.GetBadgesByType(BadgeType.Friend)) { component.ClaimBadge(badge.badgeId) }
+                //if (!this.profile || !this.replica) { continue }
+
+                pcall(() => { //fix this later (check if replica is existing) & friendservice
+
+                    Players.GetPlayers().forEach((player) => {
+                        if (!this.IsFriends(player.UserId)) { return }
+                        if (player === this.instance) { return }
+            
+                        this.session.friendList.push(player.Name)
+                    })
+    
+                    print('this.session.friendList', this.session.friendList.size())
+
+                    this.session.activePassives.forEach((value) => { value.onFriendsChanged() })
+                    for (let badge of BadgeManager.GetBadgesByType(BadgeType.Friend)) { this.ClaimBadge(badge.badgeId) }
+                })
+
+            }
         })
-
-        this.session.activePassives.forEach((value) => { print(value); value.onFriendsChanged() })
-        for (let badge of BadgeManager.GetBadgesByType(BadgeType.Friend)) { this.ClaimBadge(badge.badgeId) }
 
         this.GivePremiumReward()
         this.session.headStats.Parent = Workspace.Terrain
@@ -288,7 +320,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                 print('test'+tostring(i))
             }
             */
-            
+            /*
             if (this.profile.Data.Pets.size() < 1) {
 
                 this.AppendPet(
@@ -305,7 +337,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                 )
 
             }
-
+            */
             //this.AppendRelic('Golden Egg', 5, 11)
 
             print(this.profile.Data, 'Profile')
@@ -407,17 +439,19 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
             //print(this.profile.Data)
 
             let headFrame = this.session.headStats.WaitForChild('Frame');
-            (headFrame.WaitForChild('Nickname') as TextLabel).Text = this.instance.Name
+            //(headFrame.WaitForChild('Nickname') as TextLabel).Text = this.instance.Name
 
-            let accuracyStats = this.session.leaderStats.WaitForChild('Accuracy') as IntValue
-            let winsStats = this.session.leaderStats.WaitForChild('Wins') as IntValue
-            let rebirthStats = this.session.leaderStats.WaitForChild('Rebirth') as IntValue
-            let gemsStats = this.session.leaderStats.WaitForChild('Gems') as IntValue
+            let accuracyStats = this.session.leaderStats.WaitForChild('Strength') as StringValue
+            let killStats = this.session.leaderStats.WaitForChild('Kills') as StringValue
+            let rebirthStats = this.session.leaderStats.WaitForChild('Rebirth') as StringValue
+            let gemsStats = this.session.leaderStats.WaitForChild('Gems') as StringValue
 
             task.spawn(() => {
                 while (task.wait(1) && this.instance.Parent) {
 
                     //this.AppendRelic('BonusShotRelic', 1, 1)
+
+                    //this.profile.Data.StatValues.KillsVal += 1
 
                     this.profile.Data.StatValues.IngameTime += 1
                     this.session.sessionTime += 1
@@ -425,21 +459,29 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
                     //print(this.session.multipliers.pet.strength)
                     //this.session.character!.Humanoid.WalkSpeed += 120
                     this.ChangeWorld()
+                    this.ChangeLocation()
+                    this.IsInSafezone()
                     this.ApplySpin()
+                    this.UseTool('default')
 
-                    this.session.headStats.Adornee = this.session.character;
-                    (headFrame.WaitForChild('Stat') as TextLabel).Text = 'Accuracy: '+CreationUtilities.getSIPrefixSymbol(this.profile.Data.Values.StrengthVal)
-                    if (this.profile.Data.Products.includes('vippass')) { (headFrame.WaitForChild('Vip') as TextLabel).Visible = true }
+                    if (this.session.character && this.session.character.FindFirstChild('Head')) {
+                        this.session.headStats.Adornee = this.session.character.FindFirstChild('Head') as BasePart;
+                    }
+
+                    (headFrame.WaitForChild('Title') as TextLabel).Text = this.profile.Data.Config.RebirthTitle;
+                    (headFrame.WaitForChild('TitleImage') as ImageLabel).Image = RebirthTitles.get(this.profile.Data.Config.RebirthTitle)!.id;
+                    (headFrame.WaitForChild('Stat') as TextLabel).Text = CreationUtilities.getSIPrefixSymbol(this.profile.Data.Values.StrengthVal)
+                    //if (this.profile.Data.Products.includes('vippass')) { (headFrame.WaitForChild('Vip') as TextLabel).Visible = true }
 
                     this.session.activePassives.forEach((passive) => { passive.onTick() })
 
                     this.replica.SetValue('Session.sessionTime', this.session.sessionTime)
                     this.replica.SetValue('Profile.StatValues.IngameTime', this.profile.Data.StatValues.IngameTime )
 
-                    accuracyStats.Value = this.profile.Data.Values.StrengthVal
-                    winsStats.Value = this.profile.Data.Values.WinsVal
-                    rebirthStats.Value = this.profile.Data.Values.RebirthsVal
-                    gemsStats.Value = this.profile.Data.Values.GemsVal
+                    accuracyStats.Value = CreationUtilities.getSIPrefixSymbol(this.profile.Data.Values.StrengthVal) 
+                    //rebirthStats.Value = CreationUtilities.getSIPrefixSymbol(this.profile.Data.Values.RebirthsVal)
+                    //gemsStats.Value = CreationUtilities.getSIPrefixSymbol(this.profile.Data.Values.GemsVal)
+                    //killStats.Value = CreationUtilities.getSIPrefixSymbol(this.profile.Data.StatValues.KillsVal)
 
                     //this.replica.SetValue('Session.testvalue', math.random(0, 100))
                     //Events.ReplicateEffect.fire(this.instance, EffectName.ClickSound)
@@ -458,6 +500,7 @@ export class ServerPlayerComponent extends BaseComponent<{}, Player> implements 
         if (this.session.activeTrade) { this.session.activeTrade.Deny() }
 
         this.session.activePassives.forEach((passive) => { passive.onLeft(); })
+        PetModelManager.RemovePlayer(this.instance.UserId)
 
         this.profile.Release()
         this.replica.Destroy()
@@ -515,6 +558,8 @@ class PlayerValueController {
         this.player.profile.Data.Values.StrengthVal = math.round(value)
         this.player.profile.Data.MaxValues.StrengthMaxVal = math.max(this.player.profile.Data.MaxValues.StrengthMaxVal, math.round(value))
 
+        //this.player.UpdateBar()
+
         this.player.replica.SetValue('Profile.Values.StrengthVal', math.round(value))
         this.player.replica.SetValue('Profile.MaxValues.StrengthMaxVal', this.player.profile.Data.MaxValues.StrengthMaxVal)
     }
@@ -534,21 +579,7 @@ class PlayerValueController {
         this.player.replica.SetValue('Profile.MaxValues.WinsMaxVal', this.player.profile.Data.MaxValues.WinsMaxVal)
     }
 
-    public SetStars(value: number, source?: IncomeSource) {
-        if (!source || source === IncomeSource.Default) { 
-            this.player.session.activePassives.forEach((passive) => { 
-                passive.onValueChanged(PassiveValues.Stars); 
-                passive.onStarsChanged(value, this.player.profile.Data.Values.StarsVal) 
-            })
-        }
-
-        this.player.profile.Data.Values.StarsVal = math.round(value)
-        this.player.profile.Data.MaxValues.StarsMaxVal = math.max(this.player.profile.Data.MaxValues.StarsMaxVal, math.round(value))
-
-        this.player.replica.SetValue('Profile.Values.StarsVal', math.round(value))
-        this.player.replica.SetValue('Profile.MaxValues.StarsMaxVal', this.player.profile.Data.MaxValues.StarsMaxVal)
-    }
-
+    /*
     public SetGems(value: number, source?: IncomeSource) {
         if (!source || source === IncomeSource.Default) { 
             this.player.session.activePassives.forEach((passive) => { 
@@ -563,7 +594,9 @@ class PlayerValueController {
         this.player.replica.SetValue('Profile.Values.GemsVal', math.round(value))
         this.player.replica.SetValue('Profile.MaxValues.GemsMaxVal', this.player.profile.Data.MaxValues.GemsMaxVal)
     }
+    */
 
+    /*
     public SetRebirths(value: number, source?: IncomeSource) {
         if (!source || source === IncomeSource.Default) { 
             this.player.session.activePassives.forEach((passive) => { 
@@ -573,9 +606,12 @@ class PlayerValueController {
         }
 
         this.player.profile.Data.Values.RebirthsVal = math.round(value)
+        this.player.profile.Data.MaxValues.RebirthsMaxVal = math.max(this.player.profile.Data.MaxValues.RebirthsMaxVal, math.round(value))
+
         this.player.replica.SetValue('Profile.Values.RebirthsVal', math.round(value))
         this.player.replica.SetValue('Profile.MaxValues.RebirthsMaxVal', this.player.profile.Data.MaxValues.RebirthsMaxVal)
     }
+    */
 
 }
 
@@ -604,10 +640,9 @@ class PlayerMultiplersController {
         VoidMachineMul: number
         */
 
-        if (multiname === 'strength') { overallMultiplier *= profileData.Multipliers.StrengthMul }
+        if (multiname === 'strength') { overallMultiplier *= (profileData.Multipliers.StrengthMul) }
+        //if (multiname === 'gems') { overallMultiplier *= (profileData.Multipliers.GemsMul) }
         //if (multiname === 'stars') { overallMultiplier *= profileData.Multipliers. }
-        if (multiname === 'stars') { overallMultiplier *= profileData.Multipliers.StarsMul }
-        if (multiname === 'wins') { overallMultiplier *= profileData.Multipliers.WinsMul }
 
         /*
         Functions.iterateObject(profileData.Multipliers, (index, value: IMultipliers) => {
@@ -623,8 +658,11 @@ class PlayerMultiplersController {
 
         this.player.session.multipliers.pet = table.clone( DefaultMultipliers ) 
 
+        let hasPet = false
+
         this.player.profile.Data.Pets.forEach((pet) => {
             if (!pet.equipped) { return }
+            hasPet = true
 
             let petData = PetUtilities.DBToPetTransfer(pet, true)
 
@@ -632,6 +670,12 @@ class PlayerMultiplersController {
                 this.player.session.multipliers.pet[multi[0] as keyof typeof DefaultMultipliers] += multi[1]
             }
         })
+
+        this.player.session.activePassives.forEach((passive) => { passive.onPetMultiplierChanged() })
+
+        if (hasPet) { this.player.session.multipliers.pet.strength -= 1 }
+
+        print(this.player.session.multipliers.pet.strength, 'this.player.session.multipliers.pet.strength')
 
         this.player.replica.SetValues('Session.multipliers.pet', this.player.session.multipliers.pet)
 
@@ -682,6 +726,8 @@ class PlayerPotionController {
 
         profileData.Potions[potionIndex] = { potion: potion, amount: profileData.Potions[potionIndex].amount+(amout || 1) }
         this.player.replica.SetValue('Profile.Potions', profileData.Potions)
+
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `🧪 Got a ${potion}!`], ['Image', 'NewPotion']]))
     }
 
     public PopPotion(potion: PotionType) {
@@ -890,6 +936,37 @@ class PlayerEggController {
         ]))
     }
 
+    /*
+    public offerGemsProduct(price: number) {
+        let profileData = this.player.profile.Data
+
+        let delta = price - profileData.Values.GemsVal
+
+        let products = new Map([
+            [250, 1907111627],
+            [1000, 1907111788],
+            [2500, 1907111941],
+            [6500, 1907112107],
+            [15000, 1907112245],
+            [30000, 1907112416],
+            [50000, 1907112582],
+        ])
+
+        let selectedProduct = 0
+        let minVal = 32132132321321321
+
+        products.forEach((id, val) => {
+            if ((val > delta) && (val < minVal)) {
+                minVal = val
+                selectedProduct = id
+            }
+            print(val, delta, minVal, selectedProduct, 'check1')
+        })
+
+        Events.ReplicateEffect.fire(this.player.instance, EffectName.ReplicatePurchase, new Map<string, number>([['productId', selectedProduct]]))
+    }
+    */
+
     public BuyEgg(name: string, buytype: EggBuyType) {
         if (!this.player.profile) { return }
         let profileData = this.player.profile.Data
@@ -905,11 +982,12 @@ class PlayerEggController {
         if (buytype === EggBuyType.Ten && eggInfo!.valuetype !== EggValueType.VBugs) { return }
         if (buytype === EggBuyType.Triple && !profileData.Products.includes('3egghatch') && eggInfo!.valuetype !== EggValueType.VBugs) { return }
         if (!this.player.CheckSpaceForPets(amount)) {return}
+        if (WorldsData.get(eggInfo.world)!.weight > WorldsData.get(profileData.Config.MaxWorld)!.weight) { return }
         
         switch (eggInfo.valuetype) {
-            case EggValueType.Wins:
+            case EggValueType.Gems:
 
-                if (profileData.Values.WinsVal < eggInfo.price*amount) {return}
+                if (profileData.Values.WinsVal < eggInfo.price*amount) { return } //this.offerGemsProduct(eggInfo.price*amount);
                 print(eggInfo, 1)
 
                 this.OpenEggBypass(name, buytype)
@@ -1032,6 +1110,52 @@ class PlayerPetController {
         sessionData.deletePets = petnames
     }
 
+    public RemovePetPerks(pet: IDBPetData) {
+        print('TestTestTestTestTestTestTestTestTestTestTestTestTestTest44')
+        if (pet.equipped) { return }
+        if (!pet.additional.perks) { pet.additional.perks = []; return }
+
+        let sessionData = this.player.session
+
+        pet.additional.perks.forEach((perk) => {
+            let passiveName = PetPerkNames.get(perk.name)!
+            if (!passiveName) { return }
+
+            let index = -1
+
+            sessionData.activePassives.forEach((val, i) => { 
+                if (val.id && val.id === pet.id && val.name === passiveName && val.level === perk.level && (index < 0)) { val.onEnd(); index = i } 
+            }) //not so optimized
+    
+            sessionData.activePassives.remove(index)
+        })
+
+    }
+
+    public AddPetPerks(pet: IDBPetData, activate?: boolean) {
+        print('TestTestTestTestTestTestTestTestTestTestTestTestTestTest123123')
+        if (!pet.equipped) { return }
+        if (!pet.additional.perks) { pet.additional.perks = []; return }
+
+        let sessionData = this.player.session
+
+        pet.additional.perks.forEach((val) => {
+            let passiveName = PetPerkNames.get(val.name)!
+            print(passiveName, val.name)
+            if (!passiveName) { return }
+
+            let passive = Passives.get(passiveName)!() 
+    
+            passive.setOwner(this.player.instance)
+            passive.setPet(pet)
+            passive.level = val.level
+    
+            sessionData.activePassives.push(passive)
+            if (!activate) { return }
+            passive.onStart()
+        })
+    }
+
     public EquipPet(pet: IDBPetData, ignore?: boolean, index?: number) {
         print('TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest2', pet, ignore)
         let profileData = this.player.profile.Data
@@ -1048,9 +1172,11 @@ class PlayerPetController {
 
         task.spawn(() => { PetModelManager.AddPet(this.player.instance, profileData.Pets[petIndex]) })
         
-        if (ignore) { return }
-
+        this.AddPetPerks(profileData.Pets[petIndex], true)
         this.player.SetPetMultipliers()
+
+        if (ignore) { return }
+        
         //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Update, [profileData.Pets[petIndex]!], [pet])
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
@@ -1075,11 +1201,13 @@ class PlayerPetController {
 
         task.spawn(() => { PetModelManager.RemovePet(this.player.instance, profileData.Pets[petIndex]) })
 
+        this.RemovePetPerks(profileData.Pets[petIndex])
+        this.player.SetPetMultipliers()
+
         if (ignore) { return }
 
         print('Sent!')
-
-        this.player.SetPetMultipliers()
+        
         //Events.SendPetReplication.fire(this.player.instance, PetReplicationStatus.Update, [profileData.Pets[petIndex]!], [pet])
         this.player.replica.SetValue('Profile.Pets', profileData.Pets)
     }
@@ -1099,6 +1227,8 @@ class PlayerPetController {
         if (!this.CheckSpaceForPets(1)) {return}
 
         if (this.player.profile.Data.PetIndex.indexOf(pet.name) < 0) { this.player.profile.Data.PetIndex.push(pet.name) }
+
+        print('Added Pet ' + pet)
 
         let formatted = table.clone(pet)
         formatted.id = HttpService.GenerateGUID(false)+tostring(math.random(1, 100000))
@@ -1304,7 +1434,7 @@ class PlayerPetController {
 
         if (!selectedPet) { return }
         if (selectedPet.additional.mutation !== Mutations.Default) { return }
-        if (profileData.Values.GemsVal < count) { return }
+        //if (profileData.Values.GemsVal < count) { return } // !! Return if mutation persists
 
         let allMutations = [Mutations.Elder, Mutations.Majestic, Mutations.Primordial, Mutations.Sacred]
         let mutations: {weight: number, name: string}[] = []
@@ -1316,7 +1446,7 @@ class PlayerPetController {
 
         let mutationName = PetUtilities.RandomWeight(mutations, (1-0.088)+count*0.088)
         print(mutationName)
-        this.player.SetGems(profileData.Values.GemsVal - count)
+        //this.player.SetGems(profileData.Values.GemsVal - count)
 
         this.RemovePet(pet, false, true)
 
@@ -1334,7 +1464,7 @@ class PlayerPetController {
         if (!selectedPet) { return }
         if (selectedPet.additional.mutation === Mutations.Default) { return }
 
-        this.player.SetGems(profileData.Values.GemsVal - 1)
+        //this.player.SetGems(profileData.Values.GemsVal - 1)
 
         this.RemovePet(pet, false, true)
 
@@ -1458,9 +1588,65 @@ class PlayerWorldController {
 
             sessionData.currentWorld = worldtype
         })
-
+        
         this.player.SetWorldMultipliers()
         this.player.replica.SetValue('Session.currentWorld', sessionData.currentWorld)
+    }
+
+    public ChangeLocation() {
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        this.player.session.multipliers.location = table.clone(DefaultMultipliers)
+        
+        LocationsData.forEach((val) => {
+            let parts = game.Workspace.GetPartBoundsInBox(val.hitbox.CFrame, val.hitbox.Size)
+            let foundRootPart = parts.find((value) => value === this.player.session.character!.PrimaryPart)
+
+            if ( !foundRootPart ) { return }
+            if ( sessionData.currentWorld !== val.world ) { return }
+
+            let requirements = val.requirements
+
+            if (requirements) { 
+                let passed = true
+                
+                if ((requirements.get('strength')) && (requirements.get('strength')! > profileData.Values.StrengthVal)) { passed = false }
+                if ((requirements.get('wins')) && (requirements.get('wins')! > profileData.Values.WinsVal)) { passed = false }
+    
+                if (!passed) { return }
+            }
+
+
+
+            for (let multi of val!.multipliers) {
+                this.player.session.multipliers.location[multi[0] as keyof typeof DefaultMultipliers] = multi[1]
+            }
+
+        })
+
+        this.player.replica.SetValues('Session.multipliers.location', sessionData.multipliers.location)
+
+    }
+
+    public IsInSafezone() {
+        let sessionData = this.player.session;
+
+        if (!sessionData.character) { return }
+
+        (sessionData.character?.FindFirstChild('IsSafe') as BoolValue).Value = false
+
+        game.Workspace.WaitForChild('InstaReplica')!.GetChildren().forEach((val) => { //i dont really care about security or errors
+            if (!val.FindFirstChild('Safe')) { return }
+            if (!val.IsA('BasePart')) { return }
+
+            let parts = game.Workspace.GetPartBoundsInBox(val.CFrame, val.Size)
+            let foundRootPart = parts.find((value) => value === this.player.session.character!.PrimaryPart)
+
+            if ( !foundRootPart ) { return };
+
+            (sessionData.character?.FindFirstChild('IsSafe') as BoolValue).Value = true
+        })
     }
 
     public BuyMaxWorld(world: WorldType) {
@@ -1468,15 +1654,14 @@ class PlayerWorldController {
         let worldInfo = WorldsData.get(world)!
 
         if (worldInfo.weight <= WorldsData.get(profileData.Config.MaxWorld)!.weight) { return }
-        if (profileData.Values.StarsVal < worldInfo.price) { return }
+        if (profileData.Values.WinsVal < worldInfo.price) { return }
 
-        this.player.SetStars(profileData.Values.StarsVal - worldInfo.price)
         profileData.Config.MaxWorld = world
 
         for (let badge of BadgeManager.GetBadgesByType(BadgeType.World)) { this.player.ClaimBadge(badge.badgeId) }
         this.player.replica.SetValue('Profile.Config.MaxWorld', profileData.Config.MaxWorld)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'New Max World!'], ['Image', 'NewWorld']]))
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'New Bundle!'], ['Image', 'NewWorldBundle']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '🌍 New Max World!'], ['Image', 'NewWorld']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '🥚 New Egg Avaliable!'], ['Image', 'NewWorldBundle']]))
 
         this.UseWorldTeleport(profileData.Config.MaxWorld)
 
@@ -1490,7 +1675,52 @@ class PlayerWorldController {
         if (WorldsData.get(profileData.Config.MaxWorld)!.weight < worldInfo.weight) { return }
         //if (profileData.Products.indexOf('SomeWorldTpgamepass') < 0) { return } //TODO //There are no tp passes
 
-        this.player.session.character!.PrimaryPart!.CFrame = worldInfo.teleportPart.CFrame
+        this.player.session.character!.PrimaryPart!.CFrame = worldInfo.teleportPart.CFrame.add(new Vector3(0, 5, 0))
+        task.wait(.1)
+        this.player.session.character!.PrimaryPart!.Anchored = true
+        task.wait(.5)
+        this.player.session.character!.PrimaryPart!.Anchored = false
+    }
+
+}
+
+class PlayerTrailController {
+
+    private player: ServerPlayerComponent
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+
+    public BuyTrail(name: string) {
+        let profileData = this.player.profile.Data
+
+        let trailInfo = TrailsData.get(name)
+        if (!trailInfo) { return }
+        if (profileData.OwnedTrails.includes(name)) { return }
+        
+        if (profileData.Values.WinsVal < trailInfo.price) { return }
+
+        this.player.SetWins(profileData.Values.WinsVal - trailInfo.price)
+
+        profileData.OwnedTrails.push(name)
+        this.EquipTrail(name)
+    }
+
+    public EquipTrail(name: string) {
+        let profileData = this.player.profile.Data
+
+        let trailInfo = TrailsData.get(name)
+        if (!trailInfo) { return }
+        if (!profileData.OwnedTrails.includes(name)) { return }
+
+        this.ReplicateTrail(name)
+
+        profileData.EquippedTrail = name
+    }
+
+    public ReplicateTrail(name: string) {
+
     }
 
 }
@@ -1506,7 +1736,10 @@ class PlayerToolController {
     }
 
     private canUse(toolinfo: IToolData) {
-        if ((this.lastUsed + toolinfo.firerate*(1/this.player.session.multipliers.other.attackspeed)) > tick()) { return }
+        let sessionData = this.player.session
+        let profileData = this.player.profile.Data
+
+        if ((this.lastUsed + toolinfo.firerate*(1/(sessionData.multipliers.other.attackspeed * profileData.Multipliers.AttackSpeedMul))) > tick()) { return }
         if (this.using) { return }
         return true
     }
@@ -1517,7 +1750,32 @@ class PlayerToolController {
         this.player.profile.Data.OwnedTools.push(toolname)
 
         this.player.replica.SetValue('Profile.OwnedTools', this.player.profile.Data.OwnedTools)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'New Tool!'], ['Image', 'Success']]))
+        //Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'New Tool!'], ['Image', 'Success']]))
+    }
+
+    public EquipLastFreeTool() {
+
+        let maxWeight = 0
+        let toolname = ''
+
+        this.player.profile.Data.OwnedTools.forEach((val) => {
+            let info = ToolsData.get(val)
+            if (!info) { return }
+            if ((info.valuetype === ToolValueType.VBugs) || info.productid) { return }
+
+            if (info.weight > maxWeight) {
+                maxWeight = info.weight
+                toolname = val
+            }
+        })
+
+        if (!ToolsData.get(toolname)) { return }
+        if (!this.player.profile.Data.OwnedTools.find((val) => val === toolname)) { return }
+        this.player.profile.Data.EquippedTool = toolname
+
+        this.player.replica.SetValue('Profile.EquippedTool', this.player.profile.Data.EquippedTool)
+
+        //this.ReplicateModel()
     }
 
     public EquipTool(toolname: string) {
@@ -1527,7 +1785,20 @@ class PlayerToolController {
 
         this.player.replica.SetValue('Profile.EquippedTool', this.player.profile.Data.EquippedTool)
 
-        this.ReplicateModel()
+        //this.ReplicateModel()
+    }
+
+    public UnequipTool() {
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        profileData.EquippedTool = 'None'
+
+        this.player.replica.SetValue('Profile.EquippedTool', profileData.EquippedTool)
+
+        if (sessionData.character?.FindFirstChild('ToolModel')) {
+            sessionData.character?.FindFirstChild('ToolModel')?.Destroy()
+        }
     }
 
     public BuyTool(toolname: string) {
@@ -1557,37 +1828,90 @@ class PlayerToolController {
 
     }
 
-    public UseTool() {
+    /*
+    public Attack() {
         let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        if (!sessionData.character || !sessionData.character.PrimaryPart) { return }
+        if (sessionData.character.FindFirstChild('IsSafe') && (sessionData.character.FindFirstChild('IsSafe') as BoolValue).Value) { return }
+        if (sessionData.character.Humanoid.Health <= 0 || (sessionData.character.Humanoid.GetState() === Enum.HumanoidStateType.Dead)) { return }
+
+        Players.GetPlayers().forEach((val) => {
+            if (val.UserId === this.player.instance.UserId) { return }
+            if (!val.Character || !val.Character.PrimaryPart) { return }
+            if (val.Character.PrimaryPart?.Position.sub(sessionData.character!.PrimaryPart!.Position).Magnitude > 7) { return }
+            if (val.Character.FindFirstChild('IsSafe') && (val.Character.FindFirstChild('IsSafe') as BoolValue).Value) { return }
+
+            let percDamage = profileData.Values.StrengthVal / ServerPlayerFabric.GetPlayer(val).profile.Data.Values.StrengthVal
+            let humanoid = val.Character.FindFirstChild('Humanoid') as Humanoid
+
+            print(val.Name, humanoid.Health, percDamage, 'humanoid')
+
+            if (humanoid) { 
+                //if (humanoid.Health <= 0.1) { return } //should be 0
+                if ((humanoid.Health <= 0) || (humanoid.GetState() === Enum.HumanoidStateType.Dead)) { return }
+
+                humanoid.TakeDamage(percDamage*humanoid.MaxHealth); 
+
+                if ((humanoid.Health > 0) && (humanoid.GetState() !== Enum.HumanoidStateType.Dead)) { return }
+                
+                //humanoid.Health = humanoid.Health - percDamage*humanoid.MaxHealth
+
+                print(val.Name, humanoid.Health, 'killed')
+
+                humanoid.Health = 0;
+                profileData.StatValues.KillsVal += 1 
+                sessionData.activePassives.forEach((value) => { value.onKill() })
+
+                this.player.SetGems(profileData.Values.GemsVal + 250 * this.player.CalculateMultiplier('gems'))
+                Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `💀 Got a kill!`], ['Image', 'Accuracy']]))
+            }
+            this.player.replica.SetValue('Profile.StatValues.KillsVal', profileData.StatValues.KillsVal)
+        })
+
+    }
+    */
+
+    public UseTool(status: string) {
+        let profileData = this.player.profile.Data
+
+        if (profileData.EquippedTool === 'None') { return }
+
         let toolInfo = ToolsData.get(profileData.EquippedTool)!
 
         if (!this.canUse(toolInfo)) { return }
 
         this.using = true
 
-        this.player.SetStrength(profileData.Values.StrengthVal + toolInfo.addition * this.player.CalculateMultiplier('strength'))
+        if (status !== 'restricted') { 
+            this.player.SetStrength(profileData.Values.StrengthVal + 
+                (profileData.Values.WinsVal) * this.player.CalculateMultiplier('strength'))
+    
+            for (let badge of BadgeManager.GetBadgesByType(BadgeType.Strength)) { this.player.ClaimBadge(badge.badgeId) }
+        }
 
         this.lastUsed = tick()
         this.using = false
 
-        print(this.player.session.activePassives)
-
         this.player.session.activePassives.forEach((value) => { value.onShoot() })
-        
+
         Events.ReplicateEffect.fire(this.player.instance, toolInfo.effectname)
     }
 
+    /*
     public ReplicateModel() {
         let profileData = this.player.profile.Data
         let sessionData = this.player.session
         let toolInfo = ToolsData.get(profileData.EquippedTool)!
+
+        if (!sessionData.character || !sessionData.character.PrimaryPart) { return }
 
         if (sessionData.character?.FindFirstChild('ToolModel')) {
             sessionData.character?.FindFirstChild('ToolModel')?.Destroy()
         }
         
         let clonnedModel = toolInfo.model.Clone()
-        print(clonnedModel)
         clonnedModel.Name = 'ToolModel'
         clonnedModel.PrimaryPart!.Anchored = false
 
@@ -1596,6 +1920,7 @@ class PlayerToolController {
 
         CreationUtilities.WeldConstraint(clonnedModel.PrimaryPart!, sessionData.character!.FindFirstChild('RightHand') as Part)
     }
+    */
 
 }
 
@@ -1661,25 +1986,27 @@ class PlayerRewardController {
         if (reward.Additional?.get('smallpackwins')) { MarketCallbacks.get('smallpackwins')!(this.player) }
 
         this.player.SetStrength(profile.Values.StrengthVal + (reward.Values?.Strength || 0))
-        this.player.SetStars(profile.Values.StarsVal + (reward.Values?.Stars || 0))
         this.player.SetWins(profile.Values.WinsVal + (reward.Values?.Wins || 0))
-        this.player.SetGems(profile.Values.GemsVal + (reward.Values?.Gems || 0))
 
         if (reward.Values?.Strength) {
             let val = CreationUtilities.getSIPrefixSymbol(reward.Values?.Strength)
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${val} Accuracy!`], ['Image', 'Accuracy']]))
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `💪 Recieved ${val} Strength!`], ['Image', 'Accuracy']]))
+            Events.ReplicateEffect(this.player.instance, 'ReplicateRewards', 
+                new Map<string, number | string>([
+                    ['Amount', math.round(reward.Values?.Strength/6)], 
+                    ['Repeats', 6],
+                    ['Image', 'Accuracy'],
+                ]))
         }
         if (reward.Values?.Wins) {
             let val = CreationUtilities.getSIPrefixSymbol(reward.Values?.Wins)
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${val} Wins!`], ['Image', 'Wins']]))
-        }
-        if (reward.Values?.Stars) {
-            let val = CreationUtilities.getSIPrefixSymbol(reward.Values?.Stars)
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${val} Stars!`], ['Image', 'Stars']]))
-        }
-        if (reward.Values?.Gems) {
-            let val = CreationUtilities.getSIPrefixSymbol(reward.Values?.Gems)
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `Recieved ${val} Gems!`], ['Image', 'Gems']]))
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', `💎 Recieved ${val} Gems!`], ['Image', 'Gems']]))
+            Events.ReplicateEffect(this.player.instance, 'ReplicateRewards', 
+                new Map<string, number | string>([
+                    ['Amount', math.round(reward.Values?.Wins/6)], 
+                    ['Repeats', 6],
+                    ['Image', 'Gems'],
+                ]))
         }
 
         this.player.replica.SetValue('Profile.Config.MaxEquippedPets', profile.Config.MaxEquippedPets)
@@ -1696,6 +2023,8 @@ class PlayerRewardController {
         profileData.StatValues.DayAmount += 1
 
         let currentDay = profileData.StatValues.DayAmount%DailyRewardsData.size()
+        if (currentDay === 0) { currentDay = DailyRewardsData.size() }
+
         let selectedReward = SelectDailyReward(currentDay)
 
         this.player.replica.SetValue('Profile.StatValues.LastDayTime', profileData.StatValues.LastDayTime)
@@ -1704,7 +2033,7 @@ class PlayerRewardController {
         if (!selectedReward) { return }
         
         this.ApplyReward(selectedReward)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Daily Claimed!'], ['Image', 'Success']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '🎁 Daily Claimed!'], ['Image', 'Success']]))
     }
 
     public ClaimSessionReward(rewardindex: number) {
@@ -1712,7 +2041,7 @@ class PlayerRewardController {
         let sessionData = this.player.session
         let profileData = this.player.profile.Data
 
-        let selectedReward = SelectSessionReward(rewardindex, profileData.Config.MaxWorld)
+        let selectedReward = SelectSessionReward(rewardindex, WorldType.Cave)
 
         if (!selectedReward) { return }
         if (sessionData.claimedRewards.includes(rewardindex)) { return }
@@ -1725,7 +2054,7 @@ class PlayerRewardController {
         print(sessionData)
 
         this.ApplyReward(selectedReward)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Gift Claimed!'], ['Image', 'Success']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '🎁 Gift Claimed!'], ['Image', 'Success']]))
 
     }
 
@@ -1749,6 +2078,17 @@ class PlayerRewardController {
         this.player.replica.SetValue('Profile.CompletedQuests', profileData.CompletedQuests)
     }
 
+    public ClaimWeaponQuestReward() {
+
+        let profileData = this.player.profile.Data
+        let sessionData = this.player.session
+
+        sessionData.activePassives.forEach((value) => { value.onTrigger() })
+
+        this.player.replica.SetValue('Profile.Products', profileData.Products)
+        this.player.replica.SetValue('Profile.CompletedQuests', profileData.CompletedQuests)
+    }
+
     public RedeemCode(code: string) {
 
         let profileData = this.player.profile.Data
@@ -1757,29 +2097,29 @@ class PlayerRewardController {
         print(code, selectedReward)
 
         if (!selectedReward) { 
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Invalid Code!'], ['Image', 'Error']]))
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '❌ Invalid Code!'], ['Image', 'Error']]))
             return 
         }
         if (profileData.RedeemedCodes.includes(code)) {
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Code Already Redeemed!'], ['Image', 'Error']]))
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '❌ Code Already Redeemed!'], ['Image', 'Error']]))
             return 
         }
 
         profileData.RedeemedCodes.push(code)
 
         this.ApplyReward(selectedReward)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Code Redeemed!'], ['Image', 'Success']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '✔️ Code Redeemed!'], ['Image', 'Success']]))
     }
 
     public RedeemFollowCode(code: string) {
         let profileData = this.player.profile.Data
 
         if (code.find('@').size() < 1) {
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Invalid Code!'], ['Image', 'Error']]))
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '❌ Invalid Code!'], ['Image', 'Error']]))
             return 
         }
         if (profileData.RedeemedCodes.includes('FollowCode')) {
-            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Code Already Redeemed!'], ['Image', 'Error']]))
+            Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '❌ Code Already Redeemed!'], ['Image', 'Error']]))
             return
         }
 
@@ -1787,41 +2127,59 @@ class PlayerRewardController {
         this.ApplyReward(FollowCodeRewardData)
 
         this.player.replica.SetValue('Profile.RedeemedCodes', profileData.RedeemedCodes)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Code Redeemed!'], ['Image', 'SuccessfulFollow']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '✔️ Code Redeemed!'], ['Image', 'SuccessfulFollow']]))
     }
 
+    /*
     public DoRebirth(skip?: boolean) {
 
         let profileData = this.player.profile.Data
-        let nextRebirthData = RebirthsRewardsData[profileData.Values.RebirthsVal+1]
-        let currentRebirthData = RebirthsRewardsData[profileData.Values.RebirthsVal]!
+        let currentRebirth = GetNextRebirth(profileData.Values.RebirthsVal-1)
+        let selectedRebirth = GetNextRebirth(profileData.Values.RebirthsVal)
 
-        if (!nextRebirthData) { return }
+        let additional = selectedRebirth.Additional!
+        let currentAdditional = currentRebirth.Additional!
 
-        let additional = new Map<string, number>()
-        nextRebirthData.Additional!.forEach((value, key) => { additional.set(key, value) })
+        if ((profileData.Values.StrengthVal < additional.get('Strength')!) && !skip) { return }
 
-        let currentAdditional = new Map<string, number>()
-        currentRebirthData.Additional!.forEach((value, key) => { currentAdditional.set(key, value) })
-        
-        if ((profileData.Values.WinsVal < additional.get('Wins')!) && !skip) { return }
+        let newTools: string[] = [] //might b ebetter to create reset method but who cares
+
+        profileData.OwnedTools.forEach((val) => {
+            let data = ToolsData.get(val)
+            if (!data) { return }
+            if (data.productid || (data.valuetype === ToolValueType.VBugs)) { newTools.push(val) }
+        })
+
+        profileData.OwnedTools = newTools
 
         this.player.SetStrength(0)
-        profileData.Multipliers.StrengthMul = profileData.Multipliers.StrengthMul - currentAdditional.get('Multiplier')! + additional.get('Multiplier')!
+        this.player.SetBarLevel(0)
 
-        print(nextRebirthData)
+        profileData.AdditionValues.StrengthAdditionVal += 1
+        this.player.SetRebirths(profileData.Values.RebirthsVal + 1)
+        this.player.SetGems(profileData.Values.GemsVal + selectedRebirth.Values!.Gems! * this.player.CalculateMultiplier('gems'))
 
-        
-        profileData.Values.RebirthsVal += 1
-        profileData.Values.GemsVal += nextRebirthData.Values!.Gems! * (profileData.Multipliers.GemsMul - 1)
-        if (!skip) { profileData.Values.WinsVal -= additional.get('Wins')! }
+        let selectedName = 'Rokie'
+        let maxWeight = 0
 
-        this.ApplyReward(nextRebirthData)
+        RebirthTitles.forEach((val, name) => {
+            if ((profileData.Values.RebirthsVal >= val.goal) && (val.goal > maxWeight)) {
+                maxWeight = val.goal
+                selectedName = name
+            }
+        })
 
-        this.player.replica.SetValue('Profile.Values.WinsVal', profileData.Values.WinsVal)
+        profileData.Config.RebirthTitle = selectedName
+
+        for (let badge of BadgeManager.GetBadgesByType(BadgeType.Rebirth)) { this.player.ClaimBadge(badge.badgeId) }
+
+        this.player.replica.SetValue('Profile.AdditionValues.StrengthAdditionVal', profileData.AdditionValues.StrengthAdditionVal)
+        this.player.replica.SetValue('Profile.Config.RebirthTitle', profileData.Config.RebirthTitle)
+        this.player.replica.SetValue('Profile.OwnedTools', profileData.OwnedTools)
         this.player.replica.SetValue('Profile.Values.RebirthsVal', profileData.Values.RebirthsVal)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Rebirth Successful!'], ['Image', 'Success']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '💎 Rebirth Successful!'], ['Image', 'Success']]))
     }
+    */
 
     public ClaimFollowReward() {
 
@@ -1852,7 +2210,7 @@ class PlayerRewardController {
         profileData.StatValues.LastSpinTime = os.time()
         profileData.StatValues.SpinCount += 1
 
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'New Spin!'], ['Image', 'NewSpin']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '🎲 New Spin!'], ['Image', 'NewSpin']]))
 
         this.player.replica.SetValue('Profile.StatValues.LastSpinTime', profileData.StatValues.LastSpinTime)
         this.player.replica.SetValue('Profile.StatValues.SpinCount', profileData.StatValues.SpinCount)
@@ -1876,7 +2234,14 @@ class PlayerRewardController {
         task.wait(this.spinCD)
 
         this.ApplyReward(data.reward)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Claimed Spin Reward!'], ['Image', 'Success']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '🎁 Claimed Spin Reward!'], ['Image', 'Success']]))
+
+        if (data.reward.Potions) { 
+            this.player.UsePotion(PotionType.GemsPotion4)
+            this.player.UsePotion(PotionType.StrengthPotion4)
+        } //for katana sim only
+
+        this.player.replica.SetValue('Profile.StatValues.SpinCount', profileData.StatValues.SpinCount)
     }
  
     public ClaimDailyChest() {
@@ -1887,13 +2252,13 @@ class PlayerRewardController {
 
         profileData.StatValues.LastDailyChestTime = os.time()
 
-        for (let i = 0; i < 2; i ++) {
+        for (let i = 0; i < 1; i ++) {
             let data = this.GetChanceReward(DailyChestRewardData)
             this.ApplyReward(data.reward)
         }
 
         this.player.replica.SetValue('Profile.StatValues.LastDailyChestTime', profileData.StatValues.LastDailyChestTime)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Claimed Daily Chest!'], ['Image', 'Success']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '🎁 Claimed Daily Chest!'], ['Image', 'Success']]))
     }
 
     public ClaimGroupChest() {
@@ -1912,7 +2277,7 @@ class PlayerRewardController {
         this.ApplyReward(data.reward)
 
         this.player.replica.SetValue('Profile.StatValues.LastGroupChestTime', profileData.StatValues.LastGroupChestTime)
-        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', 'Claimed Group Chest!'], ['Image', 'Success']]))
+        Events.ReplicateEffect(this.player.instance, 'Notify', new Map([['Message', '🎁 Claimed Group Chest!'], ['Image', 'Success']]))
     }
 
 }
@@ -1961,8 +2326,7 @@ class PlayerHttpsController {
         if (profileData.Products.includes('RobloxPremium')) { return }
         if (this.player.instance.MembershipType !== Enum.MembershipType.Premium) { return }
 
-        profileData.Multipliers.WinsMul += 0.1
-        profileData.Config.Luck += 0.1
+        profileData.Multipliers.StrengthMul += 0.1
 
         profileData.Products.push('RobloxPremium')
     }
@@ -1978,179 +2342,37 @@ class PlayerFlyingController {
     }
 
     public InitializeObject() {
-        let sessionData = this.player.session
-        let profileData = this.player.profile.Data
-        if (sessionData.currentFlyingObject) { return }
-
-        let effects = ReplicatedStorage.WaitForChild('Effects')
-        let currentWorld = WorldsData.get(sessionData.currentWorld)
-        if (!currentWorld) { return }
-
-        let flyingPart = new Instance('Part')
-        flyingPart.CanCollide = false
-        flyingPart.Massless = true
-        flyingPart.Size = new Vector3(5,5,5)
-        flyingPart.Transparency = 1
-        flyingPart.Name = this.player.instance.Name+tostring(math.random(10e9, 10e8))
-
-        let ignoreFolder = game.Workspace.WaitForChild('InstaReplica') //game.Workspace.FindFirstChild('_ignoreObjects')
-
-        print(flyingPart, ignoreFolder?.GetChildren())
-
-        /*
-        if (!ignoreFolder) { 
-            ignoreFolder = new Instance('Model', game.Workspace)
-            ignoreFolder.Name = '_ignoreObjects'
-            ignoreFolder.Parent = game.Workspace
-        }
-        */
-
-        flyingPart.CFrame = new CFrame(currentWorld.startingPosition)
-        flyingPart.Anchored = true
-        flyingPart.Parent = ignoreFolder
-
-        /*
-        let gyro = new Instance('BodyGyro')
-        gyro.MaxTorque = new Vector3(10e99, 10e99, 10e99)
-        gyro.CFrame = flyingPart.CFrame
-        gyro.Parent = flyingPart
-        */
-
-        /*
-        let currentEffect = effects.WaitForChild('RedFly').Clone() as Part
-        currentEffect.CFrame = flyingPart.CFrame
-        currentEffect.CanCollide = false
-        currentEffect.Anchored = false
-        currentEffect.Massless = true
-        currentEffect.Transparency = 0
-        currentEffect.Color = Color3.fromRGB(255, 0, 0)
-        currentEffect.Size = new Vector3(1,1,1)
-        currentEffect.Parent = ignoreFolder
-        
-        let pos = new Instance('BodyPosition')
-        pos.MaxForce = new Vector3(10e99, 10e99, 10e99)
-        pos.P = 10**5
-        pos.Position = flyingPart.Position
-        pos.Parent = currentEffect
-        */
-
-        //this.effect = currentEffect
-        sessionData.currentFlyingObject = { partName: flyingPart.Name, part: flyingPart, flying: false }
-        this.player.replica.SetValue('Session.currentFlyingObject', sessionData.currentFlyingObject)
+        // operations with character
+        this.ShootObject()
     }
 
-    public ShootObject(power: number) {
+    public ShootObject() {
         let sessionData = this.player.session
         let profileData = this.player.profile.Data
 
-        if (!sessionData.currentFlyingObject) { return }
-        if (sessionData.currentFlyingObject && sessionData.currentFlyingObject.flying) { return }
+        let selectedWorld = WorldsData.get(sessionData.currentWorld)
+        if (!selectedWorld) { return }
 
-        let currentWorld = WorldsData.get(sessionData.currentWorld)
-        let flyingWorld = sessionData.currentWorld
-        if (!currentWorld) { return }
+        let testPart = new Instance("Part")
 
-        let flyingPart = sessionData.currentFlyingObject!.part
-        sessionData.currentFlyingObject!.flying = true
-        print(profileData.Values.StrengthVal, currentWorld.density, power)
-        print(profileData.Values.StrengthVal/currentWorld.gravity/3*power, profileData.Values.StrengthVal/currentWorld.density*power)
+        let flyingObject = new FlyingObjectClass(testPart, 100)
 
-        let object = new FlyingObjectClass(flyingPart, profileData.Values.StrengthVal*power*sessionData.multipliers.other.shootboost, sessionData.currentWorld)
-        let length = currentWorld.startingPosition.sub(currentWorld.endingPosition).Magnitude
-        
-        let isFlying = true
+        let speed = profileData.Values.StrengthVal
 
-        object.BindToStop((obj) => {
-            print('ended')
-            print(currentWorld!.reward * math.max((obj.Distance / length), .01) * this.player.CalculateMultiplier('wins'), math.max((obj.Distance / length), .01), this.player.CalculateMultiplier('wins'), obj.Distance, length)
-            print(obj.Laps, 'Laps')
-
-            isFlying = false
-
-            this.player.SetWins( profileData.Values.WinsVal + currentWorld!.reward * math.max((obj.Distance / length), .01) * this.player.CalculateMultiplier('wins') )
-            if (profileData.Config.MaxWorld === sessionData.currentWorld && flyingWorld === sessionData.currentWorld) { 
-                this.player.SetStars( profileData.Values.StarsVal + obj.Laps * currentWorld!.starsReward * this.player.CalculateMultiplier('stars') )
+        flyingObject.BindToStart(() => {
+            while (flyingObject.flying && task.wait(.1)) {
+                speed = profileData.Values.StrengthVal
+                flyingObject.SetSpeed(speed)
             }
-
-            sessionData.currentFlyingObject!.part.Destroy()
-            sessionData.currentFlyingObject = undefined
-            this.player.replica.SetValue('Session.currentFlyingObject', undefined)
         })
 
-        flyingPart.Anchored = false
-        flyingPart.SetNetworkOwner(undefined)
-        /*
-        let pet = PetUtilities.DBToPetTransfer(profileData.Pets[math.random(0, profileData.Pets.size()-1)]!)!
-        let model = pet.model.Clone()
-
-        model.PivotTo(flyingPart.CFrame.mul(pet.stats.rotationOffset))
-        model.Parent = flyingPart
-
-        for (let modelPart of model.GetDescendants()) {
-            if (!modelPart.IsA('BasePart')) { continue }
-
-            modelPart.Anchored = false
-            modelPart.CanCollide = false
-            modelPart.Massless = true
-        }
-
-        CreationUtilities.Weld(flyingPart, model.PrimaryPart!)
-
-        task.spawn(() => {
-
-            let effects = ReplicatedStorage.WaitForChild('Effects')
-
-            let flyEffects = new Map<Instance, number>([
-                [effects.WaitForChild('RedFly'), 1000],
-                [effects.WaitForChild('PurpleFly'), 10000],
-                [effects.WaitForChild('BlueFly'), 100000],
-                [effects.WaitForChild('GreenFly'), 1000000]
-            ])
-            
-            let currentEffect = this.effect!
-            //let pos = currentEffect.WaitForChild('BodyPosition') as BodyPosition
-
-            CreationUtilities.Weld(flyingPart, currentEffect)
-
-            while (isFlying) {
-            
-                let currentEnergy = flyingPart.AssemblyLinearVelocity.Magnitude**2/2
-
-                //let velocity = flyingPart.AssemblyLinearVelocity
-
-                //if (velocity.Magnitude < 1) { velocity = new Vector3(.01,.01,.01) }
-                //else (velocity = flyingPart.AssemblyLinearVelocity.Unit)
-
-                //pos.Position = flyingPart.Position.add(velocity)
-
-                //TweenService.Create(currentEffect, new TweenInfo(.1, Enum.EasingStyle.Linear), 
-                    //{'CFrame': new CFrame(flyingPart.Position, flyingPart.Position.add(flyingPart.AssemblyLinearVelocity.Unit))}).Play()
-
-                let delta = 10**9
-                let selected = effects.WaitForChild('RedFly')
-
-                let effect1 = (currentEffect.WaitForChild('0.1').WaitForChild('ragered1') as ParticleEmitter)
-                let effect2 = (currentEffect.WaitForChild('0.1').WaitForChild('ragered') as ParticleEmitter)
-    
-                flyEffects.forEach((value, instance) => {
-                    if ((currentEnergy - value) > delta || (currentEnergy - value) < 0) { return }
-                    delta = (currentEnergy - value)
-                    selected = instance
-                })
-
-                effect1.Color = (selected.WaitForChild('0.1').WaitForChild('ragered1') as ParticleEmitter).Color;
-                effect2.Color = (selected.WaitForChild('0.1').WaitForChild('ragered') as ParticleEmitter).Color;
-                
-                task.wait(.1)
-            }
-
-            //currentEffect.Destroy()
-            
-            
+        flyingObject.BindToStop(() => {
+            this.player.SetStrength(0)
+            this.player.ApplyReward(selectedWorld.slide.reward)
         })
-        */
-        print('started')
-        object.Activate()
+
+        flyingObject.Activate()
+
     }
 
 }
@@ -2343,12 +2565,12 @@ class PlayerRelicsController {
         switch (relicCaseInfo.valuetype) {
             case RelicCaseType.Gems:
 
-                if (profileData.Values.GemsVal < relicCaseInfo.price*amount) {return}
+                if (profileData.Values.WinsVal < relicCaseInfo.price*amount) {return}
                 this.OpenRelicCaseBypass(name, amount)
 
                 //this.player.session.activePassives.forEach((value) => { value.onEggOpened(eggInfo!, amount, buytype) })
 
-                this.player.SetGems(profileData.Values.GemsVal - relicCaseInfo.price*amount)
+                this.player.SetWins(profileData.Values.WinsVal - relicCaseInfo.price*amount)
 
                 break
             case RelicCaseType.VBugs:
@@ -2384,6 +2606,66 @@ class PlayerRelicsController {
 
     }
 
+}
+
+class PlayerBarController {
+    private player: ServerPlayerComponent
+
+    constructor(player: ServerPlayerComponent) {
+        this.player = player
+    }
+    /*
+    public SetBarLevel(level: number) {
+        let profileData = this.player.profile.Data
+        let currentBar = GetNextBar(profileData.StatValues.BarLevel)
+        let targetBar = GetNextBar(level)
+
+        profileData.StatValues.BarLevel = level
+
+        profileData.AdditionalMultipliers.StrengthAdditionalMul = 
+            profileData.AdditionalMultipliers.StrengthAdditionalMul - currentBar.Additional!.get('Multiplier') + targetBar.Additional!.get('Multiplier')
+
+        let toolname = 'None'
+
+        ToolsData.forEach((val, name) => {
+            if ((val.valuetype === ToolValueType.VBugs) || val.productid) { return }
+            if (val.weight === (level+1)) { toolname = name }
+        })
+
+        this.player.AppendTool(toolname)
+
+        this.player.replica.SetValue('Profile.StatValues.BarLevel', profileData.StatValues.BarLevel)
+        this.player.replica.SetValues('Profile.AdditionalMultipliers', profileData.AdditionalMultipliers)
+
+        if (ToolsData.get(profileData.EquippedTool)!.valuetype === ToolValueType.VBugs) { return }
+
+        this.player.EquipLastFreeTool()
+    }
+
+    public UpdateBar() {
+        let profileData = this.player.profile.Data
+        let bar = GetNextBar(profileData.StatValues.BarLevel)
+        let additional = bar.Additional!
+
+        let toolamount = 0
+
+        ToolsData.forEach((val, name) => { if (val.valuetype === ToolValueType.Strength) { toolamount += 1 } })
+
+        if (profileData.StatValues.BarLevel+1 >= 69) { return }
+        if (additional.get('Strength')! as number >= profileData.Values.StrengthVal) { return }
+
+        let level = 0
+
+        while (profileData.Values.StrengthVal >= additional.get('Strength')!) {
+            //profileData.Values.StrengthVal -= additional.get('Strength')!
+            level += 1
+            additional = GetNextBar(profileData.StatValues.BarLevel + level).Additional!
+        }
+
+        this.SetBarLevel(profileData.StatValues.BarLevel + level)
+        this.player.SetStrength(profileData.Values.StrengthVal)
+    }
+    */
 }
 
 class PlayerBadgeController { // add a debug method if playerData has badge but playerInventory doesnt (not sure about request rate)

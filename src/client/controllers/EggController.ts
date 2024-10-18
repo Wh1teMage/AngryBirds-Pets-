@@ -4,14 +4,16 @@ import { BillboardFabric } from "client/components/UIComponents/BillboardCompone
 import { ButtonFabric } from "client/components/UIComponents/ButtonComponent";
 import { Events } from "client/network";
 import { EggsData } from "shared/info/EggInfo";
-import { PetsData } from "shared/info/PetInfo";
+import { PetPerkNames, PetPerksInfo, PetsData } from "shared/info/PetInfo";
 import { EggBuyType, EggValueType, IEggData, IEggModel } from "shared/interfaces/EggData";
 import { PlayerController } from "./PlayerController";
 import { FrameFabric } from "client/components/UIComponents/FrameComponent";
 import { ImageFabric } from "client/components/UIComponents/ImageComponent";
 import { UIAnimations } from "shared/utility/UIAnimations";
-import { StarterGui, ReplicatedStorage } from "@rbxts/services";
-import { PetOperationStatus } from "shared/interfaces/PetData";
+import { StarterGui, ReplicatedStorage, MessagingService, HttpService } from "@rbxts/services";
+import { PetOperationStatus, Rarities } from "shared/interfaces/PetData";
+import { WorldsData } from "shared/info/WorldInfo";
+import { ReplicationOperationStatus } from "shared/enums/ReplicationEnums";
 
 //basically initializer
 
@@ -32,13 +34,198 @@ export class EggController implements OnStart, OnInit {
 
         let profileData = this._playerController.replica.Data.Profile
 
-        print(EggsData, 'EggsData')
-
         this._playerController.autoDeletePets.AddCallback((val) => {
             Events.ManagePets(PetOperationStatus.SessionAutoDelete, val);
         })
 
-        let eggMainUI = this._playerController.component.instance.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('EggGui')
+        let eggMainUI = this._playerController.component.instance.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('Eggs')
+
+        let petOverlay = this._playerController.component.instance.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('PetOverlay') as ImageLabel
+        let stats = petOverlay.WaitForChild('Stats') as Frame
+        let scale = petOverlay.WaitForChild('Scale') as Frame
+
+        for (let egg of EggsData) {
+
+            let name = egg[0]
+            let data = egg[1]
+            
+            let fullchance = 0
+
+            //print(name)
+
+            if (!eggMainUI.WaitForChild('ScrollingFrame')!.FindFirstChild(name)) { continue }
+
+            let eggUI = eggMainUI.WaitForChild('ScrollingFrame')!.WaitForChild(name)! as ImageLabel
+
+            for (let petchance of data.petchances) {
+                fullchance += petchance.weight
+            }
+
+            let buyButton1 = ButtonFabric.CreateButton(eggUI.WaitForChild('Buy1') as GuiButton)
+            let buyButton2 = ButtonFabric.CreateButton(eggUI.WaitForChild('Buy3') as GuiButton)
+            let buyButton3 = ButtonFabric.CreateButton(eggUI.WaitForChild('Donate1') as GuiButton)
+
+            buyButton1.BindToClick(() => { Events.BuyEgg(name, EggBuyType.Single) })
+            buyButton2.BindToClick(() => { 
+                if (!profileData.Products.includes('3egghatch')) { Events.PurchasePrompt(891593436); return }
+                Events.BuyEgg(name, EggBuyType.Triple) 
+            })
+
+            if (data.productid) {
+                buyButton3.BindToClick(() => { 
+                    if (WorldsData.get(data.world)!.weight > WorldsData.get(this._playerController.replica.Data.Profile.Config.MaxWorld)!.weight ) { return }
+                    Events.PurchasePrompt(data.productid!) 
+                })
+            }
+
+            if (eggUI.FindFirstChild('Stored1')) {
+                ButtonFabric.CreateButton(eggUI.WaitForChild('Stored1') as GuiButton).BindToClick(() => {
+                    if (!EggsData.get(name+'Stored')) { return }
+                    Events.BuyEgg(name+'Stored', EggBuyType.Single)
+                })
+            }
+
+            //print('Passed')
+
+            for (let petchance of data.petchances) {
+                if (!petchance.name) { continue }
+                
+                let pet = PetsData.get(petchance.name) 
+
+                if (!pet) { continue }
+
+                let petUI = StarterGui.WaitForChild('MainUI').WaitForChild('PetInventory').WaitForChild('Template').WaitForChild('PetExample').Clone() as GuiButton
+                //data.model.Floor.Examples.PetExample.Clone()
+
+                petUI.Visible = true;
+
+                (petUI.WaitForChild('UIScale') as UIScale).Scale = 2.5
+
+                let port = petUI.WaitForChild('ViewportFrame') as ViewportFrame
+                let model = pet!.model.Clone() 
+
+                let petNameUI = petUI.WaitForChild('PetName')! as TextLabel
+                let petChanceUI = petUI.WaitForChild('Percent')! as TextLabel
+                
+                model.PivotTo(model.GetPivot().mul(pet!.stats.rotationOffset))
+                let modelCam = new Instance('Camera')
+
+                modelCam.CFrame = new CFrame(model.GetPivot().LookVector.mul(4).add(model.GetPivot().Position), model.GetPivot().Position)
+                
+                model.Parent = port
+                modelCam.Parent = port
+                port.CurrentCamera = modelCam
+
+                let chance = math.round(petchance.weight/fullchance*100*100)/100
+                if (name === 'Shadow') { chance = math.round(petchance.weight/fullchance*100) }
+
+                petNameUI.Text = tostring(chance)+'%'//pet.name
+
+                let rarity = pet.stats.rarity
+
+                if ([Rarities.Exclusive, Rarities.Mythic, Rarities.Secret].includes(rarity)) {
+                    petNameUI.Text = '???';
+                    (eggMainUI.Parent?.WaitForChild('Templates').WaitForChild('Rainbow') as UIGradient).Clone().Parent = petNameUI
+                }
+
+                /*
+                let rarity = pet.stats.rarity
+
+                let messageData = {
+                    sender: this._playerController.component.instance,
+                    message: `💎 ${this._playerController.component.instance.Name} has hatched a ${pet.stats.rarity} ${pet.name}`,
+                    rarity: pet.stats.rarity,
+                 }
+
+                if ([Rarities.Exclusive, Rarities.Mythic, Rarities.Secret, Rarities.Common].includes(rarity)) {
+                    print(messageData, 'messageData')
+                    Events.ReplicateValues(ReplicationOperationStatus.ReplicateMessage, HttpService.JSONEncode(messageData))
+                }
+                */
+
+                /*petChanceUI.Text = tostring(math.round(petchance.weight/fullchance*100*100)/100)+'%'*/
+
+                petChanceUI.Visible = true
+
+                petUI.Parent = eggUI.WaitForChild('Pets')!
+
+                let gradient = ReplicatedStorage.WaitForChild('PetRarities').WaitForChild(pet.stats.rarity) as UIGradient
+                if (gradient) { gradient.Clone().Parent = petUI }
+
+                petChanceUI.Visible = false
+
+                petUI.GetDescendants().forEach((val) => {
+                    if (!val.IsA('UIStroke')) { return }
+                    val.Thickness = 1
+                })
+
+                let petButton = ButtonFabric.CreateButton(petUI) 
+                
+                petButton.BindToClick(() => {
+
+                    let deletePets = this._playerController.autoDeletePets.get()
+                    let deleteUI = (petUI.WaitForChild('X') as ImageLabel)
+
+                    if (deletePets.includes(pet!.name) && deleteUI.Visible) {
+
+                        deleteUI.Visible = false
+
+                        deletePets.remove(deletePets.indexOf(pet!.name)!)
+                        this._playerController.autoDeletePets.set(deletePets)
+
+                        return
+                    }
+
+                    deleteUI.Visible = true
+
+                    deletePets.push(pet!.name);
+                    this._playerController.autoDeletePets.set(deletePets)
+                })
+
+                petButton.BindToEnter(() => {
+                    petOverlay.Visible = true;
+                    stats.Visible = true;
+                    scale.Visible = false;
+    
+                    (petOverlay.WaitForChild('PetName') as TextLabel).Text = pet!.name;
+                    //(stats.WaitForChild('PetSize').WaitForChild('Text') as TextLabel).Text = pet.additional.size;
+                    //(stats.WaitForChild('PetCraft').WaitForChild('Text') as TextLabel).Text = pet.additional.evolution;
+                    (stats.WaitForChild('Rarity').WaitForChild('Text').WaitForChild('UIGradient') as UIGradient).Color = gradient.Color;
+                    (stats.WaitForChild('Rarity').WaitForChild('Text') as TextLabel).Text = pet!.stats.rarity;
+                    (stats.WaitForChild('Power').WaitForChild('Boost') as TextLabel).Text = GUIUtilities.getSIPrefixSymbol(pet!.multipliers.get('strength')!)+'x';
+
+                    if (!pet!.additional.perks) { return }
+
+                    let perkIndex = -1
+                    pet!.additional.perks?.forEach((val, index) => { if (val.name === 'Extra Power') { perkIndex = index } })
+                    
+                    if (perkIndex < 0) { return }
+        
+                    let selectedPerk = pet!.additional.perks[perkIndex]
+        
+                    stats.Visible = false
+                    scale.Visible = true;
+        
+                    (scale.WaitForChild('Rarity').WaitForChild('Text').WaitForChild('UIGradient') as UIGradient).Color = gradient.Color;
+                    (scale.WaitForChild('Rarity').WaitForChild('Text') as TextLabel).Text = pet!.stats.rarity;
+                    (scale.WaitForChild('Boost') as TextLabel).Text = PetPerksInfo.get(PetPerkNames.get(selectedPerk.name)!)![selectedPerk.level-1].desc
+                })
+
+                petButton.BindToLeave(() => { petOverlay.Visible = false; })
+
+                // //print('1/'+math.round(fullchance/petchance.weight)+'%', pet?.name+' chance')
+
+                // can be connected to work
+
+            }
+
+        }
+
+
+        /*
+
+
+
 
         let luck2List: ImageLabel[] = []
         let luck3List: ImageLabel[] = []
@@ -55,7 +242,7 @@ export class EggController implements OnStart, OnInit {
             let name = egg[0]
             let data = egg[1]
             
-            print(data.model, data.valuetype, data.name)
+            //print(data.model, data.valuetype, data.name)
             if (!data.model) { continue }
 
             let billboardPrice = data.model.WaitForChild('Floor').WaitForChild('EggPrice').WaitForChild('BillboardGui')!
@@ -109,8 +296,8 @@ export class EggController implements OnStart, OnInit {
 
             
             eggImageComponent.BindToOpen((obj) => {
-                print('Started')
-                print(obj.Visible)
+                //print('Started')
+                //print(obj.Visible)
                 UIAnimations.MainFrameAnimationOpen(obj, {position: obj.Position, size: UDim2.fromScale(0.8, 1)})
                 eggBillboard.instance.Enabled = true
             })
@@ -201,7 +388,7 @@ export class EggController implements OnStart, OnInit {
                     this._playerController.autoDeletePets.set(deletePets)
                 })
 
-                // print('1/'+math.round(fullchance/petchance.weight)+'%', pet?.name+' chance')
+                // //print('1/'+math.round(fullchance/petchance.weight)+'%', pet?.name+' chance')
 
                 // can be connected to work
 
@@ -213,6 +400,7 @@ export class EggController implements OnStart, OnInit {
             eggBillboard.instance.Name = name
         }
 
+        */
     }
 
     onStart() {

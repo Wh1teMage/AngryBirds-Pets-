@@ -12,26 +12,34 @@ interface Attributes {}
 export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implements OnStart { 
     //requires futher investigation with maid, signal deletion, component deletion after instance deletion
 
-    private _onClick?: Array<(arg: GuiButton) => void> = []
-    private _onEnter?: Array<(arg: GuiButton) => void> = []
-    private _onLeave?: Array<(arg: GuiButton) => void> = []
+    protected _onClick?: Array<(arg: GuiButton) => void> = []
+    protected _onEnter?: Array<(arg: GuiButton) => void> = []
+    protected _onLeave?: Array<(arg: GuiButton) => void> = []
 
     private _defaultScaleValue = 1
+    private _goalScaleValue = 1
     private _scale?: UIScale
-    private maid: Maid = new Maid()
+    protected maid: Maid = new Maid()
 
     private _defaultClick(arg: GuiButton) {
         PlayEffect('ClickSound')
+        if (!this._scale) { return }
+        TweenService.Create(this._scale, new TweenInfo(.1), { 'Scale': this._goalScaleValue * 1.1 }).Play()
+        task.delay(.1, () => {
+            TweenService.Create(this._scale!, new TweenInfo(.1), { 'Scale': this._goalScaleValue }).Play()
+        })
     }
 
     private _defaultEnter(arg: GuiButton) {
         if (!this._scale) { return }
+        this._goalScaleValue = this._defaultScaleValue * 1.1
         TweenService.Create(this._scale, new TweenInfo(.1), { 'Scale': this._defaultScaleValue * 1.1 }).Play()
         PlayEffect('HoverSound')
     }
 
     private _defaultLeave(arg: GuiButton) {
         if (!this._scale) { return }
+        this._goalScaleValue = this._defaultScaleValue
         TweenService.Create(this._scale, new TweenInfo(.1), { 'Scale': this._defaultScaleValue }).Play()
     }
 
@@ -56,21 +64,6 @@ export class ButtonComponent extends BaseComponent<Attributes, GuiButton> implem
                 this._onClick?.forEach((val) => { val(this.instance) })
             })
         )
-
-        /*
-        this.maid.GiveTask(
-            this.instance.TouchTap.Connect(() => {
-                this._onClick?.forEach((val) => { val(this.instance) })
-            })
-        )
-
-        
-        this.maid.GiveTask(
-            this.instance.TouchLongPress.Connect(() => {
-                this._onClick?.forEach((val) => { val(this.instance) })
-            })
-        )
-        */
 
         this.maid.GiveTask(
             this.instance.MouseEnter.Connect(() => {

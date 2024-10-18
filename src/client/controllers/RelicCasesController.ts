@@ -34,6 +34,7 @@ export class RelicCasesController implements OnStart, OnInit {
         
         if (!this._playerController.fullyLoaded) { this._playerController.loadSignal.Wait() }
 
+        /*
         let profileData = this._playerController.replica.Data.Profile
         let UIPath = this._UIControllerSetup.UIPath
 
@@ -161,6 +162,7 @@ export class RelicCasesController implements OnStart, OnInit {
             caseCircle.BindToLeave(() => { relicGui.Close() })
             
         }
+        */
 
     }
 

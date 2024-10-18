@@ -1,8 +1,28 @@
 import { ReplicatedStorage } from "@rbxts/services"
 import { Evolutions, IPetData, Mutations, Rarities, Sizes } from "shared/interfaces/PetData"
+import { IRelicData } from "shared/interfaces/RelicData"
 
 export const PetsData = new Map<string, IPetData>()
 const Pets = ReplicatedStorage.WaitForChild('Pets') as Folder
+
+export const PetPerkNames = new Map<string, string>([
+    ['Extra Power', 'ExtraPower'],
+])
+
+export const PetPerksInfo = new Map<string, Array<IRelicData>>([
+    ['ExtraPower', [
+        {stats: new Map([['multi', 60]]), desc: 'Will have 60% multiplier of your strongest pet', rarity: Rarities.Mythic},
+        {stats: new Map([['multi', 70]]), desc: 'Will have 70% multiplier of your strongest pet', rarity: Rarities.Mythic},
+        {stats: new Map([['multi', 75]]), desc: 'Will have 75% multiplier of your strongest pet', rarity: Rarities.Mythic},
+        {stats: new Map([['multi', 80]]), desc: 'Will have 80% multiplier of your strongest pet', rarity: Rarities.Mythic},
+        {stats: new Map([['multi', 85]]), desc: 'Will have 85% multiplier of your strongest pet', rarity: Rarities.Mythic},
+        {stats: new Map([['multi', 90]]), desc: 'Will have 90% multiplier of your strongest pet', rarity: Rarities.Mythic},
+        {stats: new Map([['multi', 95]]), desc: 'Will have 95% multiplier of your strongest pet', rarity: Rarities.Mythic},
+        {stats: new Map([['multi', 100]]), desc: 'Will have 100% multiplier of your strongest pet', rarity: Rarities.Mythic},
+        {stats: new Map([['multi', 120]]), desc: 'Will have 120% multiplier of your strongest pet', rarity: Rarities.Mythic},
+    ]],
+])
+
 
 // !World 1 \/
 
@@ -11,7 +31,7 @@ PetsData.set('Cat', {
     name: 'Cat',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 1.4]]),
+    multipliers: new Map([['strength', 1]]),
     stats: {
         rarity: Rarities.Common,
         sizeOffset: new Vector3(0,0,0),
@@ -29,7 +49,7 @@ PetsData.set('Dog', {
     name: 'Dog',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 1.9]]),
+    multipliers: new Map([['strength', 1.2]]),
     stats: {
         rarity: Rarities.Uncommon,
         sizeOffset: new Vector3(0,0,0),
@@ -47,7 +67,7 @@ PetsData.set('White Bunny', {
     name: 'White Bunny', // чучело (ненавидим)
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 2.3]]),
+    multipliers: new Map([['strength', 1.4]]),
     stats: {
         rarity: Rarities.Rare,
         sizeOffset: new Vector3(0,0,0),
@@ -65,7 +85,7 @@ PetsData.set('Elephant', {
     name: 'Elephant',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 3.1]]),
+    multipliers: new Map([['strength', 1.6]]),
     stats: {
         rarity: Rarities.Epic,
         sizeOffset: new Vector3(0,0,0),
@@ -83,7 +103,7 @@ PetsData.set('Butterfly', {
     name: 'Butterfly',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 6.2]]),
+    multipliers: new Map([['strength', 1.8]]),
     stats: {
         rarity: Rarities.Legendary,
         sizeOffset: new Vector3(0,0,0),
@@ -103,7 +123,7 @@ PetsData.set('Fox', {
     name: 'Fox',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 2.5]]),
+    multipliers: new Map([['strength', 2]]),
     stats: {
         rarity: Rarities.Common,
         sizeOffset: new Vector3(0,0,0),
@@ -121,7 +141,7 @@ PetsData.set('Monkey', {
     name: 'Monkey',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 3.3]]),
+    multipliers: new Map([['strength', 2.2]]),
     stats: {
         rarity: Rarities.Uncommon,
         sizeOffset: new Vector3(0,0,0),
@@ -139,7 +159,7 @@ PetsData.set('Dragon', {
     name: 'Dragon',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 4.1]]),
+    multipliers: new Map([['strength', 2.4]]),
     stats: {
         rarity: Rarities.Rare,
         sizeOffset: new Vector3(0,0,0),
@@ -157,7 +177,7 @@ PetsData.set('Raccoon', {
     name: 'Raccoon',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 5.2]]),
+    multipliers: new Map([['strength', 2.6]]),
     stats: {
         rarity: Rarities.Epic,
         sizeOffset: new Vector3(0,0,0),
@@ -175,7 +195,7 @@ PetsData.set('CandyCane Unicorn', {
     name: 'CandyCane Unicorn',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 10.4]]),
+    multipliers: new Map([['strength', 2.8]]),
     stats: {
         rarity: Rarities.Legendary,
         sizeOffset: new Vector3(0,0,0),
@@ -195,7 +215,7 @@ PetsData.set('Cow', {
     name: 'Cow',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 4.4]]),
+    multipliers: new Map([['strength', 3]]),
     stats: {
         rarity: Rarities.Common,
         sizeOffset: new Vector3(0,0,0),
@@ -213,7 +233,7 @@ PetsData.set('Pig', {
     name: 'Pig',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 5.6]]),
+    multipliers: new Map([['strength', 3.2]]),
     stats: {
         rarity: Rarities.Uncommon,
         sizeOffset: new Vector3(0,0,0),
@@ -231,7 +251,7 @@ PetsData.set('Fish', {
     name: 'Fish',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 6.8]]),
+    multipliers: new Map([['strength', 3.4]]),
     stats: {
         rarity: Rarities.Rare,
         sizeOffset: new Vector3(0,0,0),
@@ -249,7 +269,7 @@ PetsData.set('Crab', {
     name: 'Crab',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 8.8]]),
+    multipliers: new Map([['strength', 3.6]]),
     stats: {
         rarity: Rarities.Epic,
         sizeOffset: new Vector3(0,0,0),
@@ -267,7 +287,7 @@ PetsData.set('Peacock', {
     name: 'Peacock',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 17.6]]),
+    multipliers: new Map([['strength', 3.8]]),
     stats: {
         rarity: Rarities.Legendary,
         sizeOffset: new Vector3(0,0,0),
@@ -346,7 +366,7 @@ PetsData.set('Pink Bunny', {
     name: 'Pink Bunny',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 8]]),
+    multipliers: new Map([['strength', 4]]),
     stats: {
         rarity: Rarities.Common,
         sizeOffset: new Vector3(0,0,0),
@@ -364,7 +384,7 @@ PetsData.set('Pink Axolotl', {
     name: 'Pink Axolotl',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 10]]),
+    multipliers: new Map([['strength', 4.2]]),
     stats: {
         rarity: Rarities.Uncommon,
         sizeOffset: new Vector3(0,0,0),
@@ -382,7 +402,7 @@ PetsData.set('Seal', {
     name: 'Seal',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 12]]),
+    multipliers: new Map([['strength', 4.4]]),
     stats: {
         rarity: Rarities.Rare,
         sizeOffset: new Vector3(0,0,0),
@@ -400,7 +420,7 @@ PetsData.set('Diamond Golem', {
     name: 'Diamond Golem',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 15]]),
+    multipliers: new Map([['strength', 4.6]]),
     stats: {
         rarity: Rarities.Epic,
         sizeOffset: new Vector3(0,0,0),
@@ -418,7 +438,7 @@ PetsData.set('Aqua Dragon', {
     name: 'Aqua Dragon',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 30]]),
+    multipliers: new Map([['strength', 4.8]]),
     stats: {
         rarity: Rarities.Legendary,
         sizeOffset: new Vector3(0,0,0),
@@ -438,7 +458,7 @@ PetsData.set('Blue Slime', {
     name: 'Blue Slime',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 13]]),
+    multipliers: new Map([['strength', 5]]),
     stats: {
         rarity: Rarities.Common,
         sizeOffset: new Vector3(0,0,0),
@@ -456,7 +476,7 @@ PetsData.set('White Bear', {
     name: 'White Bear',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 17]]),
+    multipliers: new Map([['strength', 5.2]]),
     stats: {
         rarity: Rarities.Uncommon,
         sizeOffset: new Vector3(0,0,0),
@@ -474,7 +494,7 @@ PetsData.set('Gecon', {
     name: 'Gecon',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 21]]),
+    multipliers: new Map([['strength', 5.4]]),
     stats: {
         rarity: Rarities.Rare,
         sizeOffset: new Vector3(0,0,0),
@@ -492,7 +512,7 @@ PetsData.set('Clown Doggy', {
     name: 'Clown Doggy',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 27]]),
+    multipliers: new Map([['strength', 5.6]]),
     stats: {
         rarity: Rarities.Epic,
         sizeOffset: new Vector3(0,0,0),
@@ -510,7 +530,7 @@ PetsData.set('The Clown', {
     name: 'The Clown',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 54]]),
+    multipliers: new Map([['strength', 5.8]]),
     stats: {
         rarity: Rarities.Legendary,
         sizeOffset: new Vector3(0,0,0),
@@ -530,7 +550,7 @@ PetsData.set('Polar', {
     name: 'Polar',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 24]]),
+    multipliers: new Map([['strength', 6]]),
     stats: {
         rarity: Rarities.Common,
         sizeOffset: new Vector3(0,0,0),
@@ -549,7 +569,7 @@ PetsData.set('Red Dragon', {
     name: 'Red Dragon',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 30]]),
+    multipliers: new Map([['strength', 6.2]]),
     stats: {
         rarity: Rarities.Uncommon,
         sizeOffset: new Vector3(0,0,0),
@@ -567,7 +587,7 @@ PetsData.set('WizMouse', {
     name: 'WizMouse',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 36]]),
+    multipliers: new Map([['strength', 6.4]]),
     stats: {
         rarity: Rarities.Rare,
         sizeOffset: new Vector3(0,0,0),
@@ -585,7 +605,7 @@ PetsData.set('Lily', {
    name: 'Lily',
    locked: false,
    equipped: false,
-   multipliers: new Map([['strength', 45]]),
+   multipliers: new Map([['strength', 6.6]]),
    stats: {
         rarity: Rarities.Epic,
         sizeOffset: new Vector3(0,0,0),
@@ -603,7 +623,7 @@ PetsData.set('Crystal Lord', {
     name: 'Crystal Lord',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 90]]),
+    multipliers: new Map([['strength', 6.8]]),
     stats: {
         rarity: Rarities.Legendary,
         sizeOffset: new Vector3(0,0,0),
@@ -615,6 +635,395 @@ PetsData.set('Crystal Lord', {
         mutation: Mutations.Default
     },
     model: Pets.WaitForChild('Crystal Lord', 5) as Model
+})
+
+// *
+
+PetsData.set('Owl', {
+    name: 'Owl',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 7]]),
+    stats: {
+        rarity: Rarities.Common,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Owl', 5) as Model
+})
+
+PetsData.set('Pink Slime', {
+    name: 'Pink Slime',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 7.2]]),
+    stats: {
+        rarity: Rarities.Uncommon,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Pink Slime', 5) as Model
+})
+
+PetsData.set('Plant', {
+    name: 'Plant',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 7.4]]),
+    stats: {
+        rarity: Rarities.Rare,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Plant', 5) as Model
+})
+
+PetsData.set('Hat Trick Dragon', {
+    name: 'Hat Trick Dragon',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 7.6]]),
+    stats: {
+        rarity: Rarities.Epic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Hat Trick Dragon', 5) as Model
+})
+
+PetsData.set('Mega Demon', {
+    name: 'Mega Demon',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 7.8]]),
+    stats: {
+        rarity: Rarities.Legendary,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Mega Demon', 5) as Model
+})
+
+// *
+
+PetsData.set('Flamingo', {
+    name: 'Flamingo',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 8]]),
+    stats: {
+        rarity: Rarities.Common,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Flamingo', 5) as Model
+})
+
+PetsData.set('MailCat', {
+    name: 'MailCat',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 8.2]]),
+    stats: {
+        rarity: Rarities.Uncommon,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('MailCat', 5) as Model
+})
+
+PetsData.set('Cake', {
+    name: 'Cake',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 8.4]]),
+    stats: {
+        rarity: Rarities.Rare,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Cake', 5) as Model
+})
+
+PetsData.set('King Slime', {
+    name: 'King Slime',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 8.6]]),
+    stats: {
+        rarity: Rarities.Epic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('King Slime', 5) as Model
+})
+
+PetsData.set('Ruby Spider', {
+    name: 'Ruby Spider',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 8.8]]),
+    stats: {
+        rarity: Rarities.Legendary,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+   },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Ruby Spider', 5) as Model
+})
+
+// *
+
+PetsData.set('Hacked Doggy', {
+    name: 'Hacked Doggy',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 9]]),
+    stats: {
+        rarity: Rarities.Common,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Hacked Doggy', 5) as Model
+})
+
+PetsData.set('Alien Bird', {
+    name: 'Alien Bird',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 9.2]]),
+    stats: {
+        rarity: Rarities.Uncommon,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Alien Bird', 5) as Model
+})
+
+PetsData.set('Alien Dragon', {
+    name: 'Alien Dragon',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 9.4]]),
+    stats: {
+        rarity: Rarities.Rare,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Alien Dragon', 5) as Model
+})
+
+
+PetsData.set('Galaxy Doggy', {
+    name: 'Galaxy Doggy',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 9.6]]),
+    stats: {
+        rarity: Rarities.Epic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Galaxy Doggy', 5) as Model
+})
+
+PetsData.set('Dark Hydra', {
+    name: 'Dark Hydra',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 9.8]]),
+    stats: {
+        rarity: Rarities.Legendary,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Dark Hydra', 5) as Model
+})
+
+// *
+
+PetsData.set('Shadow Chameleon', {
+    name: 'Shadow Chameleon',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1.2*2]]),
+    stats: {
+        rarity: Rarities.Uncommon,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Shadow Chameleon', 5) as Model
+})
+
+PetsData.set('Shadow Butterfly', {
+    name: 'Shadow Butterfly',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1.8*2]]),
+    stats: {
+        rarity: Rarities.Rare,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Shadow Butterfly', 5) as Model
+})
+
+PetsData.set('Shadow Ghost', {
+    name: 'Shadow Ghost',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 2.6*2]]),
+    stats: {
+        rarity: Rarities.Epic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Shadow Ghost', 5) as Model
+})
+
+PetsData.set('Shadow Star', {
+    name: 'Shadow Star',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 3.8*2]]),
+    stats: {
+        rarity: Rarities.Legendary,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Shadow Star', 5) as Model
+})
+
+PetsData.set('Shadow Owl', {
+    name: 'Shadow Owl',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1]]),
+    stats: {
+        rarity: Rarities.Mythic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 1}]
+    },
+    model: Pets.WaitForChild('Shadow Owl', 5) as Model
+})
+
+PetsData.set('Shadow Dragon', {
+    name: 'Shadow Dragon',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 1]]),
+    stats: {
+        rarity: Rarities.Exclusive,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 9}]
+    },
+    model: Pets.WaitForChild('Shadow Dragon', 5) as Model
 })
 
 // *
@@ -653,24 +1062,6 @@ PetsData.set('Ice Cream Dog', {
         mutation: Mutations.Default
     },
     model: Pets.WaitForChild('Ice Cream Dog', 5) as Model
-})
-
-PetsData.set('Cake', {
-    name: 'Cake',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 240]]),
-    stats: {
-        rarity: Rarities.Mythic,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Cake', 5) as Model
 })
 
 // !
@@ -878,96 +1269,6 @@ PetsData.set('Moon Bird', {
 
 // *
 
-PetsData.set('Hacked Doggy', {
-    name: 'Hacked Doggy',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 145]]),
-    stats: {
-        rarity: Rarities.Uncommon,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Hacked Doggy', 5) as Model
-})
-
-PetsData.set('Alien Bird', {
-    name: 'Alien Bird',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 181]]),
-    stats: {
-        rarity: Rarities.Rare,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Alien Bird', 5) as Model
-})
-
-PetsData.set('Alien Dragon', {
-    name: 'Alien Dragon',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 226]]),
-    stats: {
-        rarity: Rarities.Epic,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Alien Dragon', 5) as Model
-})
-
-PetsData.set('Galaxy Doggy', {
-    name: 'Galaxy Doggy',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 293]]),
-    stats: {
-        rarity: Rarities.Legendary,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Galaxy Doggy', 5) as Model
-})
-
-PetsData.set('Dark Hydra', {
-    name: 'Dark Hydra',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 566]]),
-    stats: {
-        rarity: Rarities.Mythic,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Dark Hydra', 5) as Model
-})
-
 // *
 
 PetsData.set('Mega Galaxy Doggy', {
@@ -1037,7 +1338,8 @@ PetsData.set('Nightmare Cat', {
     additional: {
         size: Sizes.Baby,
         evolution: Evolutions.Normal,
-        mutation: Mutations.Default
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 2}]
     },
     model: Pets.WaitForChild('Nightmare Cat', 5) as Model
 })
@@ -1055,7 +1357,8 @@ PetsData.set('Nightmare Bunny', {
     additional: {
         size: Sizes.Baby,
         evolution: Evolutions.Normal,
-        mutation: Mutations.Default
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 4}]
     },
     model: Pets.WaitForChild('Nightmare Bunny', 5) as Model
 })
@@ -1073,7 +1376,8 @@ PetsData.set('Nightmare Yeti', {
     additional: {
         size: Sizes.Baby,
         evolution: Evolutions.Normal,
-        mutation: Mutations.Default
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 6}]
     },
     model: Pets.WaitForChild('Nightmare Yeti', 5) as Model
 })
@@ -1091,7 +1395,8 @@ PetsData.set('Devil Spider', {
     additional: {
         size: Sizes.Baby,
         evolution: Evolutions.Normal,
-        mutation: Mutations.Default
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 7}]
     },
     model: Pets.WaitForChild('Devil Spider', 5) as Model
 })
@@ -1109,7 +1414,8 @@ PetsData.set('Observer', {
     additional: {
         size: Sizes.Baby,
         evolution: Evolutions.Normal,
-        mutation: Mutations.Default
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 8}]
     },
     model: Pets.WaitForChild('Observer', 5) as Model
 })
@@ -1127,7 +1433,8 @@ PetsData.set('Confetti Balloon', {
     additional: {
         size: Sizes.Baby,
         evolution: Evolutions.Normal,
-        mutation: Mutations.Default
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 1}]
     },
     model: Pets.WaitForChild('Confetti Balloon', 5) as Model
 })
@@ -1145,7 +1452,8 @@ PetsData.set('Party Goblin', {
     additional: {
         size: Sizes.Baby,
         evolution: Evolutions.Normal,
-        mutation: Mutations.Default
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 3}]
     },
     model: Pets.WaitForChild('Party Goblin', 5) as Model
 })
@@ -1163,7 +1471,8 @@ PetsData.set('Swaggy Songbird', {
     additional: {
         size: Sizes.Baby,
         evolution: Evolutions.Normal,
-        mutation: Mutations.Default
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 5}]
     },
     model: Pets.WaitForChild('Swaggy Songbird', 5) as Model
 })
@@ -1181,84 +1490,13 @@ PetsData.set('DJ Demon', {
     additional: {
         size: Sizes.Baby,
         evolution: Evolutions.Normal,
-        mutation: Mutations.Default
+        mutation: Mutations.Default,
+        perks: [{name: 'Extra Power', level: 8}]
     },
     model: Pets.WaitForChild('DJ Demon', 5) as Model
 })
 
 // !
-
-PetsData.set('Shadow Chameleon', {
-    name: 'Shadow Chameleon',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 4]]),
-    stats: {
-        rarity: Rarities.Rare,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Shadow Chameleon', 5) as Model
-})
-
-PetsData.set('Shadow Butterfly', {
-    name: 'Shadow Butterfly',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 8]]),
-    stats: {
-        rarity: Rarities.Epic,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Shadow Butterfly', 5) as Model
-})
-
-PetsData.set('Shadow Ghost', {
-    name: 'Shadow Ghost',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 15]]),
-    stats: {
-        rarity: Rarities.Legendary,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Shadow Ghost', 5) as Model
-})
-
-PetsData.set('Shadow Star', {
-    name: 'Shadow Star',
-    locked: false,
-    equipped: false,
-    multipliers: new Map([['strength', 1250]]),
-    stats: {
-        rarity: Rarities.Exclusive,
-        sizeOffset: new Vector3(0,0,0),
-        rotationOffset: new CFrame(0,0,0),
-    },
-    additional: {
-        size: Sizes.Baby,
-        evolution: Evolutions.Normal,
-        mutation: Mutations.Default
-    },
-    model: Pets.WaitForChild('Shadow Star', 5) as Model
-})
 
 // *Gifts & Daily & Chest Rewards
 
@@ -1266,7 +1504,7 @@ PetsData.set('The Ultra Banana Split', {
     name: 'The Ultra Banana Split',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 100]]),
+    multipliers: new Map([['strength', 30]]),
     stats: {
         rarity: Rarities.Legendary,
         sizeOffset: new Vector3(0,0,0),
@@ -1412,7 +1650,7 @@ PetsData.set('Red Devil', {
     name: 'Red Devil',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 50]]),
+    multipliers: new Map([['strength', 30]]),
     stats: {
         rarity: Rarities.Mythic,
         sizeOffset: new Vector3(0,0,0),
@@ -1432,7 +1670,7 @@ PetsData.set('Magma Doggy', {
     name: 'Magma Doggy',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 5]]),
+    multipliers: new Map([['strength', 10]]),
     stats: {
         rarity: Rarities.Uncommon,
         sizeOffset: new Vector3(0,0,0),
@@ -1450,9 +1688,9 @@ PetsData.set('Soul Golem', {
     name: 'Soul Golem',
     locked: false,
     equipped: false,
-    multipliers: new Map([['strength', 10]]),
+    multipliers: new Map([['strength', 15]]),
     stats: {
-        rarity: Rarities.Rare,
+        rarity: Rarities.Exclusive,
         sizeOffset: new Vector3(0,0,0),
         rotationOffset: new CFrame(0,0,0),
     },
@@ -1862,6 +2100,42 @@ PetsData.set('Backrooms Cat', {
         mutation: Mutations.Default
     },
     model: Pets.WaitForChild('Backrooms Cat', 5) as Model
+})
+
+PetsData.set('Mega Block', {
+    name: 'Mega Block',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 15]]),
+    stats: {
+        rarity: Rarities.Epic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Mega Block', 5) as Model
+})
+
+PetsData.set('Steampunk Doggy', {
+    name: 'Steampunk Doggy',
+    locked: false,
+    equipped: false,
+    multipliers: new Map([['strength', 35]]),
+    stats: {
+        rarity: Rarities.Epic,
+        sizeOffset: new Vector3(0,0,0),
+        rotationOffset: new CFrame(0,0,0),
+    },
+    additional: {
+        size: Sizes.Baby,
+        evolution: Evolutions.Normal,
+        mutation: Mutations.Default
+    },
+    model: Pets.WaitForChild('Steampunk Doggy', 5) as Model
 })
 
 // !!GigaRacoon!!

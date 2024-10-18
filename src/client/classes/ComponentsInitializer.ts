@@ -34,6 +34,7 @@ let createComponentPath = (parent: Instance, globalObject: IGlobalObject[]) => {
         if (obj.children) { children = createComponentPath(parent.WaitForChild(obj.name), obj.children) }
 
         if (!ComponentNames.get(obj.objComponent) || !parent.WaitForChild(obj.name, 1)) { warn(obj.name+' GuiComponent Wasnt Found!'); continue}
+
         let objComponent = ComponentNames.get(obj.objComponent)!(parent.WaitForChild(obj.name))
         
         objectPath[obj.name] = { ...children, get: <T>() => {return objComponent as T }} as unknown as (IPathObject & {get: <T>() => T})
@@ -47,8 +48,8 @@ export class ComponentsInitializer {
 
     public static InitializeObject(globalObject: IGlobalObject[], parent: Instance): IPathObject {
         let path = {};
-        pcall(() => {path = createComponentPath(parent, globalObject)})
-        if (!path) warn('GuiPath Doesnt Exist!');
+        let val = pcall(() => {path = createComponentPath(parent, globalObject); return})
+        if (!val[0]) warn('GuiPath Doesnt Exist!');
         return path as IPathObject
     }
 

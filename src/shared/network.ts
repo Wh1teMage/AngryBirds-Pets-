@@ -10,7 +10,7 @@ import { RewardType } from "./enums/RewardEnums";
 import { FlyingObjectStatus } from "./enums/FlyingObjectEnums";
 import { PotionOperationStatus } from "./interfaces/PotionData";
 import { PotionType } from "./enums/PotionEnum";
-import { ReplicationOperationStatus } from "./enums/ReplicationEnums";
+import { BattlefieldOperationStatus, ReplicationOperationStatus } from "./enums/ReplicationEnums";
 import { RelicOperationStatus } from "./enums/RelicEnums";
 
 interface ClientToServerEvents {
@@ -29,6 +29,7 @@ interface ClientToServerEvents {
     ManagePotion: (operation: PotionOperationStatus, potiontype: PotionType) => void
 
     ManageRelic: (operation: RelicOperationStatus, name: string, level: number) => void
+    ManageBattlefield: (operation: BattlefieldOperationStatus) => void
 
     ClaimReward: (rewardtype: RewardType, info?: any) => void
 
@@ -37,6 +38,8 @@ interface ClientToServerEvents {
 }
 
 interface ServerToClientEvents {
+    ManageBattlefield: (operation: BattlefieldOperationStatus, additional?: Map<string, any>) => void
+
     ReplicateEffect: (name: string, additional?: Map<string, any>) => void
     SendTradeRequest: (requestingplayer: Player) => void
     SendPetReplication: (operation: PetReplicationStatus, newpets?: IDBPetData[], oldpets?: IDBPetData[]) => void

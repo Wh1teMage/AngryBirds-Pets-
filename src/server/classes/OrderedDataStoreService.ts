@@ -4,23 +4,20 @@ import { CreationUtilities } from "shared/utility/CreationUtilities"
 import Functions from "shared/utility/LuaUtilFunctions"
 
 const defaultOrdered: IOrderedData = {
-    StrengthVal: 0,
-    RebirthsVal: 0,
-    WinsVal: 0,
+    StrengthMaxVal: 0,
+    WinsMaxVal: 0,
     IngameTime: 0,
-    RobuxSpent: 0,
 }
+
 const ignoreList: string[] = [
-    '399939444', '2680486757', '3013687191', '295934777', '1080987986'
+    '399939444', '2680486757', '3013687191', '295934777', '1080987986', '2265378525'
 ]
 
 const orderedConstants = new Map<string, IOrderedDataService>()
 
-orderedConstants.set('StrengthVal', {name: 'StrengthVal', maxCount: 50, values: [] })
-orderedConstants.set('WinsVal', {name: 'WinsVal', maxCount: 50, values: [] })
+orderedConstants.set('StrengthMaxVal', {name: 'StrengthMaxVal', maxCount: 50, values: [] })
+orderedConstants.set('WinsMaxVal', {name: 'WinsMaxVal', maxCount: 50, values: [] })
 orderedConstants.set('IngameTime', {name: 'IngameTime', maxCount: 50, values: [] })
-orderedConstants.set('RobuxSpent', {name: 'RobuxSpent', maxCount: 50, values: [] })
-orderedConstants.set('RebirthsVal', {name: 'RebirthsVal', maxCount: 50, values: [] })
 
 export class OrderedDataService { //write get method
 
@@ -43,7 +40,20 @@ export class OrderedDataService { //write get method
                 counter += 1
 
                 for (let page of pages.GetCurrentPage()) {
-                    value.values.push(page)
+
+                    let dataValue = math.round(page.value as number)
+
+                    pcall(() => {
+
+                        if (dataValue > 1000) {
+                            let stringData = tostring(dataValue)
+                            let length = math.floor(dataValue)+1
+                            dataValue = tonumber(stringData.sub(-3, length))!/100*10**tonumber(stringData.sub(1, -4))!
+                        }
+    
+                        value.values.push({key: page.key, value: dataValue})
+
+                    })
                 }
                 
                 if (pages.IsFinished || counter*math.min(100, value.maxCount) >= value.maxCount) { break }
@@ -60,14 +70,19 @@ export class OrderedDataService { //write get method
         if (ignoreList.includes(id)) { return }
 
         let formattedData = Functions.constuctData(data, defaultOrdered) as IOrderedData
-        print(formattedData)
 
         orderedConstants.forEach((value: IOrderedDataService, key: string) => {
 
             let dataValue = math.round(formattedData[value.name as keyof typeof defaultOrdered])
             let existvalue = value.values.find((val) => val.key === id)
 
-            print(dataValue, key)
+            if (dataValue > 1000) {
+
+                let poweroften = math.floor(math.log(dataValue, 10))
+                let suffix = math.round((dataValue/10**poweroften)*100)
+
+                dataValue = math.round(tonumber(tostring(poweroften)+tostring(suffix))!)
+            }
 
             value.datastore!.SetAsync(id, dataValue);
             /*
@@ -104,6 +119,7 @@ export class OrderedDataService { //write get method
 
     static replicateLeaderboardValues = () => {
 
+        
         let leaderboards = Workspace.WaitForChild('Leaderboards')
         let template = leaderboards.WaitForChild('Templates').WaitForChild('Template')
 
@@ -111,6 +127,8 @@ export class OrderedDataService { //write get method
             if (!obj.IsA('Model')) { continue }
 
             let value = orderedConstants.get(obj.Name)!
+            if (!value) { continue }
+
             let playersUI = obj.WaitForChild('Main').WaitForChild('SurfaceGui').WaitForChild('LeaderboardFrame').WaitForChild('Players')
 
             for (let playerUI of playersUI.GetChildren()) {
@@ -144,12 +162,14 @@ export class OrderedDataService { //write get method
     
                     if (index < 3) { return }
                     objectUI.Parent = playersUI
+    
 
                 })
 
             })
             
         }
+        
         
     }
 

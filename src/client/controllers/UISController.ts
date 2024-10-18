@@ -31,7 +31,7 @@ export class UISController implements OnStart, OnInit {
 
             if (inputobj.KeyCode === Enum.KeyCode.Unknown) { formattedInput = tostring(inputobj.UserInputType)+tostring(state) }
 
-            if (!formattedControls.get(formattedInput)) { warn('Client Context Doesnt Exist!'); return Enum.ContextActionResult.Pass }
+            if (!formattedControls.get(formattedInput)) { return Enum.ContextActionResult.Pass } //warn('Client Context Doesnt Exist!');
             Contexts.get(formattedControls.get(formattedInput)!)!.callback()
 
             print('Test')

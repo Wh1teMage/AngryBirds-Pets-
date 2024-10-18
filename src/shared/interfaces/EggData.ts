@@ -1,8 +1,9 @@
+import { WorldType } from "shared/enums/WorldEnums"
 import { IDBPetData, IPetData } from "./PetData"
 
 export enum EggValueType {
     VBugs = 'VBugs',
-    Wins = 'Wins',
+    Gems = 'Gems',
     Stored = 'Stored',
 }
 
@@ -27,6 +28,9 @@ export interface IEggData {
 
     rotationOffset?: CFrame
     rotationAxis?: Vector3
+
+    image: string
+    world: WorldType
 }
 
 export interface IEggModel extends Model {

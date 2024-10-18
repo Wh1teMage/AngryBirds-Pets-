@@ -2,7 +2,7 @@ import { Players, ReplicatedStorage } from "@rbxts/services"
 import { Events } from "client/network";
 import { EffectName } from "shared/enums/EffectEnums";
 import { EffectsUtilities } from "shared/utility/EffectsUtilities"
-import { TweenService, RunService } from "@rbxts/services";
+import { TweenService, RunService, HttpService } from "@rbxts/services";
 import { ToolOperationStatus } from "shared/interfaces/ToolData";
 import { Binding } from "client/classes/BindbingValues";
 import { EggBuyType, IEggModel } from "shared/interfaces/EggData";
@@ -13,6 +13,9 @@ import { PetsData } from "shared/info/PetInfo";
 import { CreationUtilities } from "shared/utility/CreationUtilities";
 import { PlayerController } from "client/controllers/PlayerController";
 import { DynamicText, StrokeInfo } from "client/classes/DynamicText";
+import { ImageFabric } from "client/components/UIComponents/ImageComponent";
+import { Rarities } from "shared/interfaces/PetData";
+import { ReplicationOperationStatus } from "shared/enums/ReplicationEnums";
 
 const playerGui = Players.LocalPlayer.WaitForChild('PlayerGui')
 const player = Players.LocalPlayer
@@ -22,6 +25,9 @@ const circle = mainUI.WaitForChild('Templates').WaitForChild('ClickEffect') as I
 
 let canFireUseEvents = true
 let playingAnimation = false
+
+let dashing = false
+let lastDash = 0
 
 export const PlayEffect = (name: string, additional?: Map<string, any>) => {
     if (!Effects.get(name)) { warn('Effects Doesnt Exist!'); return }
@@ -37,18 +43,22 @@ Effects.set('ReplicatePurchase', (additional) => {
 })
 
 Effects.set('ClickSound', () => {
-    EffectsUtilities.PlaySound('rbxassetid://6052548458')
+    if (!PlayerController.enabledSFX) { return }
+    EffectsUtilities.PlaySound('rbxassetid://6052548458') //46760716
 })
 
 Effects.set('HoverSound', () => {
+    if (!PlayerController.enabledSFX) { return }
     EffectsUtilities.PlaySound('rbxassetid://10066936758')
 })
 
 Effects.set('EarnSound', () => {
+    if (!PlayerController.enabledSFX) { return }
     EffectsUtilities.PlaySound('rbxassetid://8755719003')
 })
 
 Effects.set('EquipSound', () => {
+    if (!PlayerController.enabledSFX) { return }
     EffectsUtilities.PlaySound('rbxassetid://3746956704')
 })
 
@@ -76,6 +86,7 @@ Effects.set('ChangeUseStatus', (additional) => {
 Effects.set('Click', () => {
     PlayerController.lastClick = os.time()
     if (canFireUseEvents) { Events.ManageTool.fire(ToolOperationStatus.Use, 'default') } 
+    else ( Events.ManageTool.fire(ToolOperationStatus.Use, 'restricted') )
 }) 
 
 Effects.set('ClickBind', (additional) => {
@@ -115,10 +126,10 @@ Effects.set('SpinStarted', (additional) => {
     let spinTime = additional!.get('SpinTime') as number
 
     let rewardsList = new Map<string, {nameUI: string, rotation: number}>([
-        ['Potion', { nameUI: '1', rotation: 0 }],
-        ['Wins1', { nameUI: '2', rotation: 300 }],
-        ['Gems', { nameUI: '3', rotation: 240 }],
-        ['Wins2', { nameUI: '4', rotation: 180 }],
+        ['StrengthPotion', { nameUI: '1', rotation: 0 }],
+        ['GemsPotion', { nameUI: '2', rotation: 300 }],
+        ['Gems1', { nameUI: '3', rotation: 240 }],
+        ['Gems2', { nameUI: '4', rotation: 180 }],
         ['Strength', { nameUI: '5', rotation: 120 }],
         ['Pet', { nameUI: '6', rotation: 60 }],
     ])
@@ -164,6 +175,7 @@ Effects.set('Notify', (additional) => {
         ['NewSpin', 'rbxassetid://16246051452'],
         ['SuccessfulFollow', 'rbxassetid://16248802485'],
         ['RebirthPossible', 'rbxassetid://16244936352'],
+        ['NewPotion', 'rbxassetid://16775664373'],
 
         ['Wins', 'rbxassetid://16245102737'],
         ['Accuracy', 'rbxassetid://16244326096'],
@@ -174,35 +186,37 @@ Effects.set('Notify', (additional) => {
     if (!imageName || !images.get(imageName)) { imageName = 'Default' }
 
     let notifications = mainUI.WaitForChild('Notifications')
-    let notifyTemplate = notifications.WaitForChild('Template').WaitForChild('Notification').Clone() as Frame;
+    let notifyTemplate = notifications.WaitForChild('Template').WaitForChild('Notification').Clone() as TextLabel;
 
-    (notifyTemplate.WaitForChild('Icon') as ImageLabel).Image = images.get(imageName)!;
+    //(notifyTemplate.WaitForChild('Icon') as ImageLabel).Image = images.get(imageName)!;
 
-    let size = notifyTemplate.Size.Y.Scale
+    let sizeX = notifyTemplate.Size.X.Scale
+    let sizeY = notifyTemplate.Size.Y.Scale
 
     notifyTemplate.Parent = notifications
-    notifyTemplate.Size = UDim2.fromScale(notifyTemplate.Size.X.Scale, 0)
+    notifyTemplate.Size = UDim2.fromScale(sizeX, 0)
     notifyTemplate.Visible = true
 
     let dynamicCodesText = new DynamicText(
-        (notifyTemplate.WaitForChild('TextLabel') as TextLabel),
+        notifyTemplate,
         message,
         new Map<number, StrokeInfo>([[200, {Speed: 50}]])
     )
 
     dynamicCodesText.Start()
 
-    TweenService.Create(notifyTemplate, new TweenInfo(.4, Enum.EasingStyle.Back), {'Size': UDim2.fromScale(notifyTemplate.Size.X.Scale, size)}).Play()
+    TweenService.Create(notifyTemplate, new TweenInfo(.4, Enum.EasingStyle.Quad), {'Size': UDim2.fromScale(sizeX, sizeY)}).Play()
     EffectsUtilities.PlaySound('rbxassetid://7383525713')
 
     task.delay(5, () => {
-        TweenService.Create(notifyTemplate, new TweenInfo(.4, Enum.EasingStyle.Back), {'Size': UDim2.fromScale(0, size)}).Play()
+        TweenService.Create(notifyTemplate, new TweenInfo(.4, Enum.EasingStyle.Quad), {'Size': UDim2.fromScale(sizeX, 0)}).Play()
         task.wait(.3)
         notifyTemplate.Destroy()
     })
 })
 
 Effects.set('PlaySound', (additional) => {
+    if (!PlayerController.enabledSFX) { return }
     let soundId = additional!.get('Sound') as string
 
     let sound = new Instance('Sound')
@@ -220,7 +234,7 @@ Effects.set('Shoot', () => {
     if (!humanoid) { return }
 
     let animation = new Instance('Animation')
-    animation.AnimationId = 'rbxassetid://16950998426' //16950998426
+    animation.AnimationId = ['rbxassetid://18663680618', 'rbxassetid://18663686040'][math.random(0, 1)]  //16950998426
     
     playingAnimation = true
 
@@ -233,9 +247,164 @@ Effects.set('Shoot', () => {
         playingAnimation = false
     })
 
-    EffectsUtilities.PlaySound('rbxassetid://184474135')
+    EffectsUtilities.PlaySound('rbxassetid://4374877983')
 })
 
+
+Effects.set('ReplicateRewards', (additional) => {
+    let valueAmount = additional!.get('Amount') as number
+    let repeats = additional!.get('Repeats') as number
+    let imageName = additional!.get('Image') as string
+
+    let statRewardNames = new Map<string, string>([
+        ['Wins', 'WinsInfo'],
+        ['Accuracy', 'AccuracyInfo'],
+        ['Gems', 'GemsInfo'],
+        ['Stars', 'StarsInfo'],
+    ])
+
+    let name = statRewardNames.get(imageName)!
+
+    print(name)
+
+    let statsFrame = mainUI.WaitForChild('StatsInfo') as Frame
+    let boostFrame = mainUI.WaitForChild('BoostInfo') as Frame
+    
+    let info = statsFrame.WaitForChild('Templates').WaitForChild(name) as Frame
+    let accuracyLabel = boostFrame.WaitForChild('Holder') as Frame
+
+    let positionList = new Map<string, {pos: UDim2, label: Frame}>([
+        ['AccuracyInfo', {pos: UDim2.fromScale(0.5 , -0.3), label: accuracyLabel}],
+        ['GemsInfo', {pos: UDim2.fromScale(0.5 , -0.3), label: accuracyLabel}],
+    ])
+
+    if (!info) { return }
+
+    let tweenInfo = new TweenInfo(1, Enum.EasingStyle.Quad)
+    let tweenInfo2 = new TweenInfo(.4, Enum.EasingStyle.Quad);
+
+    for (let i = 0; i < repeats; i++) {
+
+        task.wait(.1)
+
+        task.spawn(() => {
+
+            let clonnedInfo = info.Clone();
+
+            (clonnedInfo.WaitForChild('Value') as TextLabel).Text = '+'+tostring(valueAmount)
+        
+            clonnedInfo.Visible = true
+            clonnedInfo.Position = UDim2.fromScale(math.random(0, 100)/100, math.random(0, 100)/100)
+            clonnedInfo.Parent = statsFrame
+        
+            //print(clonnedInfo.Parent, delta, clonnedInfo)
+        
+            task.wait(.5)
+        
+            //TweenService.Create(clonnedInfo, tweenInfo, { 'Size': UDim2.fromScale(0,0) }).Play()
+            TweenService.Create(clonnedInfo, tweenInfo, { 'Position': positionList.get(name)!.pos }).Play()
+        
+            TweenService.Create(clonnedInfo.WaitForChild('Value').WaitForChild('UIStroke') as UIStroke, tweenInfo2, { 'Transparency': 1 }).Play()
+            TweenService.Create(clonnedInfo.WaitForChild('Value') as TextLabel, tweenInfo2, { 'TextTransparency': 1 }).Play()
+        
+            TweenService.Create(clonnedInfo.WaitForChild('Icon') as ImageLabel, tweenInfo, { 'ImageTransparency': 1 }).Play()
+        
+            task.wait(.5)
+        
+            TweenService.Create(positionList.get(name)!.label.WaitForChild('UIScale') as UIScale, new TweenInfo(.1), { 'Scale': 1.1 }).Play()
+            task.wait(.1)
+            TweenService.Create(positionList.get(name)!.label.WaitForChild('UIScale') as UIScale, new TweenInfo(.1), { 'Scale': 1 }).Play()
+        
+            clonnedInfo.Destroy()
+
+        })
+
+    }
+
+})
+
+Effects.set('Dash', () => {
+    if (!player.Character) { return }
+    let humanoid = player.Character?.WaitForChild('Humanoid') as Humanoid
+    print('dashing')
+
+    if (!humanoid) { return }
+    if (dashing) { return }
+
+    let cd = 1
+    let duration = .02
+
+    print((os.clock() - lastDash), (cd + duration))
+
+    if ((os.clock() - lastDash) < (cd + duration)) { return }
+
+    let dashButton = player.WaitForChild('PlayerGui').WaitForChild('MainUI').WaitForChild('LowerList').WaitForChild('Dash') as GuiButton
+    let cooldown = dashButton.WaitForChild('Cooldown') as Frame
+    
+    dashing = true
+
+    let effects = ReplicatedStorage.WaitForChild('Templates').WaitForChild('Effects')
+
+    let windEffect = effects.WaitForChild('Wind').Clone() as ParticleEmitter
+
+    let velocity = new Instance('LinearVelocity')
+    let attachment = new Instance('Attachment')
+
+    let vfxAttachment = new Instance('Attachment')
+
+    velocity.RelativeTo = Enum.ActuatorRelativeTo.Attachment0
+    velocity.VectorVelocity = new Vector3(0, 0, -300/2)
+
+    velocity.ForceLimitMode = Enum.ForceLimitMode.PerAxis
+    velocity.MaxAxesForce = new Vector3(0, 0, 50000)
+
+    vfxAttachment.Parent = player.Character.PrimaryPart!
+    attachment.Parent = player.Character.PrimaryPart!
+    velocity.Parent = player.Character.PrimaryPart!
+
+    velocity.Attachment0 = attachment
+
+    cooldown.Visible = true
+    cooldown.Size = UDim2.fromScale(1,1)
+
+    windEffect.Parent = vfxAttachment
+    vfxAttachment.CFrame = vfxAttachment.CFrame.mul(CFrame.Angles(1, 0, 0))
+
+    task.spawn(() => {
+        for (let i = 0; i < 3; i++) {
+            windEffect.Emit(10)
+            task.wait(.1)
+        }
+    })
+
+    task.delay(duration + 1, () => {
+        vfxAttachment.Destroy()
+    })
+
+    let animation = new Instance('Animation')
+    animation.AnimationId = 'rbxassetid://18663667691'
+    
+    playingAnimation = true
+
+    let track = humanoid.LoadAnimation(animation)
+    track.Looped = false
+    track.Play()
+
+    task.delay(.55, () => {
+        track.Stop()
+        playingAnimation = false
+    })
+
+    task.wait(duration)
+
+    dashing = false
+    lastDash = os.clock()
+
+    attachment.Destroy()
+    velocity.Destroy()
+
+    TweenService.Create(cooldown, new TweenInfo(cd, Enum.EasingStyle.Linear), {Size: UDim2.fromScale(1, 0)}).Play()
+})
 
 Effects.set('OpenEgg', (additional) => {
     let buyType = additional!.get('BuyType') as EggBuyType
@@ -305,7 +474,7 @@ Effects.set('EggHatched', (additional) => {
     viewCamera.CFrame = new CFrame(new Vector3(0,0,0), new Vector3(0,0,1))
 
     for (let obj of hatchFrame.WaitForChild('Hatching')!.GetChildren()) {
-        if (!obj.IsA('GuiObject')) { continue }
+        if (obj.IsA('UIListLayout')) { continue }
         obj.Destroy()
     }
 
@@ -317,6 +486,13 @@ Effects.set('EggHatched', (additional) => {
     let eggRotationOffset = CFrame.Angles(0,0,0)
     if (egg.rotationOffset) { eggRotationOffset = egg.rotationOffset }
     let count = 0
+
+    let shopEggsFrame = mainUI.WaitForChild('Eggs') as ImageLabel
+    let shopEggsFrameComponent = ImageFabric.GetImage(shopEggsFrame)
+
+    let wasOpened = false
+
+    if (shopEggsFrameComponent && shopEggsFrameComponent.IsOpened) { wasOpened = true; shopEggsFrameComponent.Close() }
     
     for (let pet of pets) {
         count += 1
@@ -325,24 +501,17 @@ Effects.set('EggHatched', (additional) => {
         clonnedHatch.Visible = true
         clonnedHatch.Parent = hatchFrame.WaitForChild('Hatching')
 
-        let eggFrame = clonnedHatch.WaitForChild('Egg') as ViewportFrame
+        let eggFrame = clonnedHatch.WaitForChild('Egg') as ImageLabel
         let petFrame = clonnedHatch.WaitForChild('Pet') as ViewportFrame
     
         let petName = clonnedHatch.WaitForChild('PetName') as TextLabel
         let petRarity = clonnedHatch.WaitForChild('Rarity') as TextLabel
 
-        eggFrame.CurrentCamera = viewCamera
+        eggFrame.Image = egg.image
         petFrame.CurrentCamera = viewCamera
 
-        let eggModel = egg.model!
-        if (!egg.model) { eggModel = game.Workspace.WaitForChild('Invisible Egg')! as IEggModel }
-
-        eggModel = eggModel.Clone()! as IEggModel
-        eggModel.PrimaryPart = eggModel.WaitForChild('Egg') as BasePart
-
-        eggModel.PivotTo(new CFrame(new Vector3(0,0,7), new Vector3(0,0,0)).mul(CFrame.Angles(math.rad(90), 0, 0)).mul(eggRotationOffset))
         // length/(pets.size()+1)*count - length/2
-        eggModel.Parent = eggFrame
+        //eggModel.Parent = eggFrame
         
         eggFrame.Visible = true
 
@@ -370,10 +539,10 @@ Effects.set('EggHatched', (additional) => {
 
             while (i < 360*7) {
                 i += delta
-                delta += .2*speed**2
-                eggModel.PivotTo(new CFrame(eggModel.GetPivot().Position).mul(eggRotationOffset).mul(
-                    CFrame.Angles(math.rad(90) + math.sin(math.rad(i)) * axis.X, math.sin(math.rad(i)) * axis.Y, math.sin(math.rad(i)) * axis.Z))
-                )
+                delta += .5*speed**2
+
+                eggFrame.Rotation = math.sin(math.rad(i))*30
+
                 //make tween instead of this
                 
                 //TweenService.Create(viewCamera, new TweenInfo(.01), {'CFrame': new CFrame(viewCamera.CFrame.Position).mul(CFrame.Angles( 0, 0, math.sin(math.rad(i)) ))}).Play()
@@ -405,9 +574,9 @@ Effects.set('EggHatched', (additional) => {
                 }
 
                 task.wait()
-            }
+            }            
 
-            let finalCframe = new CFrame(eggModel.GetPivot().Position).mul(pet!.stats.rotationOffset)
+            let finalCframe = new CFrame(viewCamera.CFrame.Position.add(viewCamera.CFrame.LookVector.mul(6))).mul(pet!.stats.rotationOffset)
 
             let model = pet!.model.Clone() as Model
             model.PivotTo(finalCframe.mul(CFrame.Angles(0, 2, 0)))
@@ -418,10 +587,10 @@ Effects.set('EggHatched', (additional) => {
             eggFrame.Visible = false
             petFrame.Visible = true
 
-            eggModel.Destroy()
-
             petName.Text = pet!.name
             petRarity.Text = pet!.stats.rarity;
+
+            eggFrame.Image = '';
 
             (petName.WaitForChild('PetNameStroke') as TextLabel).Text = pet!.name;
             (petRarity.WaitForChild('Stroek') as TextLabel).Text = pet!.stats.rarity;
@@ -463,6 +632,21 @@ Effects.set('EggHatched', (additional) => {
 
                 TweenService.Create(newGlow, new TweenInfo(tweenTime), { 'ImageTransparency': 1 }).Play()
                 
+                pcall(() => {
+                    if (!pet) { return }
+                    let rarity = pet.stats.rarity
+
+                    let messageData = {
+                        //sender: Players.LocalPlayer,
+                        message: `💎 ${Players.LocalPlayer.Name} has hatched a ${pet.stats.rarity} ${pet.name}`,
+                        rarity: pet.stats.rarity,
+                     }
+    
+                    if ([Rarities.Exclusive, Rarities.Mythic, Rarities.Secret].includes(rarity)) {
+                        Events.ReplicateValues(ReplicationOperationStatus.ReplicateMessage, messageData)
+                    }
+                })
+
                 task.wait(tweenTime)
                 primaryClone.Destroy()
                 model.Destroy()
@@ -488,6 +672,8 @@ Effects.set('EggHatched', (additional) => {
         task.wait(tweenTime)
         print('Ended')
         hatchFrame.Visible = false
+
+        if (shopEggsFrameComponent && wasOpened) { shopEggsFrameComponent.Open() }
     })
 
     /*

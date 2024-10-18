@@ -22,7 +22,7 @@ export class CashbackRelic extends PassiveClass {
         let chance = math.random(1, 100)
 
         if (chance < info[this.level-1].stats.get('chance')!) {
-            component.SetWins(component.profile.Data.Values.WinsVal + egg.price * amount * info[this.level-1].stats.get('multi')! / 100 )
+            //component.SetGems(component.profile.Data.Values.GemsVal + egg.price * amount * info[this.level-1].stats.get('multi')! / 100 )
         }
 
     }

@@ -1,34 +1,22 @@
 import { IMultipliers } from "./SessionData"
+import { ISlideData } from "./SlideData"
 
 export interface IWorldData {
     hitbox: Part
     teleportPart: Part
-    slingshotPart: Part
 
-    shop: Array<string>
-    shopName: string
+    //shop: Array<string>
+    //shopName: string
     worldIcon: string
+    slide: ISlideData
+    blockingWall?: Part
     
     multipliers: Map<keyof IMultipliers, number>
     weight: number // to detect max world
     price: number
 
-    maxClicks: number
-    reward: number
-    starsReward: number
-
-    gravity: number
-    density: number
-
-    startingPosition: Vector3
-    endingPosition: Vector3
-
-    minY: number
-    angle: number
-    energyLoss: number
-    lapEnergyLoss: number
-
-    maxPower: number
+    //nextWorldTeleport?: Part
+    //previousWorldTeleport?: Part
 }
 
 export enum WorldOperationStatus {

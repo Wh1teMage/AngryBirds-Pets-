@@ -23,8 +23,11 @@ export interface ISessionData {
         other: IMultipliers
         pet: IMultipliers
         world: IMultipliers
+        location: IMultipliers
         potion: IMultipliers
         friends: IMultipliers
+        gameboost: IMultipliers
+        robuxboost: IMultipliers
     }
 
     stats: Map<string, any>
@@ -43,6 +46,7 @@ export interface IMultipliers {
     strength: number
     wins: number
     stars: number
+    gems: number
     rebirths: number
     luck: number
     product: number
@@ -54,6 +58,7 @@ export const DefaultMultipliers: IMultipliers = {
     strength: 1,
     wins: 1,
     stars: 1,
+    gems: 1,
     rebirths: 1,
     luck: 1,
     product: 1,
@@ -75,8 +80,11 @@ export const SessionData: ISessionData = {
         other: table.clone(DefaultMultipliers),
         pet: table.clone(DefaultMultipliers),
         world: table.clone(DefaultMultipliers),
+        location: table.clone(DefaultMultipliers),
         potion: table.clone(DefaultMultipliers),
         friends: table.clone(DefaultMultipliers),
+        gameboost: table.clone(DefaultMultipliers),
+        robuxboost: table.clone(DefaultMultipliers),
     },
 
     stats: new Map<string, any>(),
@@ -118,8 +126,11 @@ export const cloneSessionData = () => {
         other: table.clone(DefaultMultipliers),
         pet: table.clone(DefaultMultipliers),
         world: table.clone(DefaultMultipliers),
+        location: table.clone(DefaultMultipliers),
         potion: table.clone(DefaultMultipliers),
         friends: table.clone(DefaultMultipliers),
+        gameboost: table.clone(DefaultMultipliers),
+        robuxboost: table.clone(DefaultMultipliers),
     }
 
     data.headStats = data.headStats.Clone()

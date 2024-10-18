@@ -23,6 +23,7 @@ export abstract class PassiveClass implements IPassiveData {
 
     public onShoot = () => {}
     public onTrigger = () => {}
+    public onKill = () => {}
 
     public onStrengthChanged = (newvalue: number, oldvalue: number) => {}
     public onWinsChanged = (newvalue: number, oldvalue: number) => {}
@@ -37,8 +38,10 @@ export abstract class PassiveClass implements IPassiveData {
     public onTick = () => {}
 
     public onPetAdded = (pet: IDBPetData) => {}
+    public onPetMultiplierChanged = () => {}
 
     public setOwner = (player: Player) => {}
+    public setPet = (pet: IDBPetData) => {}
 
 }
 

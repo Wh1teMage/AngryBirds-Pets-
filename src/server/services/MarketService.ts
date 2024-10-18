@@ -101,6 +101,7 @@ export class MarketService implements OnStart, OnInit {
 
             ServerPlayerFabric.GetPlayer(Players.GetPlayerByUserId(userId)!)!.profile.Data.StatValues.RobuxSpent += MarketNamings.get(productId)!.price
             playerComponent.replica.SetValue('Profile.Products', playerComponent.profile.Data.Products)
+            playerComponent.replica.SetValue('Profile.StatValues.RobuxSpent', playerComponent.profile.Data.StatValues.RobuxSpent)
 
             return Enum.ProductPurchaseDecision.PurchaseGranted
         }

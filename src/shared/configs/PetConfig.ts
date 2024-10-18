@@ -58,4 +58,8 @@ petCallbacks.set('mutation', (info: IPetData) => {
     info.multipliers.set('strength', info.multipliers.get('strength')!*multipliersConfig.mutation[info.additional.mutation])
 })
 
+petCallbacks.set('perks', (info: IPetData) => {
+    //info.multipliers.set('strength', info.multipliers.get('strength')!*multipliersConfig.mutation[info.additional.mutation])
+})
+
 //try to make shared petservice ig ( i have no idea how to make it better and readable )

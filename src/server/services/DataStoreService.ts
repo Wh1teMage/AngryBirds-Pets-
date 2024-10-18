@@ -50,14 +50,17 @@ export const LoadProfile = (player: Player) => {
     print('ReplicReplicatingReplicatingReplicatingReplicatingating')
     StartUpdating()
 
+    let released = false
+
     task.spawn(() => {
-        while (task.wait(ORDERED_UPDATE_TIME)) {
+        while ((task.wait(ORDERED_UPDATE_TIME)) && !released) {
             OrderedDataService.saveValues(tostring(player.UserId), profile!.Data)
         }
     })
 
     profile.AddUserId(player.UserId);
     profile.ListenToRelease(()=>{
+        released = true
         OrderedDataService.saveValues(tostring(player.UserId), profile!.Data)
         player.Kick("Profile was released!");
     });

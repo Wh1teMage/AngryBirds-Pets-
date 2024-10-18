@@ -6,17 +6,11 @@ export interface IProfileData {
     Values: {
         StrengthVal: number
         WinsVal: number
-        StarsVal: number
-        RebirthsVal: number
-        GemsVal: number
     }
 
     MaxValues: {
         StrengthMaxVal: number
         WinsMaxVal: number
-        StarsMaxVal: number
-        RebirthsMaxVal: number
-        GemsMaxVal: number
     }
 
     StatValues: {
@@ -33,7 +27,7 @@ export interface IProfileData {
         RobuxSpent: number
 
         SpinCount: number
-        RebirthSkips: number
+        //RebirthSkips: number
         FriendsCount: number
         //EquippedPetsCount: number
         
@@ -42,16 +36,16 @@ export interface IProfileData {
         WasRebirthing: boolean
 
         Favorited: boolean
+        MaxWorldTeleport: boolean
     }
 
     Multipliers: {
         StrengthMul: number
-        GemsMul: number
         WinsMul: number
-        StarsMul: number
-        RebirthsMul: number
         HatchSpeedMul: number
+
         VoidMachineMul: number
+        AttackSpeedMul: number
     }
 
     Config: {
@@ -80,6 +74,9 @@ export interface IProfileData {
     OwnedTools: Array<string>
     EquippedTool: string
 
+    OwnedTrails: Array<string>
+    EquippedTrail: string
+
     VoidMachine: Array<{pet: IDBPetData, endTime: number, startTime: number}>
     RedeemedCodes: Array<string>
 
@@ -96,11 +93,9 @@ export interface IProfileData {
 }
 
 export interface IOrderedData {
-    StrengthVal: number
-    WinsVal: number
+    StrengthMaxVal: number
+    WinsMaxVal: number
     IngameTime: number
-    RobuxSpent: number
-    RebirthsVal: number
 }
 
 export interface IOrderedDataService {

@@ -1,10 +1,15 @@
 import { Service, OnStart, OnInit } from "@flamework/core";
 import { Fireball } from "server/abilities/Fireball";
+import { BattlefieldClassFabric } from "server/classes/BattlefieldClass";
+import { ExtraPower } from "server/petperks/ExtraPower";
 import { EggQuest } from "server/quests/EggQuest";
 import { FriendQuest } from "server/quests/FriendQuest";
+import { GameBoostQuest } from "server/quests/GameBoostQuest";
 import { PetIndexQuest } from "server/quests/PetIndexQuest";
 import { PetQuest } from "server/quests/PetQuest";
 import { RelicQuest } from "server/quests/RelicQuest";
+//import { RobuxBoostQuest } from "server/quests/RobuxBoostQuest";
+import { WeaponQuest } from "server/quests/WeaponQuest";
 import { AttackSpeedRelic } from "server/relics/AttackSpeedRelic";
 import { BonusShotRelic } from "server/relics/BonusShotRelic";
 import { CashbackRelic } from "server/relics/CashbackRelic";
@@ -28,6 +33,9 @@ export class AbilityService implements OnStart, OnInit {
         new PetIndexQuest()
         new PetQuest()
         new RelicQuest()
+        new GameBoostQuest()
+        //new RobuxBoostQuest()
+        new WeaponQuest()
         
         new BonusShotRelic()
         new CashbackRelic()
@@ -41,6 +49,17 @@ export class AbilityService implements OnStart, OnInit {
         new AttackSpeedRelic()
         new EquipSlotRelic()
         
+        new ExtraPower()
+
+        task.delay(10, () => {
+            let battlefield = game.Workspace.WaitForChild('InstaReplica').WaitForChild('ArenaPart') as Part
+
+            BattlefieldClassFabric.CreateBattlefield(battlefield, [
+                //{Values: { Gems: 5000 }},
+                //{Values: { Gems: 2500 }},
+                //{Values: { Gems: 1000 }}
+            ])!    
+        })
 
     }
 

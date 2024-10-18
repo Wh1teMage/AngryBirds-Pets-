@@ -10,7 +10,6 @@ export class ClientPlayerComponent extends BaseComponent<Attributes, Player> imp
     onStart() {
         //task.wait(3)
         //Events.PurchasePrompt.fire(1701055226, this.instance.UserId)
-
     }
 }
 

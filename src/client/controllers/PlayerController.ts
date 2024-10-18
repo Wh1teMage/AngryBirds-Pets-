@@ -21,6 +21,8 @@ export class PlayerController implements OnStart, OnInit, ILocalPlayer {
 
     static autoEgg = false
     static enabledNotifications = true
+    static enabledVFX = true
+    static enabledSFX = true
     
     static currentClicks = new Binding<number>(0)
     static lastClick = os.time()
@@ -28,7 +30,7 @@ export class PlayerController implements OnStart, OnInit, ILocalPlayer {
     public selectedMergeRelic?: {name: string, level: number}
 
     onInit() {
-        
+
         this.component = ClientPlayerFabric.CreatePlayer(Players.LocalPlayer)
 
         ReplicaController.ReplicaOfClassCreated('PlayerData', (replica) => {
@@ -40,6 +42,7 @@ export class PlayerController implements OnStart, OnInit, ILocalPlayer {
         })
 
         ReplicaController.RequestData()
+
     }
 
     onStart() {

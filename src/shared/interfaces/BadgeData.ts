@@ -13,4 +13,5 @@ export enum BadgeType {
     World = 'World',
     Friend = 'Friend',
     Strength = 'Strength',
+    Wins = 'Wins',
 }

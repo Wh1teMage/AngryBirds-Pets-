@@ -3,7 +3,7 @@ const PrefixSymbols = new Map<number, string>([
     [ 10**6, 'M' ],
     [ 10**9, 'B' ],
     [ 10**12, 'T' ],
-    [ 10**15, 'Qa' ],
+    [ 10**15, 'Qd' ],
     [ 10**18, 'Qn' ],
     [ 10**21, 'Sx' ],
     [ 10**24, 'Sp' ],
@@ -65,7 +65,7 @@ export class GUIUtilities {
         if (math.abs(num) < 1000) { return strToReturn };
 
         PrefixSymbols.forEach((value, key) => {
-            if (((num / key) >= 1) && ((num / key) <= 1000)) {
+            if (((num / key) >= 1) && ((num / key) < 1000)) {
                 strToReturn = (tostring(math.round(num / key * 100)/100) + value);
             } 
         });

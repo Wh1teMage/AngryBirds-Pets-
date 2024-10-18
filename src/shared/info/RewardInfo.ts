@@ -6,8 +6,8 @@ import { IRewardData } from "shared/interfaces/RewardData";
 
 export const SessionRewardsData = new Array<IRewardData>()
 export const DailyRewardsData = new Array<IRewardData>()
-export const RebirthsRewardsData = new Array<IRewardData>()
 export const CodesRewardsData = new Map<string, IRewardData>()
+export const RebirthTitles = new Map<string, {goal: number, id: string}>()
 
 export const SelectDailyReward = (time: number) => {
     let selectedReward: IRewardData | undefined;
@@ -23,10 +23,41 @@ export const SelectSessionReward = (rewardIndex: number, world: WorldType) => {
     return sortedRewards[rewardIndex]
 }
 
+export const GetNextRebirth = (rebirth: number) => {
+    let rewards: IRewardData = {
+        Values: {
+            Wins: 250
+        },
+        Additional: new Map([['Strength', (rebirth+1) * 100000]])
+    }
+
+    return rewards
+}
+
+export const GetNextBar = (barlevel: number) => {
+
+    let multipliers = [1, 3, 7, 13, 25]
+    let values = [100, 300, 2000, 5000, 8000]
+
+    let barmulti = 25*2**(barlevel-4)
+    let barvalue = 20000*(2**(barlevel-5))
+
+    if (barlevel < 5) { barmulti = multipliers[barlevel]; barvalue = values[barlevel] }
+    if (barlevel > 35) { barvalue = 20000*(2**(barlevel-5))*(2**(barlevel-35)) }
+
+    let rewards: IRewardData = {
+        Additional: new Map([
+            ['Strength', barvalue],
+            ['Multiplier', barmulti],
+        ])
+    }
+
+    return rewards
+}
 
 SessionRewardsData.push({
     Values: {
-        Strength: 500
+        Strength: 250
     },
     Time: 60,
     World: WorldType.Cave,
@@ -34,7 +65,7 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Wins: 20
+        Wins: 250
     },
     Time: 60*3,
     World: WorldType.Cave,
@@ -42,646 +73,52 @@ SessionRewardsData.push({
 
 SessionRewardsData.push({
     Values: {
-        Strength: 1000
+        Wins: 1000
     },
-    Time: 60*5,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.LuckPotion, amount: 1}],
     Time: 60*7,
     World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Flame Pixie",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*10,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 2000
-    },
-    Time: 60*15,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 1
-    },
-    Time: 60*20,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 300
-    },
-    Time: 60*30,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 2
-    },
-    Time: 60*45,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Shadow Demon",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*60,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.WinsPotion, amount: 2}],
-    Time: 60*90,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 500
-    },
-    Time: 60*120,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 3
-    },
-    Time: 60*180,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.GoldPotion, amount: 1}],
-    Time: 60*240,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Nightmare Spirit",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*360,
-    World: WorldType.Cave,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Midnight",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*720,
-    World: WorldType.Cave,
-})
-
-// ! world 2 \/
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 500000/3
-    },
-    Time: 60,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 500
-    },
-    Time: 60*3,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 1000000/3
-    },
-    Time: 60*5,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.LuckPotion, amount: 1}],
-    Time: 60*7,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Flame Pixie",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*10,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 1500000/3
-    },
-    Time: 60*15,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 1
-    },
-    Time: 60*20,
-    World: WorldType.NeonCity,
 })
 
 SessionRewardsData.push({
     Values: {
         Wins: 3000
     },
-    Time: 60*30,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 2
-    },
-    Time: 60*45,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Shadow Demon",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*60,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.WinsPotion, amount: 2}],
-    Time: 60*90,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 5000
-    },
-    Time: 60*120,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 3
-    },
-    Time: 60*180,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.GoldPotion, amount: 1}],
-    Time: 60*240,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Nightmare Spirit",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*360,
-    World: WorldType.NeonCity,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Midnight",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*720,
-    World: WorldType.NeonCity,
-})
-
-// ! world 3\/
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 50000000/3
-    },
-    Time: 60,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 100000
-    },
-    Time: 60*3,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 100000000/3
-    },
-    Time: 60*5,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.LuckPotion, amount: 1}],
-    Time: 60*7,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Flame Pixie",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*10,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 150000000/3
-    },
     Time: 60*15,
-    World: WorldType.Space,
+    World: WorldType.Cave,
 })
 
 SessionRewardsData.push({
-    Values: {
-        Gems: 1
-    },
-    Time: 60*20,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 300000
-    },
+    Pets: [{pet: {
+        name: "Magma Doggy",
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    }, amount: 1}],
     Time: 60*30,
-    World: WorldType.Space,
+    World: WorldType.Cave,
 })
 
 SessionRewardsData.push({
     Values: {
-        Gems: 2
+        Wins: 10000
     },
     Time: 60*45,
-    World: WorldType.Space,
+    World: WorldType.Cave,
 })
 
 SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Shadow Demon",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
+    Values: {
+        Wins: 25000
+    },
     Time: 60*60,
-    World: WorldType.Space,
+    World: WorldType.Cave,
 })
 
 SessionRewardsData.push({
-    Potions: [{potion: PotionType.WinsPotion, amount: 2}],
-    Time: 60*90,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 500000
-    },
-    Time: 60*120,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 3
-    },
-    Time: 60*180,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.GoldPotion, amount: 1}],
-    Time: 60*240,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Nightmare Spirit",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*360,
-    World: WorldType.Space,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Midnight",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*720,
-    World: WorldType.Space,
-})
-
-
-// ! world 4\/
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 5000000000
-    },
-    Time: 60,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 1000000
-    },
-    Time: 60*3,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 15000000000
-    },
-    Time: 60*5,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.LuckPotion, amount: 1}],
-    Time: 60*7,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Flame Pixie",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*10,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Strength: 50000000000
-    },
-    Time: 60*15,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 1
-    },
-    Time: 60*20,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 5000000
-    },
-    Time: 60*30,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 2
-    },
-    Time: 60*45,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Shadow Demon",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*60,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.WinsPotion, amount: 2}],
-    Time: 60*90,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Wins: 25000000
-    },
-    Time: 60*120,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Values: {
-        Gems: 3
-    },
-    Time: 60*180,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Potions: [{potion: PotionType.GoldPotion, amount: 1}],
-    Time: 60*240,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Nightmare Spirit",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*360,
-    World: WorldType.Backrooms,
-})
-
-SessionRewardsData.push({
-    Pets: [{pet: {
-        name: "Midnight",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 60*720,
-    World: WorldType.Backrooms,
-})
-
-
-DailyRewardsData.push({
-    Values: {
-        Wins: 10
-    },
-    Time: 1
-})
-
-DailyRewardsData.push({
-    Values: {},
-    Pets: [{pet: {
-        name: "Pixie",
-        locked: false,
-        equipped: false,
-        additional: {
-            size: Sizes.Baby,
-            evolution: Evolutions.Normal,
-            mutation: Mutations.Default,
-        }
-    }, amount: 1}],
-    Time: 2
-})
-
-DailyRewardsData.push({
-    Values: {},
-    Additional: new Map([['MaxEquippedPets', 1]]),
-    Time: 3
-})
-
-DailyRewardsData.push({
-    Values: {},
-    Additional: new Map([['MaxPets', 25]]),
-    Time: 4
-})
-
-DailyRewardsData.push({
-    Values: {
-        Gems: 10
-    },
-    Time: 5
-})
-
-DailyRewardsData.push({
-    Values: {
-        Wins: 100000
-    },
-    Time: 6
-})
-
-DailyRewardsData.push({
-    Values: {},
     Pets: [{pet: {
         name: "The Ultra Banana Split",
         locked: false,
@@ -692,68 +129,81 @@ DailyRewardsData.push({
             mutation: Mutations.Default,
         }
     }, amount: 1}],
+    Time: 60*120,
+    World: WorldType.Cave,
+})
+
+DailyRewardsData.push({
+    Values: {
+        Strength: 100
+    },
+    Time: 1
+})
+
+DailyRewardsData.push({
+    Values: {},
+    Potions: [{potion: PotionType.StrengthPotion2, amount: 5}],
+    Time: 2
+})
+
+DailyRewardsData.push({
+    Values: {
+        Wins: 10000
+    },
+    Time: 3
+})
+
+DailyRewardsData.push({
+    Values: {},
+    Potions: [{potion: PotionType.GemsPotion2, amount: 5}],
+    Time: 4
+})
+
+DailyRewardsData.push({
+    Values: {},
+    Potions: [{potion: PotionType.StrengthPotion3, amount: 3}],
+    Time: 5
+})
+
+DailyRewardsData.push({
+    Values: {
+        Wins: 15000
+    },
+    Time: 6
+})
+
+DailyRewardsData.push({
+    Values: {},
+    Potions: [{potion: PotionType.GemsPotion3, amount: 3}],
     Time: 7
 })
 
 DailyRewardsData.push({
     Values: {},
-    Additional: new Map([['SpinCount', 5]]),
+    Pets: [{pet: {
+        name: "Nightmare Spirit",
+        locked: false,
+        equipped: false,
+        additional: {
+            size: Sizes.Baby,
+            evolution: Evolutions.Normal,
+            mutation: Mutations.Default,
+        }
+    }, amount: 1}],
     Time: 8
-})
-
-DailyRewardsData.push({
-    Values: {},
-    Potions: [{potion: PotionType.WinsPotion, amount: 5}],
-    Time: 9
-})
-
-DailyRewardsData.push({
-    Values: {},
-    Eggs: [{egg: 'Party', amount: 1, type: EggBuyType.Triple}],
-    Time: 10
-})
-
-DailyRewardsData.push({
-    Values: {
-        Gems: 20
-    },
-    Time: 11
-})
-
-DailyRewardsData.push({
-    Values: {},
-    Eggs: [{egg: 'Party', amount: 1, type: EggBuyType.Single}],
-    Time: 12
-})
-
-DailyRewardsData.push({
-    Values: {
-        Gems: 20
-    },
-    Time: 13
-})
-
-DailyRewardsData.push({
-    Values: {},
-    Eggs: [{egg: 'Nightmare', amount: 1, type: EggBuyType.Triple}],
-    Time: 14
 })
 
 CodesRewardsData.set('release', {
     Values: {
-        Wins: 25
+        Wins: 100
     },
-    Potions: [{potion: PotionType.LuckPotion, amount: 1}],
     Time: 1
 })
 
 CodesRewardsData.set('ketwil', {
     Values: {},
     Potions: [
-        {potion: PotionType.WinsPotion, amount: 1},
-        {potion: PotionType.LuckPotion, amount: 1},
-        {potion: PotionType.GoldPotion, amount: 1},
-        {potion: PotionType.VoidPotion, amount: 1}
+        {potion: PotionType.StrengthPotion2, amount: 1},
     ],
     Time: 1
 })
@@ -761,282 +211,29 @@ CodesRewardsData.set('ketwil', {
 CodesRewardsData.set('4upahero', {
     Values: {},
     Potions: [
-        {potion: PotionType.WinsPotion, amount: 1},
-        {potion: PotionType.LuckPotion, amount: 1},
-        {potion: PotionType.GoldPotion, amount: 1},
-        {potion: PotionType.VoidPotion, amount: 1}
+        {potion: PotionType.GemsPotion2, amount: 1},
     ],
     Time: 1
 })
 
-CodesRewardsData.set('UPDATE', {
-    Values: {},
-    Potions: [
-        {potion: PotionType.WinsPotion, amount: 1},
-        {potion: PotionType.LuckPotion, amount: 1},
-        {potion: PotionType.GoldPotion, amount: 1},
-        {potion: PotionType.VoidPotion, amount: 1},
-    ],
-    Additional: new Map([['smallpackwins', 1]]),
-    Time: 1
-})
-
-CodesRewardsData.set('RELICS ', {
-    Values: { Gems: 10 },
-    Time: 1
-})
-
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test',
-    Additional: new Map([['Wins', 0], ['Multiplier', 0]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test1',
-    Additional: new Map([['Wins', 100], ['Multiplier', .1]]) //[{data: 'Wins', amount: 10}, {data: 'Multiplier', amount: .1}],
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test2',
-    Additional: new Map([['Wins', 250], ['Multiplier', .2]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test3',
-    Additional: new Map([['Wins', 1000], ['Multiplier', .3]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test4',
-    Additional: new Map([['Wins', 2000], ['Multiplier', .4]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test5',
-    Additional: new Map([['Wins', 5000], ['Multiplier', .5]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test6',
-    Additional: new Map([['Wins', 10000], ['Multiplier', .6]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test7',
-    Additional: new Map([['Wins', 20000], ['Multiplier', .7]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test8',
-    Additional: new Map([['Wins', 50000], ['Multiplier', .8]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test9',
-    Additional: new Map([['Wins', 100000], ['Multiplier', .9]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test10',
-    Additional: new Map([['Wins', 200000], ['Multiplier', 1]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test11',
-    Additional: new Map([['Wins', 400000], ['Multiplier', 1.1]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test12',
-    Additional: new Map([['Wins', 800000], ['Multiplier', 1.2]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test13',
-    Additional: new Map([['Wins', 1200000], ['Multiplier', 1.3]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test14',
-    Additional: new Map([['Wins', 1800000], ['Multiplier', 1.4]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test15',
-    Additional: new Map([['Wins', 2700000], ['Multiplier', 1.5]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test16',
-    Additional: new Map([['Wins', 4090000], ['Multiplier', 1.6]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test17',
-    Additional: new Map([['Wins', 6100000], ['Multiplier', 1.7]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test18',
-    Additional: new Map([['Wins', 9100000], ['Multiplier', 1.8]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test19',
-    Additional: new Map([['Wins', 14000000], ['Multiplier', 1.9]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test20',
-    Additional: new Map([['Wins', 21000000], ['Multiplier', 2]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test21',
-    Additional: new Map([['Wins', 31000000], ['Multiplier', 2.1]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test22',
-    Additional: new Map([['Wins', 46000000], ['Multiplier', 2.2]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test23',
-    Additional: new Map([['Wins', 69000000], ['Multiplier', 2.3]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test24',
-    Additional: new Map([['Wins', 100000000], ['Multiplier', 2.4]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test25',
-    Additional: new Map([['Wins', 160000000], ['Multiplier', 2.5]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test26',
-    Additional: new Map([['Wins', 230000000], ['Multiplier', 2.6]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test27',
-    Additional: new Map([['Wins', 350000000], ['Multiplier', 2.7]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test28',
-    Additional: new Map([['Wins', 530000000], ['Multiplier', 2.8]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test29',
-    Additional: new Map([['Wins', 790000000], ['Multiplier', 2.9]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test30',
-    Additional: new Map([['Wins', 1200000000], ['Multiplier', 3]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test31',
-    Additional: new Map([['Wins', 1560000000], ['Multiplier', 3.1]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test32',
-    Additional: new Map([['Wins', 2000000000], ['Multiplier', 3.2]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test33',
-    Additional: new Map([['Wins', 2600000000], ['Multiplier', 3.3]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test34',
-    Additional: new Map([['Wins', 3510000000], ['Multiplier', 3.4]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test35',
-    Additional: new Map([['Wins', 4730000000], ['Multiplier', 3.5]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test36',
-    Additional: new Map([['Wins', 6140000000], ['Multiplier', 3.6]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test37',
-    Additional: new Map([['Wins', 8300000000], ['Multiplier', 3.7]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test38',
-    Additional: new Map([['Wins', 11200000000], ['Multiplier', 3.8]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 0 },
-    Title: 'Test39',
-    Additional: new Map([['Wins', 15100000000], ['Multiplier', 3.9]])
-})
-
-RebirthsRewardsData.push({
-    Values: { Gems: 1 },
-    Title: 'Test40',
-    Additional: new Map([['Wins', 21100000000], ['Multiplier', 4]])
-})
-
+RebirthTitles.set('Rokie', {goal: 0, id: ''})
+RebirthTitles.set('Noob', {goal: 5, id: 'rbxassetid://18651947087'})
+RebirthTitles.set('Guardian', {goal: 10, id: 'rbxassetid://18651948865'})
+RebirthTitles.set('Ninja', {goal: 25, id: 'rbxassetid://18651947568'})
+RebirthTitles.set('King', {goal: 50, id: 'rbxassetid://18651948593'})
+RebirthTitles.set('Coolest Gamer', {goal: 100, id: 'rbxassetid://18651949718'})
+RebirthTitles.set('Devil', {goal: 250, id: 'rbxassetid://18651949253'})
+RebirthTitles.set('Survivor', {goal: 500, id: 'rbxassetid://18651945743'})
+RebirthTitles.set('Psycho', {goal: 1000, id: 'rbxassetid://18651946630'})
+RebirthTitles.set('Missed Person', {goal: 5000, id: 'rbxassetid://18652069707'})
+RebirthTitles.set('Main Angel', {goal: 10000, id: 'rbxassetid://18651948394'})
+RebirthTitles.set('Space God', {goal: 25000, id: 'rbxassetid://18651946311'})
+RebirthTitles.set('Archangel', {goal: 50000, id: 'rbxassetid://18651950059'})
+RebirthTitles.set('Void', {goal: 100000, id: 'rbxassetid://18651945343'})
 
 export const SpinRewardData: IRewardData = {
     Chances: [
-        {weight: 1, name: 'Pet', reward: {
+        {weight: 10, name: 'Pet', reward: {
             Pets: [{pet: {
                 name: "Red Devil",
                 locked: false,
@@ -1048,21 +245,21 @@ export const SpinRewardData: IRewardData = {
                 }
             }, amount: 1}],
         }},
-        {weight: 150, name: 'Potion', reward: {
-            Potions: [{potion: PotionType.WinsPotion, amount: 1}],
+        {weight: 200, name: 'StrengthPotion', reward: {
+            Potions: [{potion: PotionType.StrengthPotion4, amount: 1}],
         }},
-        {weight: 349, name: 'Wins1', reward: {
+        {weight: 200, name: 'WinsPotion', reward: {
+            Potions: [{potion: PotionType.GemsPotion4, amount: 1}],
+        }},
+        {weight: 200, name: 'Wins1', reward: {
             Values: {
-                Wins: 10,
+                Wins: 1000,
             }
         }},
-        {weight: 50, name: 'Gems', reward: {
+        {weight: 190, name: 'Wins2', reward: {
             Values: {
-                Gems: 1,
+                Wins: 2500,
             }
-        }},
-        {weight: 250, name: 'Wins2', reward: {
-            Additional: new Map([['tinypackwins', 1]]),
         }},
         {weight: 200, name: 'Strength', reward: {
             Values: {
@@ -1075,64 +272,21 @@ export const SpinRewardData: IRewardData = {
 
 export const DailyChestRewardData: IRewardData = {
     Chances: [
-        {weight: 30, name: 'Wins', reward: {
+        {weight: 100, name: 'Wins', reward: {
             Values: {
-                Wins: 10,
+                Wins: 250
             }
         }},
-        {weight: 25, name: 'PotinonGiren', reward: {
-            Potions: [{potion: PotionType.LuckPotion, amount: 1}],
-        }},
-        {weight: 20, name: 'PotinonRad', reward: {
-            Potions: [{potion: PotionType.WinsPotion, amount: 1}],
-        }},
-        {weight: 15, name: 'PotinonYalov', reward: {
-            Potions: [{potion: PotionType.GoldPotion, amount: 1}],
-        }},
-        {weight: 9, name: 'PotinonPyprel', reward: {
-            Potions: [{potion: PotionType.VoidPotion, amount: 1}],
-        }},
-        {weight: 1, name: 'Pet', reward: {
-            Pets: [{pet: {
-                name: "Red Devil",
-                locked: false,
-                equipped: false,
-                additional: {
-                    size: Sizes.Baby,
-                    evolution: Evolutions.Normal,
-                    mutation: Mutations.Default,
-                }
-            }, amount: 1}],
-        }},
-        
     ]
 }
 
 export const GroupChestRewardData: IRewardData = {
     Chances: [
-        {weight: 50, name: 'Wins1', reward: {
+        {weight: 100, name: 'Wins', reward: {
             Values: {
-                Wins: 100,
+                Wins: 500
             }
         }},
-        {weight: 46, name: 'PotinonGiren', reward: {
-            Potions: [{potion: PotionType.LuckPotion, amount: 1}],
-        }},
-        {weight: 3, name: 'Egg', reward: {
-            Eggs: [{egg: 'Party', amount: 1, type: EggBuyType.Single}],
-        }},
-        {weight: 1, name: 'Pet', reward: {
-            Pets: [{pet: {
-                name: "Star Spike",
-                locked: false,
-                equipped: false,
-                additional: {
-                    size: Sizes.Baby,
-                    evolution: Evolutions.Normal,
-                    mutation: Mutations.Default,
-                }
-            }, amount: 1}],
-        }}
     ]
 } 
 
